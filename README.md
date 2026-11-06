@@ -31,21 +31,18 @@
 
 ### GitHub Pages (auto, via Actions)
 
-1. Fork / push this repo to GitHub
-2. Go to **Settings → Pages → Source** → select **GitHub Actions**
-3. Push to `main` — the workflow deploys automatically
+1. Go to **Settings → Pages → Source** → select **GitHub Actions**
+2. Push to `main` — deploys automatically
 
-**Live at:** `https://YOUR_USERNAME.github.io/the.astro.os`
+**Live:** https://theastrobruh.github.io/the.astro.os
 
 ### Local
 
 ```bash
-# Any static server works — example with Python
 python -m http.server 8080
-# then open http://localhost:8080
 ```
 
-Or just open `index.html` directly in the browser.
+Or open `index.html` directly in the browser.
 
 ---
 

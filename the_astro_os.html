@@ -84,15 +84,15 @@
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 5;
+            width: 100vw;
+            height: 100vh;
+            z-index: 45;
             pointer-events: none;
             touch-action: none;
         }
 
         #desktop-draw-canvas.drawing-active {
-            pointer-events: auto;
+            pointer-events: auto !important;
             cursor: crosshair;
         }
 
@@ -187,14 +187,14 @@
         /* Widget Context Menu */
         #widget-context-menu {
             position: fixed;
-            z-index: 999;
+            z-index: 9999;
             background: rgba(10, 12, 30, 0.96);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 12px;
             padding: 6px;
-            min-width: 160px;
+            width: 170px;
             backdrop-filter: blur(16px);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+            box-shadow: 0 12px 36px rgba(0,0,0,0.8), 0 0 15px rgba(0,240,255,0.2);
             display: none;
         }
 
@@ -217,7 +217,7 @@
         }
 
         #widget-context-menu button:hover {
-            background: rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.1);
         }
 
         #widget-context-menu button.danger {
@@ -225,48 +225,53 @@
         }
 
         #widget-context-menu button.danger:hover {
-            background: rgba(248, 113, 113, 0.12);
+            background: rgba(248, 113, 113, 0.15);
         }
 
         #widget-context-menu .ctx-divider {
             height: 1px;
-            background: rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.1);
             margin: 4px 6px;
         }
 
-        /* Clock pill — fixed width to prevent layout shift */
+        /* --- FIXED POS & STABLE CLOCK PILL --- */
         #clock-pill-wrapper {
             display: flex;
             align-items: center;
             gap: 6px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.12);
             padding: 4px 10px;
             border-radius: 12px;
             cursor: pointer;
-            transition: background 0.2s;
-            /* Fixed minimum height so it never collapses */
-            min-height: 32px;
+            transition: background 0.2s, border-color 0.2s;
+            height: 34px;
+            min-height: 34px;
+            box-sizing: border-box;
+            flex-shrink: 0;
         }
 
         #clock-pill-wrapper:hover {
-            background: rgba(255,255,255,0.09);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 0, 122, 0.4);
         }
 
         #multi-clock-container {
             display: flex;
             align-items: center;
             gap: 0;
+            height: 100%;
         }
 
-        /* Each individual clock cell — fixed width prevents layout shift when digits change */
+        /* Fixed width clock cell to eliminate layout shifts */
         .clock-cell {
             display: flex;
             align-items: center;
             gap: 4px;
             padding: 0 8px;
-            border-right: 1px solid rgba(255,255,255,0.15);
+            border-right: 1px solid rgba(255, 255, 255, 0.15);
             white-space: nowrap;
+            height: 100%;
         }
 
         .clock-cell:last-child {
@@ -279,26 +284,29 @@
         }
 
         .clock-flag {
-            font-size: 14px;
+            font-size: 15px;
             line-height: 1;
-            /* Prevents emoji from changing layout */
-            display: inline-block;
-            width: 18px;
-            text-align: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
         }
 
         .clock-time {
             font-size: 11px;
             font-family: 'Space Grotesk', monospace;
             font-weight: 600;
-            color: #e2e8f0;
-            /* tabular-nums ensures digits are all same width — KEY fix for layout shift */
+            color: #f1f5f9;
+            /* Constant width digits to prevent size alteration */
             font-variant-numeric: tabular-nums;
             font-feature-settings: "tnum";
-            letter-spacing: 0.03em;
-            /* Fixed min-width for a HH:MM:SS slot */
-            min-width: 62px;
+            letter-spacing: 0.02em;
+            width: 64px;
+            min-width: 64px;
+            max-width: 64px;
             display: inline-block;
+            text-align: center;
         }
 
         /* Animated CardGram Logo */
@@ -421,11 +429,11 @@
                 </svg>
             </button>
 
-            <!-- MULTI-TIMEZONE CLOCK DISPLAY (Fixed pill, 4 Zones) -->
+            <!-- MULTI-TIMEZONE CLOCK DISPLAY (Fixed Pill, Caracas, Panamá, Madrid, Berlín) -->
             <div id="clock-pill-wrapper" onclick="openTimezoneConfigModal()" title="Haz clic para configurar las zonas horarias">
                 <svg class="w-3.5 h-3.5 text-pink-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 <div id="multi-clock-container">
-                    <!-- Clocks render here -->
+                    <!-- Clocks rendered dynamically -->
                 </div>
             </div>
             
@@ -437,15 +445,15 @@
     </header>
 
     <!-- FLOATING TOOLBAR FOR DESKTOP DRAWING OVERLAY -->
-    <div id="desktop-draw-toolbar" class="fixed top-16 left-1/2 -translate-x-1/2 z-50 bg-slate-900/90 backdrop-blur-md border border-yellow-400/40 px-4 py-2 rounded-2xl shadow-2xl hidden flex items-center space-x-3">
-        <span class="text-xs font-mono font-bold text-yellow-300">Modo Dibujo Táctil / Desktop</span>
+    <div id="desktop-draw-toolbar" class="fixed top-16 left-1/2 -translate-x-1/2 z-50 bg-slate-900/95 backdrop-blur-md border border-yellow-400/60 px-4 py-2 rounded-2xl shadow-2xl hidden flex items-center space-x-3">
+        <span class="text-xs font-mono font-bold text-yellow-300">Modo Dibujo en Escritorio Activo</span>
         
         <input type="color" id="desktop-draw-color" value="#00F0FF" class="w-6 h-6 bg-transparent border-0 cursor-pointer rounded">
         
         <input type="range" id="desktop-draw-size" min="2" max="30" value="5" class="w-16 accent-yellow-400 cursor-pointer">
         
-        <button onclick="clearDesktopDrawCanvas()" class="px-2.5 py-1 bg-red-500/20 text-red-300 border border-red-500/30 font-mono text-[11px] rounded-lg">Borrar Todo</button>
-        <button onclick="toggleDesktopDrawingMode()" class="px-3 py-1 bg-yellow-500 text-slate-950 font-mono text-[11px] font-bold rounded-lg">Salir de Dibujo</button>
+        <button onclick="clearDesktopDrawCanvas()" class="px-2.5 py-1 bg-red-500/20 text-red-300 border border-red-500/30 font-mono text-[11px] rounded-lg hover:bg-red-500/40">Borrar Todo</button>
+        <button onclick="toggleDesktopDrawingMode()" class="px-3 py-1 bg-yellow-400 text-slate-950 font-mono text-[11px] font-bold rounded-lg hover:bg-yellow-300">Salir de Dibujo</button>
     </div>
 
     <!-- DESKTOP CANVAS AREA -->
@@ -562,33 +570,29 @@
 
         <!-- DEFAULT DESKTOP DISPERSING MEDIA WIDGETS (2 IMAGES + 2 GIFS) -->
         <div id="media-widget-1" class="desktop-media-widget w-36 h-36 md:w-44 md:h-44 rounded-2xl p-1 bg-black/40 border border-white/20 backdrop-blur-md shadow-2xl overflow-hidden" style="top: 15%; right: 8%;">
-            <div class="relative w-full h-full rounded-xl overflow-hidden">
-                <!-- Image 1: Cosmos Nebulae -->
-                <img src="https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=400&q=80" class="w-full h-full object-cover pointer-events-none" alt="Cosmos Image">
+            <div class="relative w-full h-full rounded-xl overflow-hidden pointer-events-none">
+                <img src="https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=400&q=80" class="w-full h-full object-cover" alt="Cosmos Image">
                 <span class="absolute bottom-1 left-2 text-[9px] font-mono text-cyan-300 bg-black/60 px-1.5 py-0.5 rounded">Cosmos.jpg</span>
             </div>
         </div>
 
         <div id="media-widget-2" class="desktop-media-widget w-40 h-32 md:w-48 md:h-36 rounded-2xl p-1 bg-black/40 border border-white/20 backdrop-blur-md shadow-2xl overflow-hidden" style="bottom: 12%; right: 18%;">
-            <div class="relative w-full h-full rounded-xl overflow-hidden">
-                <!-- Image 2: Cyber City -->
-                <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=400&q=80" class="w-full h-full object-cover pointer-events-none" alt="Cyberpunk Image">
+            <div class="relative w-full h-full rounded-xl overflow-hidden pointer-events-none">
+                <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=400&q=80" class="w-full h-full object-cover" alt="Cyberpunk Image">
                 <span class="absolute bottom-1 left-2 text-[9px] font-mono text-pink-300 bg-black/60 px-1.5 py-0.5 rounded">AstroCity.png</span>
             </div>
         </div>
 
         <div id="media-widget-3" class="desktop-media-widget w-32 h-32 md:w-40 md:h-40 rounded-2xl p-1 bg-black/40 border border-white/20 backdrop-blur-md shadow-2xl overflow-hidden" style="top: 55%; left: 15%;">
-            <div class="relative w-full h-full rounded-xl overflow-hidden">
-                <!-- GIF 1: Pixel Space / Retro Warp -->
-                <img src="https://media.giphy.com/media/l41K3t5uN1Xkk7aA8/giphy.gif" class="w-full h-full object-cover pointer-events-none" alt="Space GIF">
+            <div class="relative w-full h-full rounded-xl overflow-hidden pointer-events-none">
+                <img src="https://media.giphy.com/media/l41K3t5uN1Xkk7aA8/giphy.gif" class="w-full h-full object-cover" alt="Space GIF">
                 <span class="absolute bottom-1 left-2 text-[9px] font-mono text-yellow-300 bg-black/60 px-1.5 py-0.5 rounded">PixelWarp.gif</span>
             </div>
         </div>
 
         <div id="media-widget-4" class="desktop-media-widget w-44 h-32 md:w-52 md:h-36 rounded-2xl p-1 bg-black/40 border border-white/20 backdrop-blur-md shadow-2xl overflow-hidden" style="top: 22%; left: 35%;">
-            <div class="relative w-full h-full rounded-xl overflow-hidden">
-                <!-- GIF 2: Synthwave Sun Loop -->
-                <img src="https://media.giphy.com/media/xT9IgzoKnwFNmISR8I/giphy.gif" class="w-full h-full object-cover pointer-events-none" alt="Synthwave GIF">
+            <div class="relative w-full h-full rounded-xl overflow-hidden pointer-events-none">
+                <img src="https://media.giphy.com/media/xT9IgzoKnwFNmISR8I/giphy.gif" class="w-full h-full object-cover" alt="Synthwave GIF">
                 <span class="absolute bottom-1 left-2 text-[9px] font-mono text-emerald-300 bg-black/60 px-1.5 py-0.5 rounded">SynthGrid.gif</span>
             </div>
         </div>
@@ -808,7 +812,7 @@
                             </summary>
                             <div class="mt-2 text-xs font-mono text-gray-300 space-y-1 pl-2 border-l border-yellow-500/30">
                                 <p>• <strong>Drag & Drop Libre:</strong> Arrastre fluído por toda la pantalla (Touch + Mouse).</p>
-                                <p>• <strong>Reloj Multi-Zona:</strong> Monitoreo de hasta 4 zonas horarias en directo.</p>
+                                <p>• <strong>Reloj Multi-Zona:</strong> Monitoreo de hasta 4 zonas horarias con bandera de país fija.</p>
                                 <p>• <strong>Custom Icons Uploader:</strong> Personalización de íconos mediante imagen propia.</p>
                             </div>
                         </details>
@@ -1001,7 +1005,7 @@ jobs:
                 <button onclick="closeTimezoneConfigModal()" class="text-gray-400 hover:text-white text-xs font-mono">✕</button>
             </div>
             
-            <p class="text-xs text-gray-300">Selecciona hasta 4 zonas horarias para mostrar activas simultáneamente en la barra superior:</p>
+            <p class="text-xs text-gray-300">Selecciona las zonas horarias a mostrar activas en la barra superior:</p>
             
             <div id="timezone-selectors-container" class="space-y-3">
                 <!-- 4 Selectors rendered via JavaScript -->
@@ -1043,8 +1047,8 @@ jobs:
                 </div>
 
                 <div class="bg-white/5 p-3 rounded-xl border border-white/10 space-y-1">
-                    <span class="font-mono font-bold text-pink-300">🌐 4 Zonas Horarias</span>
-                    <p class="text-gray-300 text-[11px]">Toca el reloj superior para monitorear hasta 4 países o ciudades al tiempo.</p>
+                    <span class="font-mono font-bold text-pink-300">🌐 4 Zonas Horarias Con Íconos</span>
+                    <p class="text-gray-300 text-[11px]">Zonas por defecto: Caracas, Panamá, Madrid y Berlín con banderas del país sin saltos de tamaño.</p>
                 </div>
             </div>
 
@@ -1137,13 +1141,13 @@ jobs:
 
     <!-- JAVASCRIPT LOGIC ENGINE -->
     <script>
-        // --- 1. MULTI-TIMEZONE SYSTEM CLOCK (UP TO 4 ZONES) ---
+        // --- 1. MULTI-TIMEZONE SYSTEM CLOCK (DEFAULT: Caracas, Panama, Madrid, Berlin) ---
         const AVAILABLE_TIMEZONES = [
-            { label: 'Local',  tz: null,                  flag: '🌐', name: 'Local' },
             { label: 'CCS',    tz: 'America/Caracas',     flag: '🇻🇪', name: 'Caracas' },
             { label: 'PTY',    tz: 'America/Panama',      flag: '🇵🇦', name: 'Panamá' },
             { label: 'MAD',    tz: 'Europe/Madrid',       flag: '🇪🇸', name: 'Madrid' },
             { label: 'BER',    tz: 'Europe/Berlin',       flag: '🇩🇪', name: 'Berlín' },
+            { label: 'Local',  tz: null,                  flag: '🌐', name: 'Local' },
             { label: 'UTC',    tz: 'UTC',                 flag: '🕐', name: 'UTC' },
             { label: 'NYC',    tz: 'America/New_York',    flag: '🇺🇸', name: 'Nueva York' },
             { label: 'LON',    tz: 'Europe/London',       flag: '🇬🇧', name: 'Londres' },
@@ -1153,19 +1157,19 @@ jobs:
             { label: 'MEX',    tz: 'America/Mexico_City', flag: '🇲🇽', name: 'Ciudad de México' },
         ];
 
-        // Default: Caracas, Panamá, Madrid, Berlín
+        // EXACT DEFAULT MATCH: Caracas, Panama, Madrid, Berlin
         let selectedTimezones = ['CCS', 'PTY', 'MAD', 'BER'];
 
         function loadTimezonePreferences() {
             try {
-                const saved = localStorage.getItem('astro_selected_timezones_v2');
+                const saved = localStorage.getItem('astro_selected_timezones_v3');
                 if (saved) selectedTimezones = JSON.parse(saved);
             } catch(e) {}
         }
 
         function saveTimezonePreferences() {
             try {
-                localStorage.setItem('astro_selected_timezones_v2', JSON.stringify(selectedTimezones));
+                localStorage.setItem('astro_selected_timezones_v3', JSON.stringify(selectedTimezones));
             } catch(e) {}
         }
 
@@ -1176,7 +1180,7 @@ jobs:
             const now = new Date();
             let html = '';
 
-            selectedTimezones.slice(0, 4).forEach((tzLabel, index) => {
+            selectedTimezones.slice(0, 4).forEach((tzLabel) => {
                 const tzObj = AVAILABLE_TIMEZONES.find(t => t.label === tzLabel) || AVAILABLE_TIMEZONES[0];
                 let timeStr = '';
 
@@ -1209,7 +1213,7 @@ jobs:
             container.innerHTML = '';
 
             for (let i = 0; i < 4; i++) {
-                const currentVal = selectedTimezones[i] || AVAILABLE_TIMEZONES[0].label;
+                const currentVal = selectedTimezones[i] || AVAILABLE_TIMEZONES[i].label;
                 let optionsHtml = '';
                 AVAILABLE_TIMEZONES.forEach(tz => {
                     optionsHtml += `<option value="${tz.label}" ${tz.label === currentVal ? 'selected' : ''}>${tz.flag} ${tz.name} (${tz.label})</option>`;
@@ -1249,11 +1253,10 @@ jobs:
 
         setInterval(updateMultiClock, 1000);
 
-        // --- 2. DIRECT DESKTOP DRAWING OVERLAY (TOUCH + MOUSE) ---
+        // --- 2. DIRECT DESKTOP DRAWING OVERLAY (TOUCH + MOUSE FIX) ---
         let dCanvas, dCtx;
         let isDesktopDrawingActive = false;
         let isDesktopDrawing = false;
-        let dStartX, dStartY;
 
         function initDesktopDrawingCanvas() {
             dCanvas = document.getElementById('desktop-draw-canvas');
@@ -1261,18 +1264,12 @@ jobs:
             dCtx = dCanvas.getContext('2d');
 
             function resizeDrawCanvas() {
-                // Preserve drawing when resizing
-                const imageData = dCtx.getImageData(0, 0, dCanvas.width, dCanvas.height);
                 dCanvas.width = window.innerWidth;
                 dCanvas.height = window.innerHeight;
-                dCtx.putImageData(imageData, 0, 0);
             }
-            dCanvas.width = window.innerWidth;
-            dCanvas.height = window.innerHeight;
-            window.addEventListener('resize', () => {
-                dCanvas.width = window.innerWidth;
-                dCanvas.height = window.innerHeight;
-            });
+            
+            resizeDrawCanvas();
+            window.addEventListener('resize', resizeDrawCanvas);
 
             const getPos = (e) => {
                 if (e.touches && e.touches[0]) {
@@ -1284,6 +1281,7 @@ jobs:
             const startDraw = (e) => {
                 if (!isDesktopDrawingActive) return;
                 e.preventDefault();
+                e.stopPropagation();
                 isDesktopDrawing = true;
                 const pos = getPos(e);
                 dCtx.beginPath();
@@ -1293,6 +1291,7 @@ jobs:
             const doDraw = (e) => {
                 if (!isDesktopDrawingActive || !isDesktopDrawing) return;
                 e.preventDefault();
+                e.stopPropagation();
                 const pos = getPos(e);
                 const colorEl = document.getElementById('desktop-draw-color');
                 const sizeEl = document.getElementById('desktop-draw-size');
@@ -1304,14 +1303,13 @@ jobs:
                 dCtx.stroke();
             };
 
-            const stopDraw = () => {
+            const stopDraw = (e) => {
                 if (isDesktopDrawing) {
                     isDesktopDrawing = false;
                     dCtx.beginPath();
                 }
             };
 
-            // Use window-level listeners so drawing never misses events
             dCanvas.addEventListener('mousedown', startDraw);
             dCanvas.addEventListener('mousemove', doDraw);
             dCanvas.addEventListener('mouseup', stopDraw);
@@ -1331,12 +1329,16 @@ jobs:
             if (isDesktopDrawingActive) {
                 canvas.classList.add('drawing-active');
                 if (toolbar) toolbar.classList.remove('hidden');
-                if (btn) btn.classList.add('bg-yellow-500/30', 'border-yellow-400');
+                if (btn) {
+                    btn.classList.add('bg-yellow-500/30', 'border-yellow-400');
+                }
                 showToast("Modo Dibujo sobre Escritorio Activado!");
             } else {
                 canvas.classList.remove('drawing-active');
                 if (toolbar) toolbar.classList.add('hidden');
-                if (btn) btn.classList.remove('bg-yellow-500/30', 'border-yellow-400');
+                if (btn) {
+                    btn.classList.remove('bg-yellow-500/30', 'border-yellow-400');
+                }
                 showToast("Modo Dibujo desactivado.");
             }
         }
@@ -1348,7 +1350,7 @@ jobs:
             }
         }
 
-        // --- 2b. WIDGET RIGHT-CLICK CONTEXT MENU ---
+        // --- 3. WIDGET RIGHT-CLICK CONTEXT MENU (STABLE BUGFIX) ---
         let _ctxTargetWidget = null;
 
         function showWidgetContextMenu(e, widgetEl) {
@@ -1359,12 +1361,11 @@ jobs:
             const menu = document.getElementById('widget-context-menu');
             if (!menu) return;
 
-            // Position the menu near the cursor, keeping it inside the viewport
             const menuW = 170, menuH = 90;
             let x = e.clientX;
             let y = e.clientY;
-            if (x + menuW > window.innerWidth)  x = window.innerWidth  - menuW - 8;
-            if (y + menuH > window.innerHeight) y = window.innerHeight - menuH - 8;
+            if (x + menuW > window.innerWidth)  x = window.innerWidth  - menuW - 12;
+            if (y + menuH > window.innerHeight) y = window.innerHeight - menuH - 12;
 
             menu.style.left = x + 'px';
             menu.style.top  = y + 'px';
@@ -1374,59 +1375,66 @@ jobs:
         function hideWidgetContextMenu() {
             const menu = document.getElementById('widget-context-menu');
             if (menu) menu.style.display = 'none';
-            _ctxTargetWidget = null;
         }
 
         function widgetContextAction(action) {
+            const target = _ctxTargetWidget;
             hideWidgetContextMenu();
-            if (!_ctxTargetWidget) return;
+            
+            if (!target) return;
 
             if (action === 'delete') {
-                _ctxTargetWidget.remove();
+                target.remove();
+                _ctxTargetWidget = null;
                 showToast("Widget eliminado.");
             } else if (action === 'image') {
                 const input = document.getElementById('widget-img-input');
-                if (input) input.click();
+                if (input) {
+                    input.value = ''; // Clear value to allow re-uploading same file
+                    input.click();
+                }
             }
         }
 
         function handleWidgetImageUpload(e) {
             const file = e.target.files[0];
             if (!file || !_ctxTargetWidget) return;
+            
             const reader = new FileReader();
             reader.onload = function(evt) {
-                const img = _ctxTargetWidget.querySelector('img');
-                if (img) img.src = evt.target.result;
-                showToast("Imagen del widget actualizada!");
+                if (_ctxTargetWidget) {
+                    const img = _ctxTargetWidget.querySelector('img');
+                    if (img) img.src = evt.target.result;
+                    showToast("Imagen del widget actualizada!");
+                }
             };
             reader.readAsDataURL(file);
-            e.target.value = '';
         }
 
-        // Attach right-click to all media widgets (called after DOM ready)
         function setupWidgetContextMenus() {
+            // Bind right click listener to all widgets dynamically
             document.querySelectorAll('.desktop-media-widget').forEach(widget => {
-                widget.addEventListener('contextmenu', (e) => {
-                    showWidgetContextMenu(e, widget);
-                });
+                widget.removeEventListener('contextmenu', widget._ctxHandler);
+                widget._ctxHandler = (e) => showWidgetContextMenu(e, widget);
+                widget.addEventListener('contextmenu', widget._ctxHandler);
             });
-            // Click anywhere else closes the menu
+
+            // Global click outside to dismiss menu
             document.addEventListener('click', (e) => {
                 const menu = document.getElementById('widget-context-menu');
                 if (menu && !menu.contains(e.target)) {
                     hideWidgetContextMenu();
                 }
             });
-            // Right-click outside also closes it
+
             document.addEventListener('contextmenu', (e) => {
                 if (!e.target.closest('.desktop-media-widget')) {
-                    const menu = document.getElementById('widget-context-menu');
-                    if (menu) menu.style.display = 'none';
+                    hideWidgetContextMenu();
                 }
             });
         }
 
-        // --- 3. ONBOARDING WIZARD & GUIDE MODAL ---
+        // --- 4. ONBOARDING WIZARD & GUIDE MODAL ---
         function openOnboardingWizard() {
             const modal = document.getElementById('onboarding-modal');
             if (modal) modal.classList.remove('hidden');
@@ -1455,7 +1463,7 @@ jobs:
             }
         }
 
-        // --- 4. STARFIELD BACKGROUND CANVAS ---
+        // --- 5. STARFIELD BACKGROUND CANVAS ---
         const canvas = document.getElementById('starfield');
         const ctx = canvas.getContext('2d');
         let width, height;
@@ -1557,7 +1565,7 @@ jobs:
         initStars();
         animateStars();
 
-        // --- 5. DRAGGABLE DESKTOP ICONS & MEDIA WIDGET MECHANICS ---
+        // --- 6. DRAGGABLE DESKTOP ICONS & MEDIA WIDGET MECHANICS ---
         let customIconPositions = {};
         let customIconImages = {};
 
@@ -1627,7 +1635,7 @@ jobs:
                 let hasMoved = false;
 
                 const onPointerDown = (e) => {
-                    if (isDesktopDrawingActive) return; // ignore dragging when drawing active
+                    if (isDesktopDrawingActive) return;
                     isDragging = true;
                     hasMoved = false;
                     startX = e.clientX || (e.touches && e.touches[0].clientX);
@@ -1684,7 +1692,7 @@ jobs:
             });
         }
 
-        // --- 6. CUSTOM ICON IMAGE MANAGER ---
+        // --- 7. CUSTOM ICON IMAGE MANAGER ---
         function applyCustomIconImages() {
             Object.keys(customIconImages).forEach(winId => {
                 const iconBtn = document.getElementById(`icon-${winId}`);
@@ -1754,7 +1762,7 @@ jobs:
             location.reload();
         }
 
-        // --- 7. ASTRO PAINT APP LOGIC ---
+        // --- 8. ASTRO PAINT APP LOGIC ---
         let paintCanvas, paintCtx;
         let isDrawing = false;
         let paintTool = 'brush';
@@ -1891,11 +1899,11 @@ jobs:
             showToast("Imagen descargada con éxito!");
         }
 
-        // --- 8. NOTES, TODO & GLOSSARY ENGINE ---
+        // --- 9. NOTES, TODO & GLOSSARY ENGINE ---
         let todoList = [
             { id: 1, text: "Configurar repositorio en GitHub", done: true },
             { id: 2, text: "Probar el dibujo en escritorio y táctil", done: false },
-            { id: 3, text: "Configurar 4 zonas horarias", done: false }
+            { id: 3, text: "Verificar 4 zonas horarias fijas", done: true }
         ];
         let glossaryTerms = [
             { id: 1, term: "Glassmorphism", category: "UI/UX", def: "Estilo visual con efecto de cristal esmerilado usando transparencia y backdrop-filter." },
@@ -2043,7 +2051,7 @@ jobs:
             renderGlossary();
         }
 
-        // --- 9. THEMES & WINDOW MANAGEMENT ---
+        // --- 10. THEMES & WINDOW MANAGEMENT ---
         function applyCustomColors() {
             const top = document.getElementById('color-top').value;
             const mid = document.getElementById('color-mid').value;
@@ -2247,7 +2255,7 @@ jobs:
             showToast("Workflow YAML copiado!");
         }
 
-        // --- 10. SYSTEM INITIALIZATION ---
+        // --- 11. SYSTEM INITIALIZATION ---
         window.onload = function() {
             loadTimezonePreferences();
             updateMultiClock();

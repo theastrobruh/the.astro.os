@@ -2,8 +2,9 @@
 
 > A web-based operating system experience — glassmorphism desktop, draggable windows, starfield background & more. Pure HTML/CSS/JS, zero build step.
 
-[![Deploy](https://github.com/YOUR_USERNAME/the.astro.os/actions/workflows/deploy.yml/badge.svg)](https://github.com/YOUR_USERNAME/the.astro.os/actions/workflows/deploy.yml)
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-7000FF?style=flat&logo=github)](https://YOUR_USERNAME.github.io/the.astro.os)
+[![GitHub Pages](https://img.shields.io/badge/Deploy-GitHub%20Pages-7000FF?style=flat&logo=github)](https://github.com)
+[![Status](https://img.shields.io/badge/Status-Live-00F0FF?style=flat&logo=rocketdotchat&logoColor=white)](.github/workflows/deploy.yml)
+[![Stack](https://img.shields.io/badge/Stack-HTML%20%2F%20CSS%20%2F%20JS-FF007A?style=flat&logo=html5&logoColor=white)](index.html)
 
 ---
 

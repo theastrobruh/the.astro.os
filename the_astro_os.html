@@ -184,6 +184,123 @@
             transform: scale(1.03);
         }
 
+        /* Widget Context Menu */
+        #widget-context-menu {
+            position: fixed;
+            z-index: 999;
+            background: rgba(10, 12, 30, 0.96);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 6px;
+            min-width: 160px;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+            display: none;
+        }
+
+        #widget-context-menu button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-family: 'Space Grotesk', monospace;
+            font-weight: 600;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: #e2e8f0;
+            transition: background 0.15s;
+            text-align: left;
+        }
+
+        #widget-context-menu button:hover {
+            background: rgba(255,255,255,0.08);
+        }
+
+        #widget-context-menu button.danger {
+            color: #f87171;
+        }
+
+        #widget-context-menu button.danger:hover {
+            background: rgba(248, 113, 113, 0.12);
+        }
+
+        #widget-context-menu .ctx-divider {
+            height: 1px;
+            background: rgba(255,255,255,0.08);
+            margin: 4px 6px;
+        }
+
+        /* Clock pill — fixed width to prevent layout shift */
+        #clock-pill-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 4px 10px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+            /* Fixed minimum height so it never collapses */
+            min-height: 32px;
+        }
+
+        #clock-pill-wrapper:hover {
+            background: rgba(255,255,255,0.09);
+        }
+
+        #multi-clock-container {
+            display: flex;
+            align-items: center;
+            gap: 0;
+        }
+
+        /* Each individual clock cell — fixed width prevents layout shift when digits change */
+        .clock-cell {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 0 8px;
+            border-right: 1px solid rgba(255,255,255,0.15);
+            white-space: nowrap;
+        }
+
+        .clock-cell:last-child {
+            border-right: none;
+            padding-right: 0;
+        }
+
+        .clock-cell:first-child {
+            padding-left: 0;
+        }
+
+        .clock-flag {
+            font-size: 14px;
+            line-height: 1;
+            /* Prevents emoji from changing layout */
+            display: inline-block;
+            width: 18px;
+            text-align: center;
+        }
+
+        .clock-time {
+            font-size: 11px;
+            font-family: 'Space Grotesk', monospace;
+            font-weight: 600;
+            color: #e2e8f0;
+            /* tabular-nums ensures digits are all same width — KEY fix for layout shift */
+            font-variant-numeric: tabular-nums;
+            font-feature-settings: "tnum";
+            letter-spacing: 0.03em;
+            /* Fixed min-width for a HH:MM:SS slot */
+            min-width: 62px;
+            display: inline-block;
+        }
+
         /* Animated CardGram Logo */
         .cardgram-logo-text {
             background: linear-gradient(90deg, #FFFFFF 0%, var(--primary-accent) 50%, var(--secondary-accent) 100%);
@@ -304,11 +421,10 @@
                 </svg>
             </button>
 
-            <!-- MULTI-TIMEZONE CLOCK DISPLAY (Up to 4 Zones) -->
-            <div onclick="openTimezoneConfigModal()" title="Haz clic para configurar hasta 4 Zonas Horarias" 
-                 class="bg-white/5 hover:bg-white/10 cursor-pointer border border-white/10 px-2.5 py-1 rounded-xl text-xs font-mono font-semibold text-gray-200 shadow-inner flex items-center space-x-2 transition-colors">
-                <svg class="w-3.5 h-3.5 text-pink-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                <div id="multi-clock-container" class="flex items-center space-x-2 divide-x divide-white/20">
+            <!-- MULTI-TIMEZONE CLOCK DISPLAY (Fixed pill, 4 Zones) -->
+            <div id="clock-pill-wrapper" onclick="openTimezoneConfigModal()" title="Haz clic para configurar las zonas horarias">
+                <svg class="w-3.5 h-3.5 text-pink-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <div id="multi-clock-container">
                     <!-- Clocks render here -->
                 </div>
             </div>
@@ -1004,31 +1120,52 @@ jobs:
         <span id="toast-text" class="text-xs font-mono text-gray-200"></span>
     </div>
 
+    <!-- WIDGET RIGHT-CLICK CONTEXT MENU -->
+    <div id="widget-context-menu">
+        <button onclick="widgetContextAction('image')">
+            <svg class="w-3.5 h-3.5 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            Cambiar imagen
+        </button>
+        <div class="ctx-divider"></div>
+        <button onclick="widgetContextAction('delete')" class="danger">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            Eliminar widget
+        </button>
+        <!-- Hidden file input for image replacement -->
+        <input type="file" id="widget-img-input" accept="image/*" class="hidden" onchange="handleWidgetImageUpload(event)">
+    </div>
+
     <!-- JAVASCRIPT LOGIC ENGINE -->
     <script>
         // --- 1. MULTI-TIMEZONE SYSTEM CLOCK (UP TO 4 ZONES) ---
         const AVAILABLE_TIMEZONES = [
-            { label: 'Local', tz: null },
-            { label: 'UTC', tz: 'UTC' },
-            { label: 'NYC', tz: 'America/New_York' },
-            { label: 'LON', tz: 'Europe/London' },
-            { label: 'MAD', tz: 'Europe/Madrid' },
-            { label: 'TYO', tz: 'Asia/Tokyo' },
-            { label: 'SYD', tz: 'Australia/Sydney' }
+            { label: 'Local',  tz: null,                  flag: '🌐', name: 'Local' },
+            { label: 'CCS',    tz: 'America/Caracas',     flag: '🇻🇪', name: 'Caracas' },
+            { label: 'PTY',    tz: 'America/Panama',      flag: '🇵🇦', name: 'Panamá' },
+            { label: 'MAD',    tz: 'Europe/Madrid',       flag: '🇪🇸', name: 'Madrid' },
+            { label: 'BER',    tz: 'Europe/Berlin',       flag: '🇩🇪', name: 'Berlín' },
+            { label: 'UTC',    tz: 'UTC',                 flag: '🕐', name: 'UTC' },
+            { label: 'NYC',    tz: 'America/New_York',    flag: '🇺🇸', name: 'Nueva York' },
+            { label: 'LON',    tz: 'Europe/London',       flag: '🇬🇧', name: 'Londres' },
+            { label: 'TYO',    tz: 'Asia/Tokyo',          flag: '🇯🇵', name: 'Tokio' },
+            { label: 'SYD',    tz: 'Australia/Sydney',    flag: '🇦🇺', name: 'Sídney' },
+            { label: 'DXB',    tz: 'Asia/Dubai',          flag: '🇦🇪', name: 'Dubái' },
+            { label: 'MEX',    tz: 'America/Mexico_City', flag: '🇲🇽', name: 'Ciudad de México' },
         ];
 
-        let selectedTimezones = ['Local', 'NYC', 'MAD', 'TYO']; // Default 4 zones
+        // Default: Caracas, Panamá, Madrid, Berlín
+        let selectedTimezones = ['CCS', 'PTY', 'MAD', 'BER'];
 
         function loadTimezonePreferences() {
             try {
-                const saved = localStorage.getItem('astro_selected_timezones');
+                const saved = localStorage.getItem('astro_selected_timezones_v2');
                 if (saved) selectedTimezones = JSON.parse(saved);
             } catch(e) {}
         }
 
         function saveTimezonePreferences() {
             try {
-                localStorage.setItem('astro_selected_timezones', JSON.stringify(selectedTimezones));
+                localStorage.setItem('astro_selected_timezones_v2', JSON.stringify(selectedTimezones));
             } catch(e) {}
         }
 
@@ -1041,18 +1178,22 @@ jobs:
 
             selectedTimezones.slice(0, 4).forEach((tzLabel, index) => {
                 const tzObj = AVAILABLE_TIMEZONES.find(t => t.label === tzLabel) || AVAILABLE_TIMEZONES[0];
-                let timeStr = "";
+                let timeStr = '';
 
-                if (!tzObj.tz) {
-                    timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                } else {
-                    timeStr = now.toLocaleTimeString([], { timeZone: tzObj.tz, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                try {
+                    if (!tzObj.tz) {
+                        timeStr = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+                    } else {
+                        timeStr = now.toLocaleTimeString('es-ES', { timeZone: tzObj.tz, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+                    }
+                } catch(e) {
+                    timeStr = '--:--:--';
                 }
 
                 html += `
-                    <div class="${index > 0 ? 'pl-2' : ''} flex items-center space-x-1">
-                        <span class="text-[10px] text-pink-400 font-mono font-bold">${tzObj.label}:</span>
-                        <span>${timeStr}</span>
+                    <div class="clock-cell">
+                        <span class="clock-flag" title="${tzObj.name}">${tzObj.flag}</span>
+                        <span class="clock-time">${timeStr}</span>
                     </div>
                 `;
             });
@@ -1071,7 +1212,7 @@ jobs:
                 const currentVal = selectedTimezones[i] || AVAILABLE_TIMEZONES[0].label;
                 let optionsHtml = '';
                 AVAILABLE_TIMEZONES.forEach(tz => {
-                    optionsHtml += `<option value="${tz.label}" ${tz.label === currentVal ? 'selected' : ''}>${tz.label} (${tz.tz || 'Local'})</option>`;
+                    optionsHtml += `<option value="${tz.label}" ${tz.label === currentVal ? 'selected' : ''}>${tz.flag} ${tz.name} (${tz.label})</option>`;
                 });
 
                 const div = document.createElement('div');
@@ -1120,36 +1261,46 @@ jobs:
             dCtx = dCanvas.getContext('2d');
 
             function resizeDrawCanvas() {
+                // Preserve drawing when resizing
+                const imageData = dCtx.getImageData(0, 0, dCanvas.width, dCanvas.height);
                 dCanvas.width = window.innerWidth;
                 dCanvas.height = window.innerHeight;
+                dCtx.putImageData(imageData, 0, 0);
             }
-            resizeDrawCanvas();
-            window.addEventListener('resize', resizeDrawCanvas);
+            dCanvas.width = window.innerWidth;
+            dCanvas.height = window.innerHeight;
+            window.addEventListener('resize', () => {
+                dCanvas.width = window.innerWidth;
+                dCanvas.height = window.innerHeight;
+            });
 
-            // Pointer & Touch handlers
+            const getPos = (e) => {
+                if (e.touches && e.touches[0]) {
+                    return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                }
+                return { x: e.clientX, y: e.clientY };
+            };
+
             const startDraw = (e) => {
                 if (!isDesktopDrawingActive) return;
+                e.preventDefault();
                 isDesktopDrawing = true;
-                const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-                const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+                const pos = getPos(e);
                 dCtx.beginPath();
-                dCtx.moveTo(clientX, clientY);
+                dCtx.moveTo(pos.x, pos.y);
             };
 
             const doDraw = (e) => {
                 if (!isDesktopDrawingActive || !isDesktopDrawing) return;
-                const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-                const clientY = e.clientY || (e.touches && e.touches[0].clientY);
-
-                const color = document.getElementById('desktop-draw-color').value;
-                const size = document.getElementById('desktop-draw-size').value;
-
-                dCtx.strokeStyle = color;
-                dCtx.lineWidth = size;
+                e.preventDefault();
+                const pos = getPos(e);
+                const colorEl = document.getElementById('desktop-draw-color');
+                const sizeEl = document.getElementById('desktop-draw-size');
+                dCtx.strokeStyle = colorEl ? colorEl.value : '#00F0FF';
+                dCtx.lineWidth = sizeEl ? parseInt(sizeEl.value) : 5;
                 dCtx.lineCap = 'round';
                 dCtx.lineJoin = 'round';
-
-                dCtx.lineTo(clientX, clientY);
+                dCtx.lineTo(pos.x, pos.y);
                 dCtx.stroke();
             };
 
@@ -1160,13 +1311,14 @@ jobs:
                 }
             };
 
+            // Use window-level listeners so drawing never misses events
             dCanvas.addEventListener('mousedown', startDraw);
             dCanvas.addEventListener('mousemove', doDraw);
             dCanvas.addEventListener('mouseup', stopDraw);
             dCanvas.addEventListener('mouseleave', stopDraw);
 
-            dCanvas.addEventListener('touchstart', startDraw, { passive: true });
-            dCanvas.addEventListener('touchmove', doDraw, { passive: true });
+            dCanvas.addEventListener('touchstart', startDraw, { passive: false });
+            dCanvas.addEventListener('touchmove', doDraw, { passive: false });
             dCanvas.addEventListener('touchend', stopDraw);
         }
 
@@ -1178,13 +1330,13 @@ jobs:
 
             if (isDesktopDrawingActive) {
                 canvas.classList.add('drawing-active');
-                toolbar.classList.remove('hidden');
-                btn.classList.add('bg-yellow-500/30', 'border-yellow-400');
+                if (toolbar) toolbar.classList.remove('hidden');
+                if (btn) btn.classList.add('bg-yellow-500/30', 'border-yellow-400');
                 showToast("Modo Dibujo sobre Escritorio Activado!");
             } else {
                 canvas.classList.remove('drawing-active');
-                toolbar.classList.add('hidden');
-                btn.classList.remove('bg-yellow-500/30', 'border-yellow-400');
+                if (toolbar) toolbar.classList.add('hidden');
+                if (btn) btn.classList.remove('bg-yellow-500/30', 'border-yellow-400');
                 showToast("Modo Dibujo desactivado.");
             }
         }
@@ -1194,6 +1346,84 @@ jobs:
                 dCtx.clearRect(0, 0, dCanvas.width, dCanvas.height);
                 showToast("Trazos del escritorio limpiados.");
             }
+        }
+
+        // --- 2b. WIDGET RIGHT-CLICK CONTEXT MENU ---
+        let _ctxTargetWidget = null;
+
+        function showWidgetContextMenu(e, widgetEl) {
+            e.preventDefault();
+            e.stopPropagation();
+            _ctxTargetWidget = widgetEl;
+
+            const menu = document.getElementById('widget-context-menu');
+            if (!menu) return;
+
+            // Position the menu near the cursor, keeping it inside the viewport
+            const menuW = 170, menuH = 90;
+            let x = e.clientX;
+            let y = e.clientY;
+            if (x + menuW > window.innerWidth)  x = window.innerWidth  - menuW - 8;
+            if (y + menuH > window.innerHeight) y = window.innerHeight - menuH - 8;
+
+            menu.style.left = x + 'px';
+            menu.style.top  = y + 'px';
+            menu.style.display = 'block';
+        }
+
+        function hideWidgetContextMenu() {
+            const menu = document.getElementById('widget-context-menu');
+            if (menu) menu.style.display = 'none';
+            _ctxTargetWidget = null;
+        }
+
+        function widgetContextAction(action) {
+            hideWidgetContextMenu();
+            if (!_ctxTargetWidget) return;
+
+            if (action === 'delete') {
+                _ctxTargetWidget.remove();
+                showToast("Widget eliminado.");
+            } else if (action === 'image') {
+                const input = document.getElementById('widget-img-input');
+                if (input) input.click();
+            }
+        }
+
+        function handleWidgetImageUpload(e) {
+            const file = e.target.files[0];
+            if (!file || !_ctxTargetWidget) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const img = _ctxTargetWidget.querySelector('img');
+                if (img) img.src = evt.target.result;
+                showToast("Imagen del widget actualizada!");
+            };
+            reader.readAsDataURL(file);
+            e.target.value = '';
+        }
+
+        // Attach right-click to all media widgets (called after DOM ready)
+        function setupWidgetContextMenus() {
+            document.querySelectorAll('.desktop-media-widget').forEach(widget => {
+                widget.addEventListener('contextmenu', (e) => {
+                    showWidgetContextMenu(e, widget);
+                });
+            });
+            // Click anywhere else closes the menu
+            document.addEventListener('click', (e) => {
+                const menu = document.getElementById('widget-context-menu');
+                if (menu && !menu.contains(e.target)) {
+                    hideWidgetContextMenu();
+                }
+            });
+            // Right-click outside also closes it
+            document.addEventListener('contextmenu', (e) => {
+                if (!e.target.closest('.desktop-media-widget')) {
+                    const menu = document.getElementById('widget-context-menu');
+                    if (menu) menu.style.display = 'none';
+                }
+            });
         }
 
         // --- 3. ONBOARDING WIZARD & GUIDE MODAL ---
@@ -2026,6 +2256,7 @@ jobs:
             applyCustomIconImages();
             arrangeIconsGrid(false);
             setupDraggableElements();
+            setupWidgetContextMenus();
             loadSavedNote();
             renderTodoList();
             renderGlossary();

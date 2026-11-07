@@ -152,6 +152,29 @@
             box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 0 12px rgba(76, 175, 80, 0.6);
         }
 
+        #start-btn {
+            width: 50px;
+            height: 50px;
+            padding: 0;
+            flex-shrink: 0;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #start-btn .start-planet {
+            width: 34px;
+            height: 34px;
+            filter: drop-shadow(0 0 6px rgba(0, 240, 255, 0.55));
+            transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.25s ease;
+        }
+
+        #start-btn:hover .start-planet {
+            transform: scale(1.12) rotate(-8deg);
+            filter: drop-shadow(0 0 10px rgba(255, 0, 122, 0.75));
+        }
+
         /* Draggable Desktop Icons */
         #desktop-icons-container {
             position: absolute;
@@ -362,9 +385,333 @@
             cursor: crosshair;
             touch-action: none;
         }
+
+        /* --- WIDGET RESIZE HANDLE --- */
+        .desktop-media-widget {
+            min-width: 72px;
+            min-height: 72px;
+            box-sizing: border-box;
+        }
+
+        .desktop-media-widget.selected {
+            border-color: rgba(0, 240, 255, 0.75) !important;
+            box-shadow: 0 0 0 1px rgba(0, 240, 255, 0.45), 0 18px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        .widget-resize-handle {
+            position: absolute;
+            right: 2px;
+            bottom: 2px;
+            width: 22px;
+            height: 22px;
+            z-index: 5;
+            cursor: nwse-resize;
+            touch-action: none;
+            opacity: 0.55;
+            transition: opacity 0.15s ease;
+            background:
+                linear-gradient(135deg, transparent 45%, rgba(0, 240, 255, 0.9) 46%, rgba(0, 240, 255, 0.9) 56%, transparent 57%),
+                linear-gradient(135deg, transparent 62%, rgba(255, 255, 255, 0.75) 63%, rgba(255, 255, 255, 0.75) 70%, transparent 71%);
+            border-bottom-right-radius: 10px;
+        }
+
+        .widget-label {
+            max-width: calc(100% - 26px);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .desktop-media-widget:hover .widget-resize-handle,
+        .desktop-media-widget.selected .widget-resize-handle {
+            opacity: 1;
+        }
+
+        /* --- MOBILE STATUS BAR (hidden on desktop) --- */
+        #mobile-status-bar {
+            display: none;
+            flex-shrink: 0;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            width: 100%;
+            height: 36px;
+            padding: 0 12px;
+            padding-top: env(safe-area-inset-top, 0px);
+            background: rgba(7, 9, 24, 0.86);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            z-index: 60;
+            position: relative;
+        }
+
+        #mobile-status-bar .status-brand {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-family: 'Space Grotesk', monospace;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            color: #f1f5f9;
+            white-space: nowrap;
+        }
+
+        #mobile-status-bar .status-center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            line-height: 1.05;
+            overflow: hidden;
+        }
+
+        #mobile-status-bar .status-time {
+            font-family: 'Space Grotesk', monospace;
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+        }
+
+        #mobile-status-bar .status-date {
+            font-family: 'Space Grotesk', monospace;
+            font-size: 8px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            white-space: nowrap;
+        }
+
+        #mobile-status-bar .status-tray {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #cbd5e1;
+        }
+
+        #mobile-status-bar svg {
+            width: 13px;
+            height: 13px;
+        }
+
+        #mobile-status-bar .battery {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            font-family: 'Space Grotesk', monospace;
+            font-size: 9px;
+            font-weight: 600;
+        }
+
+        .mobile-only {
+            display: none;
+        }
+
+        @media (max-width: 767px) {
+            html,
+            body {
+                height: 100dvh;
+                max-height: 100dvh;
+            }
+
+            body {
+                font-size: 14px;
+            }
+
+            #mobile-status-bar {
+                display: flex;
+            }
+
+            .mobile-only {
+                display: flex;
+            }
+
+            #desktop {
+                padding: 8px !important;
+            }
+
+            /* Split layout: every app window fits between status bar and dock */
+            .glass-window {
+                left: 8px !important;
+                top: 8px !important;
+                width: calc(100vw - 16px) !important;
+                height: calc(100dvh - 36px - 68px - 16px) !important;
+                max-height: none !important;
+                border-radius: 16px;
+            }
+
+            .glass-window .xp-titlebar {
+                padding-top: 10px;
+                padding-bottom: 10px;
+            }
+
+            /* Dock / taskbar: symmetric three columns with Start in the center */
+            #taskbar {
+                display: grid !important;
+                grid-template-columns: 1fr auto 1fr;
+                align-items: center;
+                column-gap: 6px;
+                height: 68px !important;
+                padding: 0 10px calc(6px + env(safe-area-inset-bottom, 0px)) !important;
+            }
+
+            #taskbar-left {
+                display: contents !important;
+            }
+
+            #quick-left {
+                grid-column: 1;
+                grid-row: 1;
+                justify-self: start;
+            }
+
+            #quick-right {
+                grid-column: 3;
+                grid-row: 1;
+                justify-self: end;
+            }
+
+            #start-btn {
+                grid-column: 2;
+                grid-row: 1;
+                justify-self: center;
+                width: 50px;
+                height: 50px;
+                padding: 0;
+            }
+
+            #start-btn .start-planet {
+                width: 34px;
+                height: 34px;
+            }
+
+            #win-astroverse {
+                height: auto !important;
+                max-height: calc(100dvh - 140px) !important;
+            }
+
+            #taskbar-apps,
+            #taskbar-tray {
+                display: none !important;
+            }
+
+            #start-menu {
+                left: 50% !important;
+                transform: translateX(-50%);
+                bottom: 78px !important;
+                width: calc(100vw - 16px) !important;
+                max-height: calc(100dvh - 130px);
+                overflow-y: auto;
+            }
+
+            #clock-pill-wrapper {
+                display: none;
+            }
+
+            #toast-msg {
+                left: 12px;
+                right: 12px;
+                bottom: 80px;
+            }
+
+            #desktop-draw-toolbar {
+                top: 44px !important;
+                width: calc(100vw - 16px);
+                padding: 8px 10px;
+                gap: 8px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            #desktop-draw-toolbar > span {
+                display: none;
+            }
+
+            .desktop-icon-btn {
+                width: 86px;
+            }
+
+            .desktop-icon-btn .icon-box {
+                width: 52px !important;
+                height: 52px !important;
+            }
+
+            .desktop-icon-btn .icon-box svg {
+                width: 26px;
+                height: 26px;
+            }
+
+            .desktop-icon-btn .icon-name {
+                font-size: 9px;
+            }
+
+            #media-widget-1 {
+                width: 118px;
+                height: 118px;
+            }
+
+            #media-widget-2 {
+                width: 112px;
+                height: 94px;
+            }
+
+            #media-widget-3 {
+                width: 100px;
+                height: 100px;
+            }
+
+            #widget-context-menu {
+                width: 188px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            #quick-left,
+            #quick-right {
+                gap: 4px;
+            }
+
+            #quick-left button,
+            #quick-right button {
+                padding: 6px;
+            }
+
+            #start-btn {
+                width: 44px;
+                height: 44px;
+                padding: 0;
+            }
+
+            #start-btn .start-planet {
+                width: 30px;
+                height: 30px;
+            }
+        }
     </style>
 </head>
 <body class="h-screen w-screen overflow-hidden text-white flex flex-col justify-between">
+
+    <!-- MOBILE TOP STATUS BAR (visible only on smartphones) -->
+    <header id="mobile-status-bar">
+        <div class="status-brand">
+            <span style="font-size:13px">🪐</span>
+            <span>the.astro.os</span>
+        </div>
+        <div class="status-center">
+            <span id="mobile-clock-time" class="status-time">--:--</span>
+            <span id="mobile-clock-date" class="status-date">--</span>
+        </div>
+        <div class="status-tray">
+            <span id="mobile-clock-tz" title="Zona horaria activa" style="font-size:12px;line-height:1">🌐</span>
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M5 12.586a10 10 0 0114 0M2 8.768a15 15 0 0120 0"/></svg>
+            <span class="battery">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="2" y="7" width="17" height="10" rx="2" stroke-width="1.8"/><path stroke-linecap="round" d="M22 10v4" stroke-width="2"/><rect x="4.5" y="9.5" width="11" height="5" rx="1" fill="currentColor" stroke="none"/></svg>
+                82%
+            </span>
+        </div>
+    </header>
 
     <!-- STARFIELD CANVAS BACKGROUND -->
     <canvas id="starfield"></canvas>
@@ -391,7 +738,7 @@
                         </svg>
                     </div>
                 </div>
-                <span class="mt-1.5 text-[11px] font-semibold font-mono tracking-wide text-center text-gray-200 group-hover:text-pink-300 drop-shadow-md select-none">Astro.Verse</span>
+                <span class="mt-1.5 text-[11px] font-semibold font-mono tracking-wide text-center text-gray-200 group-hover:text-pink-300 drop-shadow-md select-none icon-name">Astro.Verse</span>
             </div>
 
             <!-- Icon 2: Pintura (Astro.Paint renamed) -->
@@ -405,7 +752,7 @@
                         </svg>
                     </div>
                 </div>
-                <span class="mt-1.5 text-[11px] font-semibold font-mono tracking-wide text-center text-gray-200 group-hover:text-yellow-300 drop-shadow-md select-none">Pintura</span>
+                <span class="mt-1.5 text-[11px] font-semibold font-mono tracking-wide text-center text-gray-200 group-hover:text-yellow-300 drop-shadow-md select-none icon-name">Pintura</span>
             </div>
 
             <!-- Icon 3: Cuaderno (Note renamed) -->
@@ -420,7 +767,7 @@
                         </svg>
                     </div>
                 </div>
-                <span class="mt-1.5 text-[11px] font-semibold font-mono tracking-wide text-center text-gray-200 group-hover:text-indigo-300 drop-shadow-md select-none">Cuaderno</span>
+                <span class="mt-1.5 text-[11px] font-semibold font-mono tracking-wide text-center text-gray-200 group-hover:text-indigo-300 drop-shadow-md select-none icon-name">Cuaderno</span>
             </div>
 
             <!-- Icon 4: Terminal -->
@@ -433,7 +780,7 @@
                         </svg>
                     </div>
                 </div>
-                <span class="mt-1.5 text-[11px] font-semibold font-mono tracking-wide text-center text-gray-200 group-hover:text-emerald-300 drop-shadow-md select-none">Terminal</span>
+                <span class="mt-1.5 text-[11px] font-semibold font-mono tracking-wide text-center text-gray-200 group-hover:text-emerald-300 drop-shadow-md select-none icon-name">Terminal</span>
             </div>
 
             <!-- Icon 5: Theme (Updated Distinct Icon & Color) -->
@@ -449,7 +796,7 @@
                         </svg>
                     </div>
                 </div>
-                <span class="mt-1.5 text-[11px] font-semibold font-mono tracking-wide text-center text-gray-200 group-hover:text-fuchsia-300 drop-shadow-md select-none">Theme</span>
+                <span class="mt-1.5 text-[11px] font-semibold font-mono tracking-wide text-center text-gray-200 group-hover:text-fuchsia-300 drop-shadow-md select-none icon-name">Theme</span>
             </div>
 
             <!-- Icon 6: Música & Radio -->
@@ -463,7 +810,7 @@
                         </svg>
                     </div>
                 </div>
-                <span class="mt-1.5 text-[11px] font-semibold font-mono tracking-wide text-center text-gray-200 group-hover:text-violet-300 drop-shadow-md select-none">Música & Radio</span>
+                <span class="mt-1.5 text-[11px] font-semibold font-mono tracking-wide text-center text-gray-200 group-hover:text-violet-300 drop-shadow-md select-none icon-name">Música & Radio</span>
             </div>
 
         </div>
@@ -485,82 +832,71 @@
 
         <div id="media-widget-3" class="desktop-media-widget w-32 h-32 md:w-40 md:h-40 rounded-2xl p-1 bg-black/40 border border-white/20 backdrop-blur-md shadow-2xl overflow-hidden" style="top: 50%; left: 18%;">
             <div class="relative w-full h-full rounded-xl overflow-hidden pointer-events-none">
-                <img src="https://media.giphy.com/media/l41K3t5uN1Xkk7aA8/giphy.gif" class="w-full h-full object-cover" alt="Space GIF">
-                <span class="absolute bottom-1 left-2 text-[9px] font-mono text-yellow-300 bg-black/60 px-1.5 py-0.5 rounded">PixelWarp.gif</span>
+                <img src="https://media.tenor.com/hWEGQvJ2ntsAAAAM/haishatp-dahyun.gif" class="w-full h-full object-cover" alt="Dahyun GIF">
+                <span class="absolute bottom-1 left-2 text-[9px] font-mono text-yellow-300 bg-black/60 px-1.5 py-0.5 rounded">Dahyun.gif</span>
             </div>
         </div>
 
         <!-- APP WINDOWS -->
 
-        <!-- WINDOW: ASTRO.VERSE (COMBINED ASTRO.BIO + CARDGRAM) -->
-        <div id="win-astroverse" class="glass-window absolute top-10 left-4 md:left-24 w-[calc(100%-2rem)] md:w-[620px] h-[520px] z-30 flex flex-col hidden">
+        <!-- WINDOW: ASTRO.VERSE (COMPACT CREATOR CARD) -->
+        <div id="win-astroverse" class="glass-window absolute top-10 left-4 md:left-24 w-[calc(100%-2rem)] md:w-[400px] z-30 flex flex-col hidden">
             <div class="xp-titlebar px-4 py-2.5 flex items-center justify-between cursor-move select-none">
                 <div class="flex items-center space-x-2">
                     <div class="w-3 h-3 rounded-full bg-pink-400 animate-pulse"></div>
-                    <span class="font-mono text-xs font-bold tracking-wider text-pink-300 uppercase">Astro.Verse - Creator Hub & Apps</span>
+                    <span class="font-mono text-xs font-bold tracking-wider text-pink-300 uppercase">theAstroBruh — Links</span>
                 </div>
                 <div class="flex items-center space-x-1.5">
                     <button onclick="minimizeWindow('win-astroverse')" class="w-6 h-6 rounded-md bg-white/10 hover:bg-white/20 flex items-center justify-center text-xs text-gray-300">_</button>
                     <button onclick="closeWindow('win-astroverse')" class="w-6 h-6 rounded-md bg-red-500/30 hover:bg-red-500/60 text-red-200 flex items-center justify-center text-xs font-bold">✕</button>
                 </div>
             </div>
-            <div class="p-5 flex-1 overflow-y-auto space-y-5">
-                
-                <!-- CREATOR HEADER BIO -->
-                <div class="flex flex-col sm:flex-row items-center sm:items-start space-y-3 sm:space-y-0 sm:space-x-4 bg-white/5 p-4 rounded-xl border border-white/10">
-                    <div class="w-20 h-20 rounded-2xl bg-gradient-to-tr from-pink-500 via-purple-600 to-cyan-400 p-0.5 shadow-xl flex-shrink-0">
-                        <div class="w-full h-full bg-slate-900 rounded-[14px] flex items-center justify-center text-2xl font-bold font-mono text-pink-400">
+            <div class="p-4 flex-1 overflow-y-auto">
+
+                <!-- MINIMAL PROFILE -->
+                <div class="flex flex-col items-center text-center">
+                    <div class="w-11 h-11 rounded-full bg-gradient-to-tr from-pink-500 via-purple-500 to-cyan-400 p-[2px] shadow-lg shadow-pink-500/20">
+                        <div class="w-full h-full rounded-full bg-slate-950 flex items-center justify-center text-xs font-bold font-mono text-pink-400">
                             aB
                         </div>
                     </div>
-                    <div class="text-center sm:text-left">
-                        <div class="flex items-center justify-center sm:justify-start space-x-2">
-                            <h2 class="text-xl font-bold text-white font-mono">AstroBruh</h2>
-                            <span class="px-2 py-0.5 text-[9px] font-mono bg-pink-500/20 text-pink-300 rounded border border-pink-500/30">Creative Dev</span>
-                        </div>
-                        <p class="text-xs text-gray-300 mt-2 leading-relaxed">
-                            AstroBruh is a Creative Developer, former Graphic Designer with +10 years of experience in Design, skilled in more than 8 different edit and creation software, now AI fused Workflow to create new digital experiences.
-                        </p>
-                    </div>
+                    <h2 class="mt-2 text-sm font-bold text-white font-mono tracking-wide">theAstroBruh</h2>
+                    <p class="text-[8px] font-mono text-cyan-300/80 uppercase tracking-[0.16em] mt-0.5">Creative Developer · Content Creator</p>
+                    <p class="text-[10px] text-gray-400 leading-snug mt-2 max-w-[280px]">
+                        Creative developer & content creator blending design, video editing and AI engineering into unique digital experiences.
+                    </p>
                 </div>
 
-                <!-- INTEGRATED APPS & LINKS -->
-                <div class="space-y-3">
-                    <h3 class="text-xs font-mono font-bold text-cyan-300 uppercase tracking-wider">Ecosistema de Aplicaciones</h3>
+                <!-- DEVELOPER LINKS -->
+                <div class="mt-4 pt-3 border-t border-white/10 space-y-1.5">
+                    <p class="text-[8px] font-mono font-bold text-pink-300 uppercase tracking-wider mb-1">developed by theAstroBruh:</p>
 
-                    <!-- CardGram Card -->
-                    <div class="bg-gradient-to-r from-cyan-500/15 to-purple-600/15 border border-cyan-500/30 rounded-xl p-4 flex flex-col md:flex-row items-center justify-between gap-3">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 rounded-xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-cyan-300 font-mono text-lg font-bold">
-                                CG
-                            </div>
-                            <div>
-                                <h4 class="text-sm font-bold text-white font-mono">CardGram</h4>
-                                <p class="text-xs text-gray-300">Generación de tarjetas e identidad web interactiva.</p>
-                            </div>
-                        </div>
-                        <a href="https://theastrobruh.github.io/CardGram/#/home" target="_blank" rel="noopener noreferrer" 
-                           class="px-4 py-2 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-mono text-xs font-bold rounded-xl shadow-lg transition-all flex items-center space-x-1.5">
-                            <span>Abrir CardGram</span>
-                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                        </a>
-                    </div>
+                    <a href="https://theastrobruh.github.io/CardGram/#/home" target="_blank" rel="noopener noreferrer"
+                       class="group flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/10 hover:border-cyan-400/40 hover:bg-white/10 transition-all">
+                        <span class="flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-lg bg-cyan-500/15 border border-cyan-400/30 text-cyan-300 font-mono text-[9px] font-bold flex items-center justify-center">CG</span>
+                            <span class="text-[11px] font-mono font-semibold text-gray-200">CardGram</span>
+                        </span>
+                        <svg class="w-3 h-3 text-gray-500 group-hover:text-cyan-300 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                    </a>
 
-                    <!-- Quick OS Apps Launcher -->
-                    <div class="grid grid-cols-3 gap-2 pt-1">
-                        <button onclick="openWindow('win-draw')" class="p-3 bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 text-center text-xs font-mono text-yellow-300 flex flex-col items-center gap-1">
-                            <span>🎨</span>
-                            <span>Pintura</span>
-                        </button>
-                        <button onclick="openWindow('win-notes')" class="p-3 bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 text-center text-xs font-mono text-indigo-300 flex flex-col items-center gap-1">
-                            <span>📓</span>
-                            <span>Cuaderno</span>
-                        </button>
-                        <button onclick="openWindow('win-music')" class="p-3 bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 text-center text-xs font-mono text-violet-300 flex flex-col items-center gap-1">
-                            <span>📻</span>
-                            <span>Música</span>
-                        </button>
-                    </div>
+                    <a href="https://theastrobruh.github.io/Inkra/inkra.html" target="_blank" rel="noopener noreferrer"
+                       class="group flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/10 hover:border-fuchsia-400/40 hover:bg-white/10 transition-all">
+                        <span class="flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-lg bg-fuchsia-500/15 border border-fuchsia-400/30 text-fuchsia-300 font-mono text-[9px] font-bold flex items-center justify-center">IN</span>
+                            <span class="text-[11px] font-mono font-semibold text-gray-200">Inkra</span>
+                        </span>
+                        <svg class="w-3 h-3 text-gray-500 group-hover:text-fuchsia-300 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                    </a>
+
+                    <a href="https://theastrobruh.github.io/bio-hub/" target="_blank" rel="noopener noreferrer"
+                       class="group flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/10 hover:border-emerald-400/40 hover:bg-white/10 transition-all">
+                        <span class="flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-lg bg-emerald-500/15 border border-emerald-400/30 text-emerald-300 font-mono text-[9px] font-bold flex items-center justify-center">BH</span>
+                            <span class="text-[11px] font-mono font-semibold text-gray-200">BioHub</span>
+                        </span>
+                        <svg class="w-3 h-3 text-gray-500 group-hover:text-emerald-300 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                    </a>
                 </div>
 
             </div>
@@ -838,49 +1174,70 @@
         <button onclick="toggleDesktopDrawingMode()" class="px-3 py-1 bg-yellow-400 text-slate-950 font-mono text-[11px] font-bold rounded-lg hover:bg-yellow-300">Salir de Dibujo</button>
     </div>
 
-    <!-- WINDOWS XP STYLE BOTTOM TASKBAR -->
-    <footer class="w-full h-12 xp-taskbar px-2 flex items-center justify-between z-40 relative">
+    <!-- WINDOWS XP STYLE BOTTOM TASKBAR / MOBILE DOCK -->
+    <footer id="taskbar" class="w-full h-12 xp-taskbar px-2 flex items-center justify-between z-40 relative">
         
         <!-- Left: Start Button (Logo: 🪐 . OS) & Quick Action Icons -->
-        <div class="flex items-center space-x-2">
+        <div id="taskbar-left" class="flex items-center space-x-2">
             
-            <!-- Start Button -->
-            <button onclick="toggleStartMenu()" class="xp-start-btn px-3 py-1 rounded-r-xl rounded-l-md flex items-center space-x-2 text-white font-mono transition-all active:scale-95">
-                <span class="text-lg">🪐</span>
-                <span class="font-bold text-xs tracking-wider uppercase text-white drop-shadow">. OS</span>
-            </button>
-
-            <!-- ICON ONLY: Reset Layout (Reordenar) with Tooltip -->
-            <button onclick="resetIconLayout()" title="Reordenar íconos del escritorio" 
-                    class="p-2 rounded-lg bg-white/10 hover:bg-pink-500/30 text-pink-300 border border-white/10 transition-all active:scale-95">
-                <svg class="w-4 h-4 text-pink-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+            <!-- Start Button (centered on mobile via grid) -->
+            <button id="start-btn" onclick="toggleStartMenu()" title="Inicio" aria-label="Inicio" class="xp-start-btn px-3 py-1 rounded-r-xl rounded-l-md flex items-center space-x-2 text-white font-mono transition-all active:scale-95">
+                <svg class="start-planet" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+                    <defs>
+                        <linearGradient id="startPlanetGrad" x1="14" y1="12" x2="34" y2="36" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#00F0FF"/>
+                            <stop offset="0.55" stop-color="#7000FF"/>
+                            <stop offset="1" stop-color="#FF007A"/>
+                        </linearGradient>
+                        <linearGradient id="startRingGrad" x1="4" y1="28" x2="44" y2="20" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#00F0FF"/>
+                            <stop offset="0.5" stop-color="#FFB800"/>
+                            <stop offset="1" stop-color="#FF007A"/>
+                        </linearGradient>
+                    </defs>
+                    <circle cx="24" cy="23" r="11" fill="url(#startPlanetGrad)"/>
+                    <ellipse cx="24" cy="24" rx="20" ry="7.5" transform="rotate(-18 24 24)" stroke="url(#startRingGrad)" stroke-width="2.6"/>
+                    <circle cx="20" cy="19" r="2.4" fill="#ffffff" fill-opacity="0.55"/>
                 </svg>
             </button>
 
-            <!-- ICON ONLY: Desktop Draw Toggle with Tooltip -->
-            <button onclick="toggleDesktopDrawingMode()" id="desktop-draw-toggle-btn" title="Dibujar en Escritorio" 
-                    class="p-2 rounded-lg bg-white/10 hover:bg-yellow-500/30 text-yellow-300 border border-white/10 transition-all active:scale-95">
-                <svg class="w-4 h-4 text-yellow-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
-                </svg>
-            </button>
+            <!-- Left quick actions -->
+            <div id="quick-left" class="flex items-center space-x-2">
+                <!-- ICON ONLY: Reset Layout (Reordenar) with Tooltip -->
+                <button onclick="resetIconLayout()" title="Reordenar íconos del escritorio" 
+                        class="p-2 rounded-lg bg-white/10 hover:bg-pink-500/30 text-pink-300 border border-white/10 transition-all active:scale-95">
+                    <svg class="w-4 h-4 text-pink-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+                    </svg>
+                </button>
 
-            <!-- ICON ONLY: Music Launcher -->
-            <button onclick="openWindow('win-music')" title="Reproductor de Música & Radio" 
-                    class="p-2 rounded-lg bg-white/10 hover:bg-violet-500/30 text-violet-300 border border-white/10 transition-all active:scale-95">
-                <svg class="w-4 h-4 text-violet-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 18V5l12-2v13M6 18a3 3 0 100-6 3 3 0 000 6zm12-2a3 3 0 100-6 3 3 0 000 6z"/>
-                </svg>
-            </button>
+                <!-- ICON ONLY: Desktop Draw Toggle with Tooltip -->
+                <button onclick="toggleDesktopDrawingMode()" id="desktop-draw-toggle-btn" title="Dibujar en Escritorio" 
+                        class="p-2 rounded-lg bg-white/10 hover:bg-yellow-500/30 text-yellow-300 border border-white/10 transition-all active:scale-95">
+                    <svg class="w-4 h-4 text-yellow-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                    </svg>
+                </button>
+            </div>
 
-            <!-- ICON ONLY: Icon Customizer Launcher -->
-            <button onclick="openWindow('win-icon-manager')" title="Personalizar íconos" 
-                    class="p-2 rounded-lg bg-white/10 hover:bg-cyan-500/30 text-cyan-300 border border-white/10 transition-all active:scale-95">
-                <svg class="w-4 h-4 text-cyan-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                </svg>
-            </button>
+            <!-- Right quick actions (right side of the mobile dock) -->
+            <div id="quick-right" class="flex items-center space-x-2">
+                <!-- ICON ONLY: Music Launcher -->
+                <button onclick="openWindow('win-music')" title="Reproductor de Música & Radio" 
+                        class="p-2 rounded-lg bg-white/10 hover:bg-violet-500/30 text-violet-300 border border-white/10 transition-all active:scale-95">
+                    <svg class="w-4 h-4 text-violet-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 18V5l12-2v13M6 18a3 3 0 100-6 3 3 0 000 6zm12-2a3 3 0 100-6 3 3 0 000 6z"/>
+                    </svg>
+                </button>
+
+                <!-- ICON ONLY: Icon Customizer Launcher -->
+                <button onclick="openWindow('win-icon-manager')" title="Personalizar íconos" 
+                        class="p-2 rounded-lg bg-white/10 hover:bg-cyan-500/30 text-cyan-300 border border-white/10 transition-all active:scale-95">
+                    <svg class="w-4 h-4 text-cyan-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                </button>
+            </div>
 
         </div>
 
@@ -890,7 +1247,7 @@
         </div>
 
         <!-- Right: MULTI TIMEZONE CLOCK & System Tray -->
-        <div class="flex items-center space-x-2">
+        <div id="taskbar-tray" class="flex items-center space-x-2">
             <!-- Multi-timezone Clock Pill -->
             <div id="clock-pill-wrapper" onclick="openTimezoneConfigModal()" title="Configurar zonas horarias">
                 <svg class="w-3.5 h-3.5 text-pink-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -923,7 +1280,7 @@
         <!-- Start Menu Menu Items -->
         <div class="py-3 space-y-1">
             <button onclick="openWindow('win-astroverse'); toggleStartMenu();" class="w-full p-2 rounded-xl hover:bg-white/10 flex items-center space-x-3 text-left text-xs font-semibold text-pink-300">
-                <span>🪐 Astro.Verse & Bio</span>
+                <span>🪐 theAstroBruh & Links</span>
             </button>
             <button onclick="openWindow('win-music'); toggleStartMenu();" class="w-full p-2 rounded-xl hover:bg-white/10 flex items-center space-x-3 text-left text-xs font-semibold text-violet-300">
                 <span>📻 Música & Radio Player</span>
@@ -936,6 +1293,12 @@
             </button>
             <button onclick="toggleDesktopDrawingMode(); toggleStartMenu();" class="w-full p-2 rounded-xl hover:bg-white/10 flex items-center space-x-3 text-left text-xs font-semibold text-cyan-300">
                 <span>✏️ Dibujar en Escritorio</span>
+            </button>
+            <button onclick="triggerNewWidget(); toggleStartMenu();" class="w-full p-2 rounded-xl hover:bg-white/10 flex items-center space-x-3 text-left text-xs font-semibold text-fuchsia-300">
+                <span>🖼️ Nuevo Widget de Imagen</span>
+            </button>
+            <button onclick="openWindow('win-icon-manager'); toggleStartMenu();" class="w-full p-2 rounded-xl hover:bg-white/10 flex items-center space-x-3 text-left text-xs font-semibold text-cyan-300">
+                <span>🖼️ Personalizar Íconos</span>
             </button>
             <button onclick="resetIconLayout(); toggleStartMenu();" class="w-full p-2 rounded-xl hover:bg-white/10 flex items-center space-x-3 text-left text-xs font-semibold text-emerald-300">
                 <span>🔄 Reordenar Íconos</span>
@@ -970,6 +1333,10 @@
             <svg class="w-3.5 h-3.5 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
             Cambiar imagen
         </button>
+        <button onclick="widgetContextAction('reset-size')">
+            <svg class="w-3.5 h-3.5 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+            Tamaño original
+        </button>
         <div class="ctx-divider"></div>
         <button onclick="widgetContextAction('delete')" class="danger">
             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
@@ -977,6 +1344,9 @@
         </button>
         <input type="file" id="widget-img-input" accept="image/*" class="hidden" onchange="handleWidgetImageUpload(event)">
     </div>
+
+    <!-- HIDDEN INPUT: CREATE NEW IMAGE WIDGETS -->
+    <input type="file" id="new-widget-input" accept="image/*" multiple class="hidden" onchange="createWidgetsFromFiles(event)">
 
     <!-- JAVASCRIPT LOGIC ENGINE -->
     <script>
@@ -1039,6 +1409,31 @@
             });
 
             container.innerHTML = html;
+
+            // Mobile top status bar clock (primary timezone)
+            const mobileTimeEl = document.getElementById('mobile-clock-time');
+            if (mobileTimeEl) {
+                const primaryTz = AVAILABLE_TIMEZONES.find(t => t.label === selectedTimezones[0]) || AVAILABLE_TIMEZONES[0];
+                try {
+                    mobileTimeEl.textContent = now.toLocaleTimeString('es-ES', {
+                        timeZone: primaryTz.tz || undefined,
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: false
+                    });
+                } catch (e) {
+                    mobileTimeEl.textContent = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false });
+                }
+                const dateEl = document.getElementById('mobile-clock-date');
+                if (dateEl) {
+                    dateEl.textContent = now.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' });
+                }
+                const tzEl = document.getElementById('mobile-clock-tz');
+                if (tzEl) {
+                    tzEl.textContent = primaryTz.flag;
+                    tzEl.title = primaryTz.name;
+                }
+            }
         }
 
         function openTimezoneConfigModal() {
@@ -1379,22 +1774,56 @@
         // --- 5. DRAGGABLE DESKTOP ICONS & WIDGET MECHANICS ---
         let customIconPositions = {};
         let customIconImages = {};
+        let widgetLayout = {};
+        let assetManifest = { icons: [], images: [], songs: [] };
+
+        function isMobileLayout() {
+            return window.innerWidth < 768;
+        }
+
+        function iconLayoutKey() {
+            return isMobileLayout() ? 'astro_icon_positions_mobile' : 'astro_icon_positions';
+        }
+
+        function widgetLayoutKey() {
+            return isMobileLayout() ? 'astro_widget_layout_mobile_v2' : 'astro_widget_layout_v2';
+        }
 
         function loadIconPreferences() {
             try {
-                const savedPos = localStorage.getItem('astro_icon_positions');
-                if (savedPos) customIconPositions = JSON.parse(savedPos);
+                const savedPos = localStorage.getItem(iconLayoutKey());
+                customIconPositions = savedPos ? JSON.parse(savedPos) : {};
 
                 const savedImg = localStorage.getItem('astro_icon_images');
                 if (savedImg) customIconImages = JSON.parse(savedImg);
-            } catch (e) {}
+
+                const savedWidgets = localStorage.getItem(widgetLayoutKey());
+                widgetLayout = savedWidgets ? JSON.parse(savedWidgets) : {};
+            } catch (e) {
+                customIconPositions = {};
+                widgetLayout = {};
+            }
         }
 
         function saveIconPreferences() {
             try {
-                localStorage.setItem('astro_icon_positions', JSON.stringify(customIconPositions));
+                localStorage.setItem(iconLayoutKey(), JSON.stringify(customIconPositions));
                 localStorage.setItem('astro_icon_images', JSON.stringify(customIconImages));
             } catch (e) {}
+        }
+
+        function saveWidgetLayout() {
+            try {
+                localStorage.setItem(widgetLayoutKey(), JSON.stringify(widgetLayout));
+            } catch (e) {}
+        }
+
+        function getDesktopBounds() {
+            const desktop = document.getElementById('desktop');
+            return {
+                width: desktop ? desktop.clientWidth : window.innerWidth,
+                height: desktop ? desktop.clientHeight : window.innerHeight
+            };
         }
 
         function arrangeIconsGrid(forceReset = false) {
@@ -1407,7 +1836,7 @@
             const paddingX = 16;
             const paddingY = 16;
 
-            const cols = Math.floor((dWidth - paddingX) / (iconWidth + paddingX)) || 4;
+            const cols = Math.max(1, Math.floor((dWidth - paddingX) / (iconWidth + paddingX)) || 4);
 
             if (forceReset) {
                 customIconPositions = {};
@@ -1415,11 +1844,47 @@
                 icons.sort((a, b) => parseInt(a.dataset.defaultOrder) - parseInt(b.dataset.defaultOrder));
             }
 
+            // On phones the icon rows are centered for a symmetric layout
+            if (isMobileLayout()) {
+                const gap = 16;
+                const rows = [];
+                for (let i = 0; i < icons.length; i += cols) {
+                    rows.push(icons.slice(i, i + cols));
+                }
+
+                rows.forEach((rowIcons, rowIndex) => {
+                    const buttonWidth = rowIcons[0].offsetWidth || 86;
+                    const rowWidth = rowIcons.length * buttonWidth + (rowIcons.length - 1) * gap;
+                    const startX = Math.max(8, (dWidth - rowWidth) / 2);
+                    const y = paddingY + rowIndex * (iconHeight + gap);
+
+                    rowIcons.forEach((icon, col) => {
+                        const winId = icon.dataset.win;
+                        const saved = customIconPositions[winId];
+                        if (!forceReset && saved && Number.isFinite(saved.x) && Number.isFinite(saved.y)) {
+                            const maxX = Math.max(0, dWidth - icon.offsetWidth);
+                            const maxY = Math.max(0, desktop.clientHeight - icon.offsetHeight);
+                            icon.style.left = `${Math.min(Math.max(0, saved.x), maxX)}px`;
+                            icon.style.top = `${Math.min(Math.max(0, saved.y), maxY)}px`;
+                        } else {
+                            const x = startX + col * (buttonWidth + gap);
+                            icon.style.left = `${x}px`;
+                            icon.style.top = `${y}px`;
+                            customIconPositions[winId] = { x, y };
+                        }
+                    });
+                });
+                return;
+            }
+
             icons.forEach((icon, index) => {
                 const winId = icon.dataset.win;
-                if (!forceReset && customIconPositions[winId]) {
-                    icon.style.left = `${customIconPositions[winId].x}px`;
-                    icon.style.top = `${customIconPositions[winId].y}px`;
+                const saved = customIconPositions[winId];
+                if (!forceReset && saved && Number.isFinite(saved.x) && Number.isFinite(saved.y)) {
+                    const maxX = Math.max(0, dWidth - icon.offsetWidth);
+                    const maxY = Math.max(0, desktop.clientHeight - icon.offsetHeight);
+                    icon.style.left = `${Math.min(Math.max(0, saved.x), maxX)}px`;
+                    icon.style.top = `${Math.min(Math.max(0, saved.y), maxY)}px`;
                 } else {
                     const row = Math.floor(index / cols);
                     const col = index % cols;
@@ -1439,68 +1904,380 @@
         }
 
         function setupDraggableElements() {
-            const draggables = document.querySelectorAll('.desktop-icon-btn, .desktop-media-widget');
-            draggables.forEach(elem => {
-                let isDragging = false;
-                let startX, startY, initialLeft, initialTop;
-                let hasMoved = false;
-
-                const onPointerDown = (e) => {
-                    if (isDesktopDrawingActive) return;
-                    isDragging = true;
-                    hasMoved = false;
-                    startX = e.clientX || (e.touches && e.touches[0].clientX);
-                    startY = e.clientY || (e.touches && e.touches[0].clientY);
-                    initialLeft = parseFloat(elem.style.left) || elem.offsetLeft;
-                    initialTop = parseFloat(elem.style.top) || elem.offsetTop;
-
-                    elem.style.zIndex = '30';
-                };
-
-                const onPointerMove = (e) => {
-                    if (!isDragging || isDesktopDrawingActive) return;
-                    const currentX = e.clientX || (e.touches && e.touches[0].clientX);
-                    const currentY = e.clientY || (e.touches && e.touches[0].clientY);
-                    const dx = currentX - startX;
-                    const dy = currentY - startY;
-
-                    if (Math.abs(dx) > 4 || Math.abs(dy) > 4) {
-                        hasMoved = true;
-                    }
-
-                    if (hasMoved) {
-                        const newX = Math.max(0, Math.min(window.innerWidth - 120, initialLeft + dx));
-                        const newY = Math.max(0, Math.min(window.innerHeight - 120, initialTop + dy));
-                        elem.style.left = `${newX}px`;
-                        elem.style.top = `${newY}px`;
-                    }
-                };
-
-                const onPointerUp = () => {
-                    if (isDragging) {
-                        isDragging = false;
-                        if (hasMoved) {
-                            if (elem.dataset.win) {
-                                customIconPositions[elem.dataset.win] = {
-                                    x: parseFloat(elem.style.left),
-                                    y: parseFloat(elem.style.top)
-                                };
-                                saveIconPreferences();
-                            }
-                        } else if (elem.dataset.win) {
-                            openWindow(elem.dataset.win);
-                        }
-                    }
-                };
-
-                elem.addEventListener('mousedown', onPointerDown);
-                window.addEventListener('mousemove', onPointerMove);
-                window.addEventListener('mouseup', onPointerUp);
-
-                elem.addEventListener('touchstart', onPointerDown, { passive: true });
-                window.addEventListener('touchmove', onPointerMove, { passive: true });
-                window.addEventListener('touchend', onPointerUp);
+            document.querySelectorAll('.desktop-icon-btn').forEach(bindIconDrag);
+            document.querySelectorAll('.desktop-media-widget').forEach(initWidget);
+            document.addEventListener('pointerdown', (e) => {
+                if (!e.target.closest('.desktop-media-widget')) {
+                    document.querySelectorAll('.desktop-media-widget.selected').forEach(w => w.classList.remove('selected'));
+                }
             });
+        }
+
+        // Pointer-event drag for icons (works with mouse, touch and pen)
+        function bindIconDrag(elem) {
+            let drag = null;
+
+            elem.addEventListener('pointerdown', (e) => {
+                if (isDesktopDrawingActive) return;
+                if (e.button !== undefined && e.button !== 0) return;
+                drag = {
+                    startX: e.clientX,
+                    startY: e.clientY,
+                    left: elem.offsetLeft,
+                    top: elem.offsetTop,
+                    moved: false
+                };
+                elem.style.transition = 'none';
+                elem.style.zIndex = '30';
+                try { elem.setPointerCapture(e.pointerId); } catch (err) {}
+            });
+
+            elem.addEventListener('pointermove', (e) => {
+                if (!drag) return;
+                const dx = e.clientX - drag.startX;
+                const dy = e.clientY - drag.startY;
+                if (!drag.moved && Math.hypot(dx, dy) < 4) return;
+                drag.moved = true;
+
+                const bounds = getDesktopBounds();
+                const maxX = Math.max(0, bounds.width - elem.offsetWidth);
+                const maxY = Math.max(0, bounds.height - elem.offsetHeight);
+                elem.style.left = `${Math.max(0, Math.min(maxX, drag.left + dx))}px`;
+                elem.style.top = `${Math.max(0, Math.min(maxY, drag.top + dy))}px`;
+            });
+
+            const finishDrag = () => {
+                if (!drag) return;
+                const moved = drag.moved;
+                drag = null;
+                elem.style.transition = '';
+                if (moved) {
+                    if (elem.dataset.win) {
+                        customIconPositions[elem.dataset.win] = {
+                            x: elem.offsetLeft,
+                            y: elem.offsetTop
+                        };
+                        saveIconPreferences();
+                    }
+                } else if (elem.dataset.win) {
+                    openWindow(elem.dataset.win);
+                }
+            };
+
+            elem.addEventListener('pointerup', finishDrag);
+            elem.addEventListener('pointercancel', () => {
+                drag = null;
+                elem.style.transition = '';
+            });
+        }
+
+        // --- WIDGET ENGINE: MOVE, RESIZE, PERSIST ---
+        function initWidget(el) {
+            if (!el.dataset.widgetId) {
+                el.dataset.widgetId = el.id || `widget-${Date.now()}-${Math.floor(Math.random() * 999)}`;
+            }
+
+            const saved = widgetLayout[el.dataset.widgetId];
+            if (saved && saved.deleted) {
+                el.remove();
+                return;
+            }
+            if (saved) applyWidgetRect(el, saved);
+            else if (isMobileLayout()) applyMobileWidgetSeed(el);
+
+            ensureResizeHandle(el);
+            bindWidgetDrag(el);
+            el.addEventListener('contextmenu', (e) => showWidgetContextMenu(e, el));
+            el.addEventListener('pointerdown', () => selectWidget(el), { capture: true });
+        }
+
+        function applyMobileWidgetSeed(el) {
+            const bounds = getDesktopBounds();
+            const seeds = {
+                'media-widget-1': { x: bounds.width - 134, y: 250 },
+                'media-widget-2': { x: bounds.width - 130, y: bounds.height - 200 },
+                'media-widget-3': { x: 16, y: 360 }
+            };
+            const position = seeds[el.dataset.widgetId];
+            if (!position) return;
+
+            el.style.left = `${Math.max(8, position.x)}px`;
+            el.style.top = `${Math.max(8, position.y)}px`;
+            el.style.right = 'auto';
+            el.style.bottom = 'auto';
+            saveWidgetRect(el);
+        }
+
+        function applyWidgetRect(el, rect) {
+            if (!el || !rect) return;
+            const bounds = getDesktopBounds();
+            if (Number.isFinite(rect.w)) el.style.width = `${Math.min(rect.w, bounds.width)}px`;
+            if (Number.isFinite(rect.h)) el.style.height = `${Math.min(rect.h, bounds.height)}px`;
+            if (Number.isFinite(rect.x)) el.style.left = `${Math.max(0, Math.min(rect.x, bounds.width - (rect.w || el.offsetWidth)))}px`;
+            if (Number.isFinite(rect.y)) el.style.top = `${Math.max(0, Math.min(rect.y, bounds.height - (rect.h || el.offsetHeight)))}px`;
+            if (rect.src) {
+                const img = el.querySelector('img');
+                if (img) img.src = rect.src;
+            }
+            el.style.right = 'auto';
+            el.style.bottom = 'auto';
+        }
+
+        function selectWidget(el) {
+            document.querySelectorAll('.desktop-media-widget.selected').forEach(w => {
+                if (w !== el) w.classList.remove('selected');
+            });
+            el.classList.add('selected');
+        }
+
+        function ensureResizeHandle(el) {
+            if (el.querySelector('.widget-resize-handle')) return;
+            const handle = document.createElement('div');
+            handle.className = 'widget-resize-handle';
+            handle.title = 'Arrastra para redimensionar';
+            handle.addEventListener('pointerdown', (e) => startWidgetResize(e, el, handle));
+            el.appendChild(handle);
+        }
+
+        function bindWidgetDrag(el) {
+            let drag = null;
+
+            el.addEventListener('pointerdown', (e) => {
+                if (isDesktopDrawingActive) return;
+                if (e.button !== undefined && e.button !== 0) return;
+                if (e.target.closest('.widget-resize-handle')) return;
+
+                drag = {
+                    startX: e.clientX,
+                    startY: e.clientY,
+                    left: el.offsetLeft,
+                    top: el.offsetTop
+                };
+                el.style.transition = 'none';
+                el.style.zIndex = '29';
+                try { el.setPointerCapture(e.pointerId); } catch (err) {}
+            });
+
+            el.addEventListener('pointermove', (e) => {
+                if (!drag) return;
+                const bounds = getDesktopBounds();
+                const maxX = Math.max(0, bounds.width - el.offsetWidth);
+                const maxY = Math.max(0, bounds.height - el.offsetHeight);
+                el.style.left = `${Math.max(0, Math.min(maxX, drag.left + (e.clientX - drag.startX)))}px`;
+                el.style.top = `${Math.max(0, Math.min(maxY, drag.top + (e.clientY - drag.startY)))}px`;
+            });
+
+            const finish = () => {
+                if (!drag) return;
+                drag = null;
+                el.style.transition = '';
+                saveWidgetRect(el);
+            };
+            el.addEventListener('pointerup', finish);
+            el.addEventListener('pointercancel', finish);
+        }
+
+        function startWidgetResize(e, widget, handle) {
+            if (e.button !== undefined && e.button !== 0) return;
+            e.preventDefault();
+            e.stopPropagation();
+            selectWidget(widget);
+
+            const startX = e.clientX;
+            const startY = e.clientY;
+            const startW = widget.offsetWidth;
+            const startH = widget.offsetHeight;
+            const left = widget.offsetLeft;
+            const top = widget.offsetTop;
+            const ratio = startW / startH;
+
+            widget.style.transition = 'none';
+            try { handle.setPointerCapture(e.pointerId); } catch (err) {}
+
+            const onMove = (ev) => {
+                const bounds = getDesktopBounds();
+                const maxW = Math.max(72, bounds.width - left);
+                const maxH = Math.max(72, bounds.height - top);
+                let w = Math.max(72, Math.min(maxW, startW + (ev.clientX - startX)));
+                let h = Math.max(72, Math.min(maxH, startH + (ev.clientY - startY)));
+
+                // Shift keeps the original aspect ratio
+                if (ev.shiftKey) {
+                    h = Math.max(72, Math.min(maxH, w / ratio));
+                    w = Math.max(72, Math.min(maxW, h * ratio));
+                }
+                widget.style.width = `${w}px`;
+                widget.style.height = `${h}px`;
+            };
+
+            const onUp = () => {
+                widget.style.transition = '';
+                handle.removeEventListener('pointermove', onMove);
+                handle.removeEventListener('pointerup', onUp);
+                handle.removeEventListener('pointercancel', onUp);
+                saveWidgetRect(widget);
+            };
+
+            handle.addEventListener('pointermove', onMove);
+            handle.addEventListener('pointerup', onUp);
+            handle.addEventListener('pointercancel', onUp);
+        }
+
+        function saveWidgetRect(el) {
+            if (!el || !el.dataset.widgetId) return;
+            widgetLayout[el.dataset.widgetId] = {
+                x: el.offsetLeft,
+                y: el.offsetTop,
+                w: el.offsetWidth,
+                h: el.offsetHeight
+            };
+            saveWidgetLayout();
+        }
+
+        // --- USER WIDGET CREATION ---
+        function triggerNewWidget() {
+            const input = document.getElementById('new-widget-input');
+            if (!input) return;
+            input.value = '';
+            input.click();
+        }
+
+        function fileToDataUrl(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (evt) => resolve(evt.target.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function compressImageDataUrl(dataUrl, maxSize = 1000) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => {
+                    let { width, height } = img;
+                    if (width > maxSize || height > maxSize) {
+                        const scale = Math.min(maxSize / width, maxSize / height);
+                        width = Math.round(width * scale);
+                        height = Math.round(height * scale);
+                    }
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+                    try {
+                        resolve(canvas.toDataURL('image/jpeg', 0.84));
+                    } catch (err) {
+                        resolve(dataUrl);
+                    }
+                };
+                img.onerror = () => resolve(dataUrl);
+                img.src = dataUrl;
+            });
+        }
+
+        async function createWidgetsFromFiles(e) {
+            const files = Array.from(e.target.files || []).filter(f => f.type.startsWith('image/'));
+            if (!files.length) return;
+            let created = 0;
+
+            for (const [index, file] of files.entries()) {
+                try {
+                    const raw = await fileToDataUrl(file);
+                    const src = await compressImageDataUrl(raw);
+                    const id = `user-${Date.now()}-${index}`;
+                    const label = file.name.replace(/\.[^/.]+$/, '').slice(0, 24) || 'Mi Imagen';
+                    const offset = 20 + (index % 5) * 26;
+                    createImageWidget(src, id, offset, offset, 176, 176, label, true);
+                    created++;
+                } catch (err) {}
+            }
+
+            if (created) showToast(`${created} widget(s) creado(s). Arrástralos y usa la esquina para redimensionar.`);
+        }
+
+        function createImageWidget(src, id, x, y, w = 176, h = 176, label = 'Mi Imagen', persist = false) {
+            if (document.querySelector(`[data-widget-id="${id}"]`)) return null;
+            const widget = document.createElement('div');
+            widget.id = `widget-${id}`;
+            widget.dataset.widgetId = id;
+            if (persist) widget.dataset.userWidget = 'true';
+            widget.className = 'desktop-media-widget rounded-2xl p-1 bg-black/40 border border-white/20 backdrop-blur-md shadow-2xl overflow-hidden';
+            widget.style.left = `${x}px`;
+            widget.style.top = `${y}px`;
+            widget.style.width = `${w}px`;
+            widget.style.height = `${h}px`;
+            widget.innerHTML = `
+                <div class="relative w-full h-full rounded-xl overflow-hidden pointer-events-none">
+                    <img src="${src}" class="w-full h-full object-cover" alt="${label}">
+                    <span class="widget-label absolute bottom-1 left-2 text-[9px] font-mono text-cyan-300 bg-black/60 px-1.5 py-0.5 rounded"></span>
+                </div>`;
+            widget.querySelector('.widget-label').textContent = label;
+            document.getElementById('desktop').appendChild(widget);
+            initWidget(widget);
+            saveWidgetRect(widget);
+            if (persist) saveUserWidgets();
+            return widget;
+        }
+
+        function saveUserWidgets() {
+            try {
+                const list = Array.from(document.querySelectorAll('[data-user-widget="true"]')).map(el => ({
+                    id: el.dataset.widgetId,
+                    src: el.querySelector('img') ? el.querySelector('img').src : '',
+                    label: el.querySelector('.widget-label') ? el.querySelector('.widget-label').textContent : 'Mi Imagen'
+                }));
+                localStorage.setItem('astro_user_widgets', JSON.stringify(list));
+            } catch (err) {
+                showToast('No hay espacio para guardar más imágenes. Elimina algún widget.');
+            }
+        }
+
+        function restoreUserWidgets() {
+            try {
+                const list = JSON.parse(localStorage.getItem('astro_user_widgets') || '[]');
+                list.forEach((item, index) => {
+                    if (!item || !item.src) return;
+                    if (widgetLayout[item.id] && widgetLayout[item.id].deleted) return;
+                    const offset = 24 + (index % 5) * 26;
+                    createImageWidget(item.src, item.id, offset, offset, 176, 176, item.label || 'Mi Imagen', true);
+                });
+            } catch (err) {}
+        }
+
+        // Loads optional assets listed in /assets/manifest.json
+        async function loadAssetManifest() {
+            try {
+                const response = await fetch('assets/manifest.json', { cache: 'no-store' });
+                if (!response.ok) return;
+                const data = await response.json();
+                assetManifest = {
+                    icons: Array.isArray(data.icons) ? data.icons : [],
+                    images: Array.isArray(data.images) ? data.images : [],
+                    songs: Array.isArray(data.songs) ? data.songs : []
+                };
+
+                assetManifest.images.forEach((entry, index) => {
+                    const src = typeof entry === 'string' ? entry : entry.src;
+                    if (!src) return;
+                    const id = 'asset-' + src.replace(/[^a-z0-9]+/gi, '-').toLowerCase();
+                    if (widgetLayout[id] && widgetLayout[id].deleted) return;
+                    const label = (typeof entry === 'object' && entry.label) ? entry.label : (src.split('/').pop() || 'Imagen');
+                    const offset = 24 + (index % 5) * 26;
+                    createImageWidget(src, id, offset, offset, 176, 176, label, false);
+                });
+
+                assetManifest.songs.forEach((entry) => {
+                    const url = typeof entry === 'string' ? entry : entry.url;
+                    if (!url) return;
+                    const name = (typeof entry === 'object' && entry.name)
+                        ? entry.name
+                        : (url.split('/').pop() || 'Canción').replace(/\.[^/.]+$/, '');
+                    if (!localAudioPlaylist.some(track => track.url === url)) {
+                        localAudioPlaylist.push({ name, url });
+                    }
+                });
+            } catch (err) {}
         }
 
         // --- 6. CUSTOM ICON IMAGE MANAGER ---
@@ -1868,9 +2645,20 @@
             if (!target) return;
 
             if (action === 'delete') {
+                if (target.dataset.widgetId) {
+                    widgetLayout[target.dataset.widgetId] = { deleted: true };
+                    saveWidgetLayout();
+                }
+                const wasUserWidget = target.dataset.userWidget === 'true';
                 target.remove();
+                if (wasUserWidget) saveUserWidgets();
                 _ctxTargetWidget = null;
                 showToast("Widget eliminado.");
+            } else if (action === 'reset-size') {
+                target.style.width = '176px';
+                target.style.height = '176px';
+                saveWidgetRect(target);
+                showToast("Tamaño restablecido.");
             } else if (action === 'image') {
                 const input = document.getElementById('widget-img-input');
                 if (input) {
@@ -1889,6 +2677,14 @@
                 if (_ctxTargetWidget) {
                     const img = _ctxTargetWidget.querySelector('img');
                     if (img) img.src = evt.target.result;
+
+                    if (_ctxTargetWidget.dataset.widgetId) {
+                        const rect = widgetLayout[_ctxTargetWidget.dataset.widgetId] || {};
+                        rect.src = evt.target.result;
+                        widgetLayout[_ctxTargetWidget.dataset.widgetId] = rect;
+                        saveWidgetLayout();
+                    }
+                    if (_ctxTargetWidget.dataset.userWidget === 'true') saveUserWidgets();
                     showToast("Imagen del widget actualizada!");
                 }
             };
@@ -1896,10 +2692,7 @@
         }
 
         function setupWidgetContextMenus() {
-            document.querySelectorAll('.desktop-media-widget').forEach(widget => {
-                widget.addEventListener('contextmenu', (e) => showWidgetContextMenu(e, widget));
-            });
-
+            // Context menus are bound per-widget in initWidget(); just handle closing here.
             document.addEventListener('click', (e) => {
                 const menu = document.getElementById('widget-context-menu');
                 if (menu && !menu.contains(e.target)) {
@@ -2048,10 +2841,39 @@
             arrangeIconsGrid(false);
             setupDraggableElements();
             setupWidgetContextMenus();
+            restoreUserWidgets();
+            loadAssetManifest();
             loadSavedNote();
             renderTodoList();
             renderGlossary();
         };
+
+        // Keep a separate layout per device type and reflow when crossing the breakpoint
+        let currentLayoutProfile = isMobileLayout();
+        let layoutResizeTimer = null;
+        window.addEventListener('resize', () => {
+            clearTimeout(layoutResizeTimer);
+            layoutResizeTimer = setTimeout(() => {
+                if (isMobileLayout() === currentLayoutProfile) return;
+                currentLayoutProfile = isMobileLayout();
+                loadIconPreferences();
+                applyCustomIconImages();
+                arrangeIconsGrid(false);
+
+                const bounds = getDesktopBounds();
+                document.querySelectorAll('.desktop-media-widget').forEach(el => {
+                    const saved = widgetLayout[el.dataset.widgetId];
+                    if (saved && !saved.deleted) {
+                        applyWidgetRect(el, saved);
+                    } else {
+                        const maxX = Math.max(0, bounds.width - el.offsetWidth);
+                        const maxY = Math.max(0, bounds.height - el.offsetHeight);
+                        el.style.left = `${Math.max(0, Math.min(el.offsetLeft, maxX))}px`;
+                        el.style.top = `${Math.max(0, Math.min(el.offsetTop, maxY))}px`;
+                    }
+                });
+            }, 250);
+        });
     </script>
 </body>
 </html>

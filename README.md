@@ -40,6 +40,12 @@
 
 **Desktop extras:** Starfield canvas animation, draggable media widgets (GIFs + photos) with right-click context menu (resize/delete), multi-timezone clock, desktop drawing overlay, icon rearrange & reset.
 
+**Mobile / responsive mode:** On screens under 768px the OS switches to a smartphone layout. The clock, date and system info move to a top status bar, the Start button sits centered in the bottom dock (symmetric quick actions on both sides), and app windows fill the space between both bars. Icon positions and widget layouts are saved separately per device type.
+
+**Widgets:** every widget can be dragged with mouse, touch or pen, and resized freely from its bottom-right corner (hold `Shift` to keep the aspect ratio). Sizes and positions are saved automatically. Create new widgets from **Start → Nuevo Widget de Imagen**.
+
+**Asset folders:** drop your own media in `assets/icons/`, `assets/images/` and `assets/music/`. Add files to `assets/manifest.json` to auto-load images as desktop widgets and songs into the player — see the README inside each folder.
+
 ---
 
 ## 🌐 My Other Projects

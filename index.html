@@ -813,6 +813,35 @@
                 <span class="mt-1.5 text-[11px] font-semibold font-mono tracking-wide text-center text-gray-200 group-hover:text-violet-300 drop-shadow-md select-none icon-name">Música & Radio</span>
             </div>
 
+            <!-- Icon 7: MediaFlow Studio (imágenes y medios) -->
+            <div id="icon-win-mediaflow" data-win="win-mediaflow" data-default-order="6" class="desktop-icon-btn group flex flex-col items-center justify-center p-2 rounded-2xl">
+                <div class="icon-box relative w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br from-indigo-500 via-blue-500 to-cyan-400 p-0.5 shadow-lg border border-white/20 flex items-center justify-center overflow-hidden">
+                    <div class="w-full h-full bg-slate-900 rounded-[14px] flex items-center justify-center relative overflow-hidden icon-content">
+                        <svg class="w-8 h-8 text-cyan-300 group-hover:scale-110 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="4.5" width="18" height="15" rx="2.5"/>
+                            <circle cx="8.5" cy="9.5" r="1.6"/>
+                            <path d="M4 17l4.5-4.5 3 3 2.5-3.5L20 17"/>
+                        </svg>
+                    </div>
+                </div>
+                <span class="mt-1.5 text-[11px] font-semibold font-mono tracking-wide text-center text-gray-200 group-hover:text-cyan-300 drop-shadow-md select-none icon-name">MediaFlow</span>
+            </div>
+
+            <!-- Icon 8: CardGram (app dedicada) -->
+            <div id="icon-win-cardgram" data-win="win-cardgram" data-default-order="7" class="desktop-icon-btn group flex flex-col items-center justify-center p-2 rounded-2xl">
+                <div class="icon-box relative w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br from-cyan-400 via-blue-500 to-pink-500 p-0.5 shadow-lg border border-white/20 flex items-center justify-center overflow-hidden">
+                    <div class="w-full h-full bg-slate-900 rounded-[14px] flex items-center justify-center relative overflow-hidden icon-content">
+                        <svg class="w-8 h-8 text-cyan-300 group-hover:scale-110 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2.5" y="8" width="13" height="11" rx="2"/>
+                            <rect x="8.5" y="3.5" width="13" height="11" rx="2"/>
+                            <circle cx="15" cy="9" r="2.4"/>
+                            <circle cx="19" cy="6" r="0.7" fill="currentColor" stroke="none"/>
+                        </svg>
+                    </div>
+                </div>
+                <span class="mt-1.5 text-[11px] font-semibold font-mono tracking-wide text-center text-gray-200 group-hover:text-cyan-300 drop-shadow-md select-none icon-name">CardGram</span>
+            </div>
+
         </div>
 
         <!-- DEFAULT DESKTOP MEDIA WIDGETS -->
@@ -1073,6 +1102,46 @@
             </div>
         </div>
 
+        <!-- WINDOW: MEDIAFLOW STUDIO (APP DE ESCRITORIO) -->
+        <div id="win-mediaflow" class="glass-window absolute top-6 left-4 md:left-20 w-[calc(100%-2rem)] md:w-[1080px] md:max-w-[calc(100%-6rem)] z-30 flex flex-col hidden" style="height: min(760px, calc(100% - 2rem));">
+            <div class="xp-titlebar px-4 py-2.5 flex items-center justify-between cursor-move select-none">
+                <div class="flex items-center space-x-2">
+                    <div class="w-3 h-3 rounded-full bg-cyan-400 animate-pulse"></div>
+                    <span class="font-mono text-xs font-bold tracking-wider text-cyan-300 uppercase">MediaFlow Studio — Imágenes & Medios</span>
+                </div>
+                <div class="flex items-center space-x-1.5">
+                    <a href="mediaflow_studio.html" target="_blank" rel="noopener noreferrer" title="Abrir en pestaña nueva" class="w-6 h-6 rounded-md bg-white/10 hover:bg-white/20 flex items-center justify-center text-gray-300">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                    </a>
+                    <button onclick="minimizeWindow('win-mediaflow')" class="w-6 h-6 rounded-md bg-white/10 hover:bg-white/20 flex items-center justify-center text-xs text-gray-300">_</button>
+                    <button onclick="closeWindow('win-mediaflow')" class="w-6 h-6 rounded-md bg-red-500/30 hover:bg-red-500/60 text-red-200 flex items-center justify-center text-xs font-bold">✕</button>
+                </div>
+            </div>
+            <div class="flex-1 min-h-0 bg-slate-950/60">
+                <iframe id="mediaflow-frame" src="mediaflow_studio.html" title="MediaFlow Studio" class="w-full h-full border-0 rounded-b-[13px]" allow="clipboard-read; clipboard-write; downloads"></iframe>
+            </div>
+        </div>
+
+        <!-- WINDOW: CARDGRAM (APP DEDICADA) -->
+        <div id="win-cardgram" class="glass-window absolute top-6 left-4 md:left-24 w-[calc(100%-2rem)] md:w-[1080px] md:max-w-[calc(100%-6rem)] z-30 flex flex-col hidden" style="height: min(760px, calc(100% - 2rem));">
+            <div class="xp-titlebar px-4 py-2.5 flex items-center justify-between cursor-move select-none">
+                <div class="flex items-center space-x-2">
+                    <div class="w-3 h-3 rounded-full bg-pink-400 animate-pulse"></div>
+                    <span class="font-mono text-xs font-bold tracking-wider text-pink-300 uppercase">CardGram — Social Cards</span>
+                </div>
+                <div class="flex items-center space-x-1.5">
+                    <a href="https://theastrobruh.github.io/CardGram/#/home" target="_blank" rel="noopener noreferrer" title="Abrir en pestaña nueva" class="w-6 h-6 rounded-md bg-white/10 hover:bg-white/20 flex items-center justify-center text-gray-300">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                    </a>
+                    <button onclick="minimizeWindow('win-cardgram')" class="w-6 h-6 rounded-md bg-white/10 hover:bg-white/20 flex items-center justify-center text-xs text-gray-300">_</button>
+                    <button onclick="closeWindow('win-cardgram')" class="w-6 h-6 rounded-md bg-red-500/30 hover:bg-red-500/60 text-red-200 flex items-center justify-center text-xs font-bold">✕</button>
+                </div>
+            </div>
+            <div class="flex-1 min-h-0 bg-slate-950/60">
+                <iframe id="cardgram-frame" src="https://theastrobruh.github.io/CardGram/#/home" title="CardGram" class="w-full h-full border-0 rounded-b-[13px]" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+        </div>
+
         <!-- WINDOW: TERMINAL -->
         <div id="win-terminal" class="glass-window absolute top-20 left-4 md:left-72 w-[calc(100%-2rem)] md:w-[580px] h-[400px] z-30 flex flex-col hidden">
             <div class="xp-titlebar px-4 py-2.5 flex items-center justify-between cursor-move select-none">
@@ -1284,6 +1353,12 @@
             </button>
             <button onclick="openWindow('win-music'); toggleStartMenu();" class="w-full p-2 rounded-xl hover:bg-white/10 flex items-center space-x-3 text-left text-xs font-semibold text-violet-300">
                 <span>📻 Música & Radio Player</span>
+            </button>
+            <button onclick="openWindow('win-mediaflow'); toggleStartMenu();" class="w-full p-2 rounded-xl hover:bg-white/10 flex items-center space-x-3 text-left text-xs font-semibold text-cyan-300">
+                <span>🖼️ MediaFlow Studio</span>
+            </button>
+            <button onclick="openWindow('win-cardgram'); toggleStartMenu();" class="w-full p-2 rounded-xl hover:bg-white/10 flex items-center space-x-3 text-left text-xs font-semibold text-pink-300">
+                <span>💳 CardGram</span>
             </button>
             <button onclick="openWindow('win-draw'); toggleStartMenu();" class="w-full p-2 rounded-xl hover:bg-white/10 flex items-center space-x-3 text-left text-xs font-semibold text-yellow-300">
                 <span>🎨 Pintura Studio</span>

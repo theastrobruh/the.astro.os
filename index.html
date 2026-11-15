@@ -689,9 +689,261 @@
                 height: 30px;
             }
         }
+
+        /* --- WELCOME SCREEN & ENTRANCE ANIMATIONS --- */
+        #welcome-screen {
+            backdrop-filter: blur(28px);
+            -webkit-backdrop-filter: blur(28px);
+            transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        #welcome-screen.welcome-leaving {
+            opacity: 0 !important;
+            transform: scale(1.1) !important;
+            pointer-events: none !important;
+        }
+        @keyframes astroLogoAppear {
+            0% { opacity: 0; transform: scale(0.4) translateY(24px); filter: blur(12px); }
+            65% { opacity: 1; transform: scale(1.08) translateY(-4px); filter: blur(0); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        @keyframes astroTextFade {
+            0% { opacity: 0; transform: translateY(16px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes astroCardsSlideUp {
+            0% { opacity: 0; transform: translateY(30px) scale(0.95); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes astroShake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-12px); }
+            40% { transform: translateX(12px); }
+            60% { transform: translateX(-8px); }
+            80% { transform: translateX(8px); }
+        }
+        @keyframes astroIconEnter {
+            0% {
+                opacity: 0;
+                transform: scale(0.2) translateY(30px);
+                filter: blur(8px);
+            }
+            70% {
+                opacity: 1;
+                transform: scale(1.12) translateY(-4px);
+                filter: blur(0);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+        @keyframes astroWidgetBloom {
+            0% {
+                opacity: 0;
+                transform: scale(0.2) rotate(-6deg);
+                filter: blur(12px) brightness(1.4);
+            }
+            70% {
+                opacity: 1;
+                transform: scale(1.05) rotate(1deg);
+                filter: blur(0) brightness(1.1);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) rotate(0deg);
+                filter: none;
+            }
+        }
+        .anim-logo-appear {
+            animation: astroLogoAppear 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .anim-text-fade {
+            animation: astroTextFade 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.35s backwards;
+        }
+        .anim-cards-appear {
+            animation: astroCardsSlideUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.65s backwards;
+        }
+        .shake-error {
+            animation: astroShake 0.45s ease-in-out !important;
+        }
+        .desktop-icon-btn.icon-animating {
+            animation: astroIconEnter 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+        .desktop-media-widget.widget-blooming {
+            animation: astroWidgetBloom 0.95s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+        .pin-dot {
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .pin-dot.filled {
+            background-color: #FF007A !important;
+            border-color: #FF007A !important;
+            box-shadow: 0 0 14px #FF007A, 0 0 24px rgba(255, 0, 122, 0.6) !important;
+            transform: scale(1.3) !important;
+        }
+        .pin-dot.success {
+            background-color: #10B981 !important;
+            border-color: #10B981 !important;
+            box-shadow: 0 0 16px #10B981, 0 0 28px rgba(16, 185, 129, 0.6) !important;
+        }
+        .admin-tab-btn.active {
+            background: rgba(255, 255, 255, 0.15) !important;
+            color: #00F0FF !important;
+            border-left: 3px solid #00F0FF !important;
+        }
+        .desktop-icon-btn .icon-box {
+            width: var(--desktop-icon-size, 3.5rem);
+            height: var(--desktop-icon-size, 3.5rem);
+            transition: width 0.2s ease, height 0.2s ease;
+        }
+        .desktop-icon-btn .icon-name {
+            font-size: var(--desktop-icon-font-size, 11px);
+        }
+        .glass-window {
+            backdrop-filter: blur(var(--glass-blur, 24px));
+            -webkit-backdrop-filter: blur(var(--glass-blur, 24px));
+        }
+
     </style>
 </head>
 <body class="h-screen w-screen overflow-hidden text-white flex flex-col justify-between">
+
+    <!-- ========================================== -->
+    <!-- WELCOME / AUTH SCREEN OVERLAY -->
+    <!-- ========================================== -->
+    <div id="welcome-screen" class="fixed inset-0 z-[100] flex items-center justify-center p-4 select-none overflow-hidden" style="background: radial-gradient(circle at 50% 40%, rgba(112, 0, 255, 0.35) 0%, rgba(5, 5, 16, 0.96) 80%), #050510;">
+        <!-- Ambient cosmic light glows -->
+        <div class="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-purple-600/25 blur-3xl pointer-events-none animate-pulse"></div>
+        <div class="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-pink-600/25 blur-3xl pointer-events-none animate-pulse" style="animation-delay: 1.5s;"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-cyan-500/10 blur-[120px] pointer-events-none"></div>
+
+        <!-- Preload Progress Bar -->
+        <div id="welcome-preload-bar" class="absolute top-0 left-0 h-1 bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-400 transition-all duration-500 w-1/3 opacity-70"></div>
+
+        <!-- Central Welcome Glass Card -->
+        <div id="welcome-card" class="relative z-10 w-full max-w-lg p-6 md:p-8 rounded-3xl bg-slate-900/85 border border-white/20 backdrop-blur-2xl shadow-2xl flex flex-col items-center text-center">
+            
+            <!-- Phase 1: Logo & Celestial Glow -->
+            <div class="relative mb-5 anim-logo-appear">
+                <!-- Rotating celestial ring -->
+                <div class="absolute -inset-3 rounded-full border border-pink-500/40 border-dashed animate-spin-slow pointer-events-none"></div>
+                <!-- Aura glow -->
+                <div class="absolute -inset-1 rounded-full bg-gradient-to-tr from-pink-500 via-purple-500 to-cyan-400 blur-md opacity-75"></div>
+                <!-- Logo Box -->
+                <div class="relative w-20 h-20 md:w-24 md:h-24 rounded-full bg-slate-950 p-1 flex items-center justify-center border-2 border-white/30 shadow-inner">
+                    <div class="w-full h-full rounded-full bg-gradient-to-br from-indigo-950 via-slate-900 to-slate-950 flex items-center justify-center text-4xl md:text-5xl select-none">
+                        🪐
+                    </div>
+                    <span class="absolute bottom-1 right-1 w-4 h-4 rounded-full bg-emerald-400 border-2 border-slate-950 shadow-sm animate-pulse"></span>
+                </div>
+            </div>
+
+            <!-- Phase 2: Title & Greeting -->
+            <div class="space-y-1.5 mb-6 anim-text-fade">
+                <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-mono text-cyan-300 mb-1">
+                    <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+                    <span>theAstroBruh OS Engine v2.0</span>
+                </div>
+                <h1 class="text-3xl md:text-4xl font-extrabold font-mono tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-pink-400 via-purple-300 to-cyan-400">
+                    the.astro.os
+                </h1>
+                <p class="text-xs md:text-sm text-gray-300 font-sans max-w-sm mx-auto">
+                    Experiencia visual de escritorio retrofuturista. Selecciona tu perfil de acceso:
+                </p>
+            </div>
+
+            <!-- Phase 3: Selection View -->
+            <div id="welcome-view-select" class="w-full space-y-3.5 anim-cards-appear">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 w-full">
+                    
+                    <!-- Admin Card -->
+                    <button onclick="showWelcomePinView()" class="group relative p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/15 hover:border-pink-500/60 transition-all duration-300 text-left flex flex-col justify-between overflow-hidden shadow-lg hover:shadow-pink-500/20 active:scale-95">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-pink-500/10 rounded-full blur-xl group-hover:bg-pink-500/25 transition-all"></div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="w-10 h-10 rounded-xl bg-pink-500/20 border border-pink-500/40 flex items-center justify-center text-xl">
+                                👑
+                            </span>
+                            <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-pink-500/20 text-pink-300 border border-pink-500/30 flex items-center space-x-1">
+                                <span>🔒 PIN 0412</span>
+                            </span>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold font-mono text-white group-hover:text-pink-300 transition-colors">Administrador</h3>
+                            <p class="text-[11px] text-gray-400 mt-0.5 leading-tight">Control total: edita pantallas, tamaños, iconos, widgets y ajustes.</p>
+                        </div>
+                    </button>
+
+                    <!-- Guest Card -->
+                    <button onclick="enterOperatingSystem('guest')" class="group relative p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/15 hover:border-cyan-400/60 transition-all duration-300 text-left flex flex-col justify-between overflow-hidden shadow-lg hover:shadow-cyan-400/20 active:scale-95">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-cyan-400/10 rounded-full blur-xl group-hover:bg-cyan-400/25 transition-all"></div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="w-10 h-10 rounded-xl bg-cyan-400/20 border border-cyan-400/40 flex items-center justify-center text-xl">
+                                🚀
+                            </span>
+                            <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center space-x-1">
+                                <span>⚡ Acceso Libre</span>
+                            </span>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold font-mono text-white group-hover:text-cyan-300 transition-colors">Invitado</h3>
+                            <p class="text-[11px] text-gray-400 mt-0.5 leading-tight">Explora aplicaciones interactivas, utilidades y música libremente.</p>
+                        </div>
+                    </button>
+
+                </div>
+
+                <div class="pt-2 text-[10px] font-mono text-gray-400 flex items-center justify-center space-x-1">
+                    <span>🪐 Elementos multimedia y de fondo sincronizados en memoria</span>
+                </div>
+            </div>
+
+            <!-- PIN Pad View (Hidden initially) -->
+            <div id="welcome-view-pin" class="w-full hidden flex-col items-center">
+                <div class="flex items-center justify-between w-full mb-3">
+                    <button onclick="showWelcomeSelectView()" class="text-xs font-mono text-gray-400 hover:text-pink-300 flex items-center space-x-1 transition-colors px-2 py-1 rounded-lg hover:bg-white/5">
+                        <span>← Volver</span>
+                    </button>
+                    <span class="text-xs font-mono font-bold text-pink-300 flex items-center space-x-1">
+                        <span>👑 Modo Administrador</span>
+                    </span>
+                    <div class="w-12"></div>
+                </div>
+
+                <p class="text-xs text-gray-300 mb-3 font-mono">Ingresa el PIN de seguridad (PIN: <span class="text-pink-400 font-bold">0412</span>)</p>
+
+                <!-- 4 PIN Dots -->
+                <div id="pin-dots-container" class="flex items-center space-x-4 mb-3">
+                    <div class="pin-dot w-4 h-4 rounded-full border-2 border-white/40 bg-white/10" id="pdot-0"></div>
+                    <div class="pin-dot w-4 h-4 rounded-full border-2 border-white/40 bg-white/10" id="pdot-1"></div>
+                    <div class="pin-dot w-4 h-4 rounded-full border-2 border-white/40 bg-white/10" id="pdot-2"></div>
+                    <div class="pin-dot w-4 h-4 rounded-full border-2 border-white/40 bg-white/10" id="pdot-3"></div>
+                </div>
+
+                <!-- Error message indicator -->
+                <div id="pin-error-msg" class="h-5 text-[11px] font-mono text-rose-400 font-bold opacity-0 transition-opacity mb-2">
+                    PIN incorrecto. Intenta de nuevo.
+                </div>
+
+                <!-- Numeric Keypad -->
+                <div class="grid grid-cols-3 gap-2.5 w-64 max-w-full">
+                    <button onclick="inputPinDigit('1')" class="h-11 rounded-xl bg-white/5 hover:bg-white/15 border border-white/15 text-sm font-mono font-bold hover:border-pink-500/50 active:scale-95 transition-all">1</button>
+                    <button onclick="inputPinDigit('2')" class="h-11 rounded-xl bg-white/5 hover:bg-white/15 border border-white/15 text-sm font-mono font-bold hover:border-pink-500/50 active:scale-95 transition-all">2</button>
+                    <button onclick="inputPinDigit('3')" class="h-11 rounded-xl bg-white/5 hover:bg-white/15 border border-white/15 text-sm font-mono font-bold hover:border-pink-500/50 active:scale-95 transition-all">3</button>
+                    <button onclick="inputPinDigit('4')" class="h-11 rounded-xl bg-white/5 hover:bg-white/15 border border-white/15 text-sm font-mono font-bold hover:border-pink-500/50 active:scale-95 transition-all">4</button>
+                    <button onclick="inputPinDigit('5')" class="h-11 rounded-xl bg-white/5 hover:bg-white/15 border border-white/15 text-sm font-mono font-bold hover:border-pink-500/50 active:scale-95 transition-all">5</button>
+                    <button onclick="inputPinDigit('6')" class="h-11 rounded-xl bg-white/5 hover:bg-white/15 border border-white/15 text-sm font-mono font-bold hover:border-pink-500/50 active:scale-95 transition-all">6</button>
+                    <button onclick="inputPinDigit('7')" class="h-11 rounded-xl bg-white/5 hover:bg-white/15 border border-white/15 text-sm font-mono font-bold hover:border-pink-500/50 active:scale-95 transition-all">7</button>
+                    <button onclick="inputPinDigit('8')" class="h-11 rounded-xl bg-white/5 hover:bg-white/15 border border-white/15 text-sm font-mono font-bold hover:border-pink-500/50 active:scale-95 transition-all">8</button>
+                    <button onclick="inputPinDigit('9')" class="h-11 rounded-xl bg-white/5 hover:bg-white/15 border border-white/15 text-sm font-mono font-bold hover:border-pink-500/50 active:scale-95 transition-all">9</button>
+                    <button onclick="clearPinInput()" class="h-11 rounded-xl bg-rose-500/10 hover:bg-rose-500/25 border border-rose-500/30 text-xs font-mono font-bold text-rose-300 active:scale-95 transition-all">✕</button>
+                    <button onclick="inputPinDigit('0')" class="h-11 rounded-xl bg-white/5 hover:bg-white/15 border border-white/15 text-sm font-mono font-bold hover:border-pink-500/50 active:scale-95 transition-all">0</button>
+                    <button onclick="backspacePinDigit()" class="h-11 rounded-xl bg-white/5 hover:bg-white/15 border border-white/15 text-sm font-mono font-bold hover:border-pink-500/50 active:scale-95 transition-all">⌫</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
 
     <!-- MOBILE TOP STATUS BAR (visible only on smartphones) -->
     <header id="mobile-status-bar">
@@ -841,6 +1093,21 @@
                 </div>
                 <span class="mt-1.5 text-[11px] font-semibold font-mono tracking-wide text-center text-gray-200 group-hover:text-cyan-300 drop-shadow-md select-none icon-name">CardGram</span>
             </div>
+
+            <!-- Icon 9: Panel Admin (Only for Admin or prompts PIN) -->
+            <div id="icon-win-admin" data-win="win-admin" data-default-order="8" class="desktop-icon-btn group flex flex-col items-center justify-center p-2 rounded-2xl cursor-pointer">
+                <div class="icon-box relative w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br from-amber-400 via-rose-500 to-purple-600 p-0.5 shadow-lg border border-white/20 flex items-center justify-center overflow-hidden">
+                    <div class="w-full h-full bg-slate-900 rounded-[14px] flex items-center justify-center relative overflow-hidden icon-content">
+                        <svg class="w-8 h-8 text-amber-400 group-hover:scale-110 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                        </svg>
+                        <span id="admin-icon-lock-badge" class="absolute top-1 right-1 text-[9px] hidden">🔒</span>
+                    </div>
+                </div>
+                <span class="mt-1.5 text-[11px] font-semibold font-mono tracking-wide text-center text-amber-200 group-hover:text-amber-100 drop-shadow-md select-none icon-name">Panel Admin</span>
+            </div>
+
 
         </div>
 
@@ -1232,6 +1499,262 @@
             </div>
         </div>
 
+
+        <!-- WINDOW: ADMIN CONTROL PANEL -->
+        <div id="win-admin" class="glass-window absolute top-6 left-4 md:left-24 w-[calc(100%-2rem)] md:w-[860px] h-[620px] max-h-[calc(100%-2rem)] z-30 flex flex-col hidden shadow-2xl border border-amber-500/30">
+            <!-- Titlebar -->
+            <div class="xp-titlebar px-4 py-2.5 flex items-center justify-between cursor-move select-none bg-gradient-to-r from-amber-600/30 via-slate-900/80 to-purple-900/30 border-b border-white/10">
+                <div class="flex items-center space-x-2">
+                    <span class="text-base">👑</span>
+                    <span id="win-admin-title" class="font-mono text-xs font-bold text-amber-300 tracking-wider">the.astro.os • Panel de Control de Administrador</span>
+                    <span id="win-admin-badge" class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30">Admin Activo</span>
+                </div>
+                <div class="flex items-center space-x-1.5">
+                    <button onclick="minimizeWindow('win-admin')" class="w-6 h-6 rounded-md bg-white/10 hover:bg-white/20 flex items-center justify-center text-xs font-mono text-gray-300 transition-colors">_</button>
+                    <button onclick="closeWindow('win-admin')" class="w-6 h-6 rounded-md bg-rose-500/30 hover:bg-rose-500/60 flex items-center justify-center text-xs font-mono text-rose-200 transition-colors">✕</button>
+                </div>
+            </div>
+
+            <!-- Body Layout: Sidebar Navigation + Tab Contents -->
+            <div class="flex-1 flex flex-col md:flex-row overflow-hidden bg-slate-950/70">
+                <!-- Sidebar Navigation -->
+                <div class="w-full md:w-56 bg-slate-900/60 border-b md:border-b-0 md:border-r border-white/10 p-2 md:p-3 flex md:flex-col space-x-1 md:space-x-0 md:space-y-1.5 overflow-x-auto md:overflow-x-visible shrink-0 select-none">
+                    <button onclick="switchAdminTab('icons')" id="admin-tab-btn-icons" class="admin-tab-btn active w-full px-3 py-2.5 rounded-xl text-left text-xs font-mono font-medium flex items-center space-x-2.5 transition-all text-cyan-300">
+                        <span class="text-base">🖼️</span>
+                        <span class="truncate">Iconos & Escritorio</span>
+                    </button>
+                    <button onclick="switchAdminTab('windows')" id="admin-tab-btn-windows" class="admin-tab-btn w-full px-3 py-2.5 rounded-xl text-left text-xs font-mono font-medium flex items-center space-x-2.5 transition-all text-gray-400 hover:text-white hover:bg-white/5">
+                        <span class="text-base">🪟</span>
+                        <span class="truncate">Pantallas & Ventanas</span>
+                    </button>
+                    <button onclick="switchAdminTab('widgets')" id="admin-tab-btn-widgets" class="admin-tab-btn w-full px-3 py-2.5 rounded-xl text-left text-xs font-mono font-medium flex items-center space-x-2.5 transition-all text-gray-400 hover:text-white hover:bg-white/5">
+                        <span class="text-base">🎬</span>
+                        <span class="truncate">Widgets Multimedia</span>
+                    </button>
+                    <button onclick="switchAdminTab('effects')" id="admin-tab-btn-effects" class="admin-tab-btn w-full px-3 py-2.5 rounded-xl text-left text-xs font-mono font-medium flex items-center space-x-2.5 transition-all text-gray-400 hover:text-white hover:bg-white/5">
+                        <span class="text-base">🌌</span>
+                        <span class="truncate">Fondo & Efectos</span>
+                    </button>
+                    <button onclick="switchAdminTab('system')" id="admin-tab-btn-system" class="admin-tab-btn w-full px-3 py-2.5 rounded-xl text-left text-xs font-mono font-medium flex items-center space-x-2.5 transition-all text-gray-400 hover:text-white hover:bg-white/5">
+                        <span class="text-base">⚙️</span>
+                        <span class="truncate">Seguridad & Sistema</span>
+                    </button>
+                </div>
+
+                <!-- Tab Contents Area -->
+                <div class="flex-1 p-4 md:p-6 overflow-y-auto space-y-4 text-xs font-sans text-gray-200">
+                    <!-- TAB 1: ICONOS Y ESCRITORIO -->
+                    <div id="admin-tab-pane-icons" class="space-y-5">
+                        <div class="border-b border-white/10 pb-3">
+                            <h3 class="text-sm font-bold font-mono text-cyan-300 flex items-center space-x-2">
+                                <span>🖼️ Configuración de Iconos del Escritorio</span>
+                            </h3>
+                            <p class="text-[11px] text-gray-400">Modifica tamaños, nombres, visibilidad y distribución en tiempo real.</p>
+                        </div>
+
+                        <!-- Dimension Sliders Card -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-2xl bg-white/5 border border-white/10">
+                            <div class="space-y-1.5">
+                                <div class="flex justify-between">
+                                    <label class="text-[11px] font-mono font-bold text-gray-300">Tamaño de Iconos</label>
+                                    <span id="admin-icon-size-val" class="font-mono text-cyan-400 font-bold">60px</span>
+                                </div>
+                                <input type="range" id="admin-icon-size-slider" min="44" max="88" value="60" oninput="updateAdminIconSize(this.value)" class="w-full accent-cyan-400 cursor-pointer">
+                            </div>
+                            <div class="space-y-1.5">
+                                <div class="flex justify-between">
+                                    <label class="text-[11px] font-mono font-bold text-gray-300">Tamaño de Texto</label>
+                                    <span id="admin-icon-font-val" class="font-mono text-cyan-400 font-bold">11px</span>
+                                </div>
+                                <input type="range" id="admin-icon-font-slider" min="9" max="15" value="11" oninput="updateAdminIconFontSize(this.value)" class="w-full accent-cyan-400 cursor-pointer">
+                            </div>
+                        </div>
+
+                        <!-- Desktop Icons List -->
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <h4 class="text-xs font-mono font-bold text-white">Gestión individual de iconos</h4>
+                                <div class="space-x-2">
+                                    <button onclick="rearrangeAdminIcons()" class="px-2.5 py-1 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/30 font-mono text-[10px]">🔄 Reordenar cuadrícula</button>
+                                    <button onclick="resetAdminIconDefaults()" class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/15 text-gray-300 border border-white/10 font-mono text-[10px]">↺ Restablecer todo</button>
+                                </div>
+                            </div>
+                            <div id="admin-icons-list" class="space-y-2 max-h-72 overflow-y-auto pr-1">
+                                <!-- Populated dynamically via JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 2: PANTALLAS Y VENTANAS -->
+                    <div id="admin-tab-pane-windows" class="hidden space-y-5">
+                        <div class="border-b border-white/10 pb-3">
+                            <h3 class="text-sm font-bold font-mono text-pink-300 flex items-center space-x-2">
+                                <span>🪟 Configuración de Pantallas y Ventanas del Sistema</span>
+                            </h3>
+                            <p class="text-[11px] text-gray-400">Personaliza los títulos de las barras superiores y las dimensiones de cada ventana.</p>
+                        </div>
+                        <div id="admin-windows-list" class="space-y-3 max-h-96 overflow-y-auto pr-1">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+                    </div>
+
+                    <!-- TAB 3: WIDGETS MULTIMEDIA -->
+                    <div id="admin-tab-pane-widgets" class="hidden space-y-5">
+                        <div class="border-b border-white/10 pb-3">
+                            <h3 class="text-sm font-bold font-mono text-yellow-300 flex items-center space-x-2">
+                                <span>🎬 Widgets Multimedia del Escritorio</span>
+                            </h3>
+                            <p class="text-[11px] text-gray-400">Edita las 2 imágenes y el GIF del escritorio: URLs, dimensiones y posiciones.</p>
+                        </div>
+                        <div id="admin-widgets-list" class="space-y-4 max-h-96 overflow-y-auto pr-1">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+                        <div class="flex justify-end pt-2">
+                            <button onclick="resetAdminWidgets()" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-gray-200 text-xs font-mono border border-white/15">↺ Restablecer Widgets Originales</button>
+                        </div>
+                    </div>
+
+                    <!-- TAB 4: FONDO Y EFECTOS -->
+                    <div id="admin-tab-pane-effects" class="hidden space-y-5">
+                        <div class="border-b border-white/10 pb-3">
+                            <h3 class="text-sm font-bold font-mono text-purple-300 flex items-center space-x-2">
+                                <span>🌌 Fondo Cósmico, Estrellas y Efectos Visuales</span>
+                            </h3>
+                            <p class="text-[11px] text-gray-400">Ajusta los degradados del universo, la densidad del campo estelar y el desenfoque de cristal.</p>
+                        </div>
+
+                        <!-- Theme Presets -->
+                        <div class="space-y-2">
+                            <label class="text-[11px] font-mono font-bold text-gray-300">Presets Temáticos Rápidos</label>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                <button onclick="applyAdminThemePreset('cyberpunk')" class="p-2 rounded-xl bg-gradient-to-r from-pink-600/30 to-purple-900/30 border border-pink-500/30 hover:border-pink-500 text-left font-mono text-[11px]">
+                                    🌸 Cyberpunk Void
+                                </button>
+                                <button onclick="applyAdminThemePreset('deepspace')" class="p-2 rounded-xl bg-gradient-to-r from-blue-900/30 to-slate-900/30 border border-blue-500/30 hover:border-blue-500 text-left font-mono text-[11px]">
+                                    🌌 Deep Cosmic
+                                </button>
+                                <button onclick="applyAdminThemePreset('sunset')" class="p-2 rounded-xl bg-gradient-to-r from-amber-600/30 to-rose-900/30 border border-amber-500/30 hover:border-amber-500 text-left font-mono text-[11px]">
+                                    🌅 Sunset Aurora
+                                </button>
+                                <button onclick="applyAdminThemePreset('matrix')" class="p-2 rounded-xl bg-gradient-to-r from-emerald-900/30 to-teal-900/30 border border-emerald-500/30 hover:border-emerald-500 text-left font-mono text-[11px]">
+                                    🟢 Emerald Matrix
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Gradient Colors Pickers -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 rounded-2xl bg-white/5 border border-white/10">
+                            <div>
+                                <label class="block text-[11px] font-mono text-gray-300 mb-1">Color Superior</label>
+                                <div class="flex items-center space-x-2">
+                                    <input type="color" id="admin-color-top" onchange="updateAdminColors()" class="w-8 h-8 rounded border-0 cursor-pointer bg-transparent">
+                                    <span id="admin-color-top-val" class="font-mono text-[11px] text-gray-300">#050510</span>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-mono text-gray-300 mb-1">Color Medio</label>
+                                <div class="flex items-center space-x-2">
+                                    <input type="color" id="admin-color-mid" onchange="updateAdminColors()" class="w-8 h-8 rounded border-0 cursor-pointer bg-transparent">
+                                    <span id="admin-color-mid-val" class="font-mono text-[11px] text-gray-300">#160c28</span>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-mono text-gray-300 mb-1">Color Inferior</label>
+                                <div class="flex items-center space-x-2">
+                                    <input type="color" id="admin-color-bot" onchange="updateAdminColors()" class="w-8 h-8 rounded border-0 cursor-pointer bg-transparent">
+                                    <span id="admin-color-bot-val" class="font-mono text-[11px] text-gray-300">#3b1c3c</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Starfield Controls -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-2xl bg-white/5 border border-white/10">
+                            <div class="space-y-1.5">
+                                <div class="flex justify-between">
+                                    <label class="text-[11px] font-mono font-bold text-gray-300">Cantidad de Estrellas</label>
+                                    <span id="admin-star-count-val" class="font-mono text-cyan-400 font-bold">250</span>
+                                </div>
+                                <input type="range" id="admin-star-count-slider" min="60" max="600" value="250" oninput="updateAdminStarCount(this.value)" class="w-full accent-cyan-400 cursor-pointer">
+                            </div>
+                            <div class="space-y-1.5">
+                                <div class="flex justify-between">
+                                    <label class="text-[11px] font-mono font-bold text-gray-300">Velocidad del Universo</label>
+                                    <span id="admin-star-speed-val" class="font-mono text-pink-400 font-bold">1.0x</span>
+                                </div>
+                                <input type="range" id="admin-star-speed-slider" min="1" max="40" value="10" oninput="updateAdminStarSpeed(this.value)" class="w-full accent-pink-400 cursor-pointer">
+                            </div>
+                        </div>
+
+                        <!-- Glass Blur Control -->
+                        <div class="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-1.5">
+                            <div class="flex justify-between">
+                                <label class="text-[11px] font-mono font-bold text-gray-300">Nivel de Desenfoque de Cristal (Backdrop Blur)</label>
+                                <span id="admin-glass-blur-val" class="font-mono text-purple-400 font-bold">24px</span>
+                            </div>
+                            <input type="range" id="admin-glass-blur-slider" min="8" max="40" value="24" oninput="updateAdminGlassBlur(this.value)" class="w-full accent-purple-400 cursor-pointer">
+                        </div>
+                    </div>
+
+                    <!-- TAB 5: SEGURIDAD Y SISTEMA -->
+                    <div id="admin-tab-pane-system" class="hidden space-y-5">
+                        <div class="border-b border-white/10 pb-3">
+                            <h3 class="text-sm font-bold font-mono text-amber-300 flex items-center space-x-2">
+                                <span>⚙️ Seguridad, PIN y Persistencia del Sistema</span>
+                            </h3>
+                            <p class="text-[11px] text-gray-400">Gestiona la clave de acceso, guarda cambios y exporta/importa tu configuración completa.</p>
+                        </div>
+
+                        <!-- Admin PIN Configuration Card -->
+                        <div class="p-4 rounded-2xl bg-white/5 border border-amber-500/20 space-y-3">
+                            <div class="flex items-center justify-between">
+                                <h4 class="text-xs font-mono font-bold text-amber-300 flex items-center space-x-1.5">
+                                    <span>🔐 PIN de Seguridad de Administrador</span>
+                                </h4>
+                                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-300">Activo: 4 dígitos</span>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 items-end">
+                                <div>
+                                    <label class="block text-[11px] font-mono text-gray-300 mb-1">Nuevo PIN (4 dígitos numéricos)</label>
+                                    <input type="password" maxlength="4" id="admin-new-pin-input" placeholder="Ej: 0412" class="w-full bg-slate-900 border border-white/20 rounded-xl px-3 py-2 text-sm font-mono tracking-widest text-white focus:outline-none focus:border-amber-400">
+                                </div>
+                                <button onclick="updateAdminPin()" class="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-mono font-bold text-xs transition-all active:scale-95 shadow-lg shadow-amber-500/20">
+                                    Actualizar PIN
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Storage & Backup Actions -->
+                        <div class="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-3">
+                            <h4 class="text-xs font-mono font-bold text-white">Copia de Seguridad y Restauración</h4>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <button onclick="saveAllAdminConfig(true)" class="p-3 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-cyan-300 font-mono text-xs font-bold flex items-center justify-center space-x-2 transition-all">
+                                    <span>💾 Guardar Todo en Navegador</span>
+                                </button>
+                                <button onclick="exportAdminConfigJSON()" class="p-3 rounded-xl bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/40 text-purple-300 font-mono text-xs font-bold flex items-center justify-center space-x-2 transition-all">
+                                    <span>📥 Exportar Configuración JSON</span>
+                                </button>
+                                <button onclick="triggerImportAdminConfig()" class="p-3 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 font-mono text-xs font-bold flex items-center justify-center space-x-2 transition-all">
+                                    <span>📤 Importar Configuración JSON</span>
+                                </button>
+                                <input type="file" id="admin-import-file" accept=".json" class="hidden" onchange="handleAdminImportFile(event)">
+                                <button onclick="resetFactorySettings()" class="p-3 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 font-mono text-xs font-bold flex items-center justify-center space-x-2 transition-all">
+                                    <span>⚠️ Restaurar Ajustes de Fábrica</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Session management -->
+                        <div class="pt-2 flex justify-between items-center border-t border-white/10">
+                            <span class="text-[11px] font-mono text-gray-400">Sesión actual: <strong class="text-amber-300">Administrador</strong></span>
+                            <button onclick="logoutToWelcome(); closeWindow('win-admin');" class="px-4 py-2 rounded-xl bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 border border-rose-500/40 font-mono text-xs font-bold transition-all">
+                                🚪 Cerrar Sesión / Ir a Bienvenida
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </main>
 
     <!-- FLOATING TOOLBAR FOR DESKTOP DRAWING OVERLAY -->
@@ -1348,6 +1871,16 @@
 
         <!-- Start Menu Menu Items -->
         <div class="py-3 space-y-1">
+
+            <div id="start-user-badge-container" class="px-2 py-1 mb-1">
+                <span id="start-user-badge" class="px-2.5 py-1 rounded-full text-[10px] font-mono inline-flex items-center space-x-1.5 bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                    <span>👑 Modo Administrador</span>
+                </span>
+            </div>
+            <button id="start-admin-btn" onclick="openWindow('win-admin'); toggleStartMenu();" class="w-full p-2 rounded-xl hover:bg-white/10 flex items-center space-x-3 text-left text-xs font-semibold text-amber-300">
+                <span>👑 Panel de Control Admin</span>
+            </button>
+
             <button onclick="openWindow('win-astroverse'); toggleStartMenu();" class="w-full p-2 rounded-xl hover:bg-white/10 flex items-center space-x-3 text-left text-xs font-semibold text-pink-300">
                 <span>🪐 theAstroBruh & Links</span>
             </button>
@@ -1375,6 +1908,11 @@
             <button onclick="openWindow('win-icon-manager'); toggleStartMenu();" class="w-full p-2 rounded-xl hover:bg-white/10 flex items-center space-x-3 text-left text-xs font-semibold text-cyan-300">
                 <span>🖼️ Personalizar Íconos</span>
             </button>
+
+            <button onclick="logoutToWelcome(); toggleStartMenu();" class="w-full p-2 rounded-xl hover:bg-rose-500/20 flex items-center space-x-3 text-left text-xs font-semibold text-rose-300 border-t border-white/10 mt-1 pt-2">
+                <span>🚪 Cerrar Sesión / Cambiar Usuario</span>
+            </button>
+
             <button onclick="resetIconLayout(); toggleStartMenu();" class="w-full p-2 rounded-xl hover:bg-white/10 flex items-center space-x-3 text-left text-xs font-semibold text-emerald-300">
                 <span>🔄 Reordenar Íconos</span>
             </button>
@@ -1816,7 +2354,7 @@
             update() {
                 this.opacity += this.blinkSpeed * this.direction;
                 if (this.opacity >= 1 || this.opacity <= 0.1) this.direction *= -1;
-                this.y -= 0.1;
+                this.y -= 0.1 * (window.starSpeedMultiplier || 1.0);
                 if (this.y < 0) this.y = height;
             }
             draw() {
@@ -1830,7 +2368,7 @@
         function initStars() {
             resizeCanvas();
             stars = [];
-            for (let i = 0; i < 250; i++) stars.push(new Star());
+            for (let i = 0; i < (window.starCountSetting || 250); i++) stars.push(new Star());
         }
 
         function animateStars() {
@@ -2907,6 +3445,7 @@
 
         // --- 11. INITIALIZATION ---
         window.onload = function() {
+            initAdminSystem();
             loadTimezonePreferences();
             updateMultiClock();
             initMusicPlayer();
@@ -2949,6 +3488,871 @@
                 });
             }, 250);
         });
+
+        // ==========================================
+        // 12. ADMIN CONFIGURATION & WELCOME SYSTEM
+        // ==========================================
+        const DEFAULT_ADMIN_CONFIG = {
+            version: '2.0',
+            security: {
+                adminPin: '0412',
+                osTitle: 'the.astro.os'
+            },
+            desktop: {
+                iconSize: 60,
+                fontSize: 11,
+                gridGap: 16,
+                icons: {
+                    'icon-win-astroverse': { name: 'Astro.Verse', visible: true },
+                    'icon-win-draw': { name: 'Pintura', visible: true },
+                    'icon-win-notes': { name: 'Cuaderno', visible: true },
+                    'icon-win-terminal': { name: 'Terminal', visible: true },
+                    'icon-win-themes': { name: 'Theme.XP', visible: true },
+                    'icon-win-music': { name: 'Música', visible: true },
+                    'icon-win-mediaflow': { name: 'MediaFlow', visible: true },
+                    'icon-win-cardgram': { name: 'CardGram', visible: true },
+                    'icon-win-admin': { name: 'Panel Admin', visible: true }
+                }
+            },
+            windows: {
+                'win-astroverse': { title: 'Astro.Verse • Creator Card', width: '400px', height: 'auto' },
+                'win-draw': { title: 'Pintura Studio • Astro.Paint', width: '720px', height: '550px' },
+                'win-notes': { title: 'Astro.Notes • Cuaderno & Glosario', width: '780px', height: '540px' },
+                'win-music': { title: 'Astro.Radio • Cyber Beats', width: '600px', height: '500px' },
+                'win-mediaflow': { title: 'MediaFlow Studio', width: '1080px', height: '760px' },
+                'win-cardgram': { title: 'CardGram • Showcase', width: '1080px', height: '760px' },
+                'win-terminal': { title: 'astro@os:~ (Terminal)', width: '580px', height: '400px' },
+                'win-themes': { title: 'Theme Studio • Personalización', width: '520px', height: '460px' },
+                'win-icon-manager': { title: 'Personalizar Íconos', width: '580px', height: '480px' },
+                'win-admin': { title: '👑 Panel de Control de Administrador', width: '860px', height: '620px' }
+            },
+            widgets: {
+                'media-widget-1': {
+                    url: 'https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=400&q=80',
+                    label: 'Cosmos.jpg',
+                    width: 176,
+                    height: 176,
+                    top: '12%',
+                    right: '8%',
+                    visible: true
+                },
+                'media-widget-2': {
+                    url: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=400&q=80',
+                    label: 'AstroCity.png',
+                    width: 192,
+                    height: 144,
+                    bottom: '16%',
+                    right: '18%',
+                    visible: true
+                },
+                'media-widget-3': {
+                    url: 'https://media.tenor.com/hWEGQvJ2ntsAAAAM/haishatp-dahyun.gif',
+                    label: 'Dahyun.gif',
+                    width: 160,
+                    height: 160,
+                    top: '50%',
+                    left: '18%',
+                    visible: true
+                }
+            },
+            effects: {
+                bgTop: '#050510',
+                bgMiddle: '#160c28',
+                bgBottom: '#3b1c3c',
+                starCount: 250,
+                starSpeed: 1.0,
+                glassBlur: 24
+            }
+        };
+
+        let adminConfig = JSON.parse(JSON.stringify(DEFAULT_ADMIN_CONFIG));
+        let currentUserRole = null; // 'admin' | 'guest'
+        let currentPinBuffer = '';
+        let pinValidationInProgress = false;
+
+        // Load & Initialize Admin Configuration
+        function initAdminSystem() {
+            try {
+                const saved = localStorage.getItem('astro_os_admin_config');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    adminConfig = Object.assign({}, DEFAULT_ADMIN_CONFIG, parsed);
+                    if (parsed.desktop) adminConfig.desktop = Object.assign({}, DEFAULT_ADMIN_CONFIG.desktop, parsed.desktop);
+                    if (parsed.security) adminConfig.security = Object.assign({}, DEFAULT_ADMIN_CONFIG.security, parsed.security);
+                    if (parsed.effects) adminConfig.effects = Object.assign({}, DEFAULT_ADMIN_CONFIG.effects, parsed.effects);
+                    if (parsed.widgets) adminConfig.widgets = Object.assign({}, DEFAULT_ADMIN_CONFIG.widgets, parsed.widgets);
+                    if (parsed.windows) adminConfig.windows = Object.assign({}, DEFAULT_ADMIN_CONFIG.windows, parsed.windows);
+                }
+            } catch (e) {
+                console.warn('Could not load admin config:', e);
+            }
+            applyAdminConfigToDOM();
+            preloadBackgroundAssets();
+            setupPinKeyboardListener();
+        }
+
+        // Apply configuration live to DOM
+        function applyAdminConfigToDOM() {
+            // 1. Icon sizes and fonts
+            document.documentElement.style.setProperty('--desktop-icon-size', `${adminConfig.desktop.iconSize}px`);
+            document.documentElement.style.setProperty('--desktop-icon-font-size', `${adminConfig.desktop.fontSize}px`);
+            document.documentElement.style.setProperty('--glass-blur', `${adminConfig.effects.glassBlur}px`);
+
+            // Apply custom icon names and visibility
+            if (adminConfig.desktop.icons) {
+                Object.keys(adminConfig.desktop.icons).forEach(iconId => {
+                    const iconEl = document.getElementById(iconId);
+                    if (iconEl) {
+                        const iconData = adminConfig.desktop.icons[iconId];
+                        const nameSpan = iconEl.querySelector('.icon-name');
+                        if (nameSpan && iconData.name) nameSpan.innerText = iconData.name;
+                        iconEl.style.display = iconData.visible === false ? 'none' : 'flex';
+                    }
+                });
+            }
+
+            // 2. Windows titles and dimensions
+            if (adminConfig.windows) {
+                Object.keys(adminConfig.windows).forEach(winId => {
+                    const winEl = document.getElementById(winId);
+                    if (winEl) {
+                        const winData = adminConfig.windows[winId];
+                        const titleEl = winEl.querySelector('.xp-titlebar span');
+                        if (titleEl && winData.title && winId !== 'win-admin') {
+                            titleEl.innerText = winData.title;
+                        }
+                        if (winData.width && !isMobileLayout()) winEl.style.width = winData.width;
+                        if (winData.height && !isMobileLayout() && winData.height !== 'auto') winEl.style.height = winData.height;
+                    }
+                });
+            }
+
+            // 3. Widgets sources and layout
+            if (adminConfig.widgets) {
+                Object.keys(adminConfig.widgets).forEach(wId => {
+                    const wEl = document.getElementById(wId);
+                    if (wEl) {
+                        const wData = adminConfig.widgets[wId];
+                        const img = wEl.querySelector('img');
+                        const label = wEl.querySelector('span');
+                        if (img && wData.url) img.src = wData.url;
+                        if (label && wData.label) label.innerText = wData.label;
+                        if (wData.visible === false) wEl.style.display = 'none';
+                        else wEl.style.display = '';
+                    }
+                });
+            }
+
+            // 4. Effects: background colors & starfield
+            document.documentElement.style.setProperty('--bg-top', adminConfig.effects.bgTop);
+            document.documentElement.style.setProperty('--bg-middle', adminConfig.effects.bgMiddle);
+            document.documentElement.style.setProperty('--bg-bottom', adminConfig.effects.bgBottom);
+
+            window.starCountSetting = adminConfig.effects.starCount || 250;
+            window.starSpeedMultiplier = adminConfig.effects.starSpeed || 1.0;
+            if (typeof initStars === 'function') {
+                initStars(window.starCountSetting);
+            }
+        }
+
+        // Silent Asset Preloader
+        function preloadBackgroundAssets() {
+            const urls = [
+                'https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=400&q=80',
+                'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=400&q=80',
+                'https://media.tenor.com/hWEGQvJ2ntsAAAAM/haishatp-dahyun.gif'
+            ];
+            if (adminConfig.widgets) {
+                Object.values(adminConfig.widgets).forEach(w => {
+                    if (w.url && !urls.includes(w.url)) urls.push(w.url);
+                });
+            }
+
+            let loadedCount = 0;
+            const bar = document.getElementById('welcome-preload-bar');
+            urls.forEach(url => {
+                const img = new Image();
+                img.onload = img.onerror = () => {
+                    loadedCount++;
+                    const pct = Math.round((loadedCount / urls.length) * 100);
+                    if (bar) bar.style.width = `${pct}%`;
+                };
+                img.src = url;
+            });
+        }
+
+        // Welcome Screen View Toggles
+        function showWelcomePinView() {
+            document.getElementById('welcome-view-select').classList.add('hidden');
+            const pinView = document.getElementById('welcome-view-pin');
+            pinView.classList.remove('hidden');
+            pinView.classList.add('flex');
+            clearPinInput();
+        }
+
+        function showWelcomeSelectView() {
+            document.getElementById('welcome-view-pin').classList.add('hidden');
+            document.getElementById('welcome-view-pin').classList.remove('flex');
+            document.getElementById('welcome-view-select').classList.remove('hidden');
+            clearPinInput();
+        }
+
+        // PIN Keypad Management
+        function inputPinDigit(digit) {
+            if (pinValidationInProgress || currentPinBuffer.length >= 4) return;
+            currentPinBuffer += digit;
+            updatePinDotsUI();
+
+            if (currentPinBuffer.length === 4) {
+                validatePinCode();
+            }
+        }
+
+        function backspacePinDigit() {
+            if (pinValidationInProgress || currentPinBuffer.length === 0) return;
+            currentPinBuffer = currentPinBuffer.slice(0, -1);
+            updatePinDotsUI();
+        }
+
+        function clearPinInput() {
+            currentPinBuffer = '';
+            updatePinDotsUI();
+            const err = document.getElementById('pin-error-msg');
+            if (err) err.style.opacity = '0';
+        }
+
+        function updatePinDotsUI() {
+            for (let i = 0; i < 4; i++) {
+                const dot = document.getElementById(`pdot-${i}`);
+                if (!dot) continue;
+                if (i < currentPinBuffer.length) {
+                    dot.classList.add('filled');
+                } else {
+                    dot.classList.remove('filled', 'success');
+                }
+            }
+        }
+
+        function validatePinCode() {
+            pinValidationInProgress = true;
+            const targetPin = (adminConfig.security && adminConfig.security.adminPin) ? adminConfig.security.adminPin : '0412';
+
+            if (currentPinBuffer === targetPin) {
+                // Success: turn dots green
+                for (let i = 0; i < 4; i++) {
+                    const dot = document.getElementById(`pdot-${i}`);
+                    if (dot) dot.classList.add('success');
+                }
+                setTimeout(() => {
+                    pinValidationInProgress = false;
+                    enterOperatingSystem('admin');
+                }, 350);
+            } else {
+                // Failure: shake & clear
+                const dotsCont = document.getElementById('pin-dots-container');
+                const err = document.getElementById('pin-error-msg');
+                if (dotsCont) dotsCont.classList.add('shake-error');
+                if (err) err.style.opacity = '1';
+
+                setTimeout(() => {
+                    if (dotsCont) dotsCont.classList.remove('shake-error');
+                    clearPinInput();
+                    pinValidationInProgress = false;
+                }, 700);
+            }
+        }
+
+        function setupPinKeyboardListener() {
+            window.addEventListener('keydown', (e) => {
+                const pinView = document.getElementById('welcome-view-pin');
+                if (!pinView || pinView.classList.contains('hidden')) return;
+
+                if (e.key >= '0' && e.key <= '9') {
+                    inputPinDigit(e.key);
+                } else if (e.key === 'Backspace') {
+                    backspacePinDigit();
+                } else if (e.key === 'Escape') {
+                    showWelcomeSelectView();
+                }
+            });
+        }
+
+        // ==========================================
+        // DESKTOP ENTRANCE SEQUENCE & ANIMATIONS
+        // ==========================================
+        function enterOperatingSystem(role) {
+            currentUserRole = role;
+            updateRoleUI();
+
+            const welcomeEl = document.getElementById('welcome-screen');
+            if (welcomeEl) {
+                welcomeEl.classList.add('welcome-leaving');
+                setTimeout(() => {
+                    welcomeEl.style.display = 'none';
+                }, 750);
+            }
+
+            // Sequential Staggered Entrance of Icons
+            playDesktopEntranceSequence();
+
+            // Toast greeting
+            if (role === 'admin') {
+                showToast("👑 Sesión iniciada: Modo Administrador activado");
+            } else {
+                showToast("🚀 Bienvenido a the.astro.os en Modo Invitado");
+            }
+        }
+
+        function playDesktopEntranceSequence() {
+            const icons = Array.from(document.querySelectorAll('.desktop-icon-btn'));
+            const widgets = Array.from(document.querySelectorAll('.desktop-media-widget'));
+
+            // 1. Reset and hide all icons and widgets first
+            icons.forEach(el => {
+                el.classList.remove('icon-animating');
+                el.style.opacity = '0';
+            });
+            widgets.forEach(w => {
+                w.classList.remove('widget-blooming');
+                w.style.opacity = '0';
+            });
+
+            // 2. Cascade desktop icons one by one
+            const iconStagger = 75; // ms
+            icons.forEach((icon, idx) => {
+                setTimeout(() => {
+                    icon.style.opacity = '1';
+                    icon.classList.add('icon-animating');
+                }, 300 + idx * iconStagger);
+            });
+
+            // 3. Bloom widgets sequentially right after icons finish
+            const widgetStartDelay = 300 + (icons.length * iconStagger) + 150;
+            widgets.forEach((widget, wIdx) => {
+                setTimeout(() => {
+                    widget.style.opacity = '1';
+                    widget.classList.add('widget-blooming');
+                }, widgetStartDelay + wIdx * 160);
+            });
+        }
+
+        // Update UI based on active role
+        function updateRoleUI() {
+            const badge = document.getElementById('start-user-badge');
+            const adminStartBtn = document.getElementById('start-admin-btn');
+            const adminIcon = document.getElementById('icon-win-admin');
+            const lockBadge = document.getElementById('admin-icon-lock-badge');
+
+            if (currentUserRole === 'admin') {
+                if (badge) {
+                    badge.innerHTML = '<span>👑 Modo Administrador</span>';
+                    badge.className = "px-2.5 py-1 rounded-full text-[10px] font-mono inline-flex items-center space-x-1.5 bg-amber-500/20 text-amber-300 border border-amber-500/30";
+                }
+                if (adminStartBtn) adminStartBtn.style.display = '';
+                if (adminIcon) adminIcon.style.opacity = '1';
+                if (lockBadge) lockBadge.classList.add('hidden');
+            } else {
+                if (badge) {
+                    badge.innerHTML = '<span>🚀 Modo Invitado</span>';
+                    badge.className = "px-2.5 py-1 rounded-full text-[10px] font-mono inline-flex items-center space-x-1.5 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+                }
+                if (lockBadge) lockBadge.classList.remove('hidden');
+            }
+        }
+
+        // Intercept opening admin window if in guest mode
+        const originalOpenWindow = openWindow;
+        openWindow = function(winId) {
+            if (winId === 'win-admin' && currentUserRole !== 'admin') {
+                // Prompt PIN elevation modal
+                showAdminPinPromptModal();
+                return;
+            }
+            originalOpenWindow(winId);
+            if (winId === 'win-admin') {
+                renderAdminPanel();
+            }
+        };
+
+        function showAdminPinPromptModal() {
+            const pin = prompt("👑 Acceso de Administrador requerido.\nIntroduce el PIN (0412):");
+            const targetPin = (adminConfig.security && adminConfig.security.adminPin) ? adminConfig.security.adminPin : '0412';
+            if (pin === targetPin) {
+                currentUserRole = 'admin';
+                updateRoleUI();
+                showToast("👑 Modo Administrador desbloqueado!");
+                originalOpenWindow('win-admin');
+                renderAdminPanel();
+            } else if (pin !== null) {
+                alert("❌ PIN incorrecto.");
+            }
+        }
+
+        // Logout to Welcome Screen
+        function logoutToWelcome() {
+            // Close all windows
+            openWindowsMap.forEach(w => closeWindow(w));
+            currentUserRole = null;
+            const welcomeEl = document.getElementById('welcome-screen');
+            if (welcomeEl) {
+                welcomeEl.style.display = 'flex';
+                welcomeEl.classList.remove('welcome-leaving');
+                showWelcomeSelectView();
+            }
+        }
+
+        // ==========================================
+        // ADMIN PANEL CATEGORY & TABS CONTROLLER
+        // ==========================================
+        function switchAdminTab(tabKey) {
+            const tabs = ['icons', 'windows', 'widgets', 'effects', 'system'];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`admin-tab-btn-${t}`);
+                const pane = document.getElementById(`admin-tab-pane-${t}`);
+                if (btn) {
+                    if (t === tabKey) btn.classList.add('active');
+                    else btn.classList.remove('active');
+                }
+                if (pane) {
+                    if (t === tabKey) pane.classList.remove('hidden');
+                    else pane.classList.add('hidden');
+                }
+            });
+        }
+
+        function renderAdminPanel() {
+            // Tab 1: Icons
+            const slider = document.getElementById('admin-icon-size-slider');
+            const fontSlider = document.getElementById('admin-icon-font-slider');
+            if (slider) slider.value = adminConfig.desktop.iconSize;
+            if (fontSlider) fontSlider.value = adminConfig.desktop.fontSize;
+            document.getElementById('admin-icon-size-val').innerText = `${adminConfig.desktop.iconSize}px`;
+            document.getElementById('admin-icon-font-val').innerText = `${adminConfig.desktop.fontSize}px`;
+
+            renderAdminIconsList();
+            renderAdminWindowsList();
+            renderAdminWidgetsList();
+            renderAdminEffectsSettings();
+        }
+
+        // Tab 1: Render Icons List
+        function renderAdminIconsList() {
+            const container = document.getElementById('admin-icons-list');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const icons = Array.from(document.querySelectorAll('.desktop-icon-btn'));
+            icons.forEach(iconEl => {
+                const id = iconEl.id;
+                const winId = iconEl.dataset.win;
+                const currentName = iconEl.querySelector('.icon-name') ? iconEl.querySelector('.icon-name').innerText : id;
+                const isVisible = iconEl.style.display !== 'none';
+
+                const row = document.createElement('div');
+                row.className = "flex items-center justify-between p-2.5 rounded-xl bg-white/5 border border-white/10 space-x-3";
+                row.innerHTML = `
+                    <div class="flex items-center space-x-2.5 flex-1 min-w-0">
+                        <span class="text-sm">📌</span>
+                        <input type="text" value="${currentName}" onchange="updateAdminIconName('${id}', this.value)" class="bg-black/40 border border-white/15 rounded-lg px-2.5 py-1 text-xs font-mono text-cyan-200 focus:outline-none focus:border-cyan-400 w-44 truncate">
+                        <span class="text-[10px] font-mono text-gray-500 hidden sm:inline">(${winId})</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="toggleAdminIconVisibility('${id}')" class="px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold transition-all ${isVisible ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'}">
+                            ${isVisible ? 'Visible' : 'Oculto'}
+                        </button>
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        function updateAdminIconSize(val) {
+            adminConfig.desktop.iconSize = parseInt(val);
+            document.getElementById('admin-icon-size-val').innerText = `${val}px`;
+            document.documentElement.style.setProperty('--desktop-icon-size', `${val}px`);
+            arrangeIconsGrid(false);
+            saveAllAdminConfig(false);
+        }
+
+        function updateAdminIconFontSize(val) {
+            adminConfig.desktop.fontSize = parseInt(val);
+            document.getElementById('admin-icon-font-val').innerText = `${val}px`;
+            document.documentElement.style.setProperty('--desktop-icon-font-size', `${val}px`);
+            saveAllAdminConfig(false);
+        }
+
+        function updateAdminIconName(iconId, newName) {
+            const iconEl = document.getElementById(iconId);
+            if (iconEl && iconEl.querySelector('.icon-name')) {
+                iconEl.querySelector('.icon-name').innerText = newName;
+            }
+            if (!adminConfig.desktop.icons) adminConfig.desktop.icons = {};
+            if (!adminConfig.desktop.icons[iconId]) adminConfig.desktop.icons[iconId] = {};
+            adminConfig.desktop.icons[iconId].name = newName;
+            saveAllAdminConfig(false);
+            showToast(`Ícono renombrado a: ${newName}`);
+        }
+
+        function toggleAdminIconVisibility(iconId) {
+            const iconEl = document.getElementById(iconId);
+            if (!iconEl) return;
+            const willBeVisible = iconEl.style.display === 'none';
+            iconEl.style.display = willBeVisible ? 'flex' : 'none';
+
+            if (!adminConfig.desktop.icons) adminConfig.desktop.icons = {};
+            if (!adminConfig.desktop.icons[iconId]) adminConfig.desktop.icons[iconId] = {};
+            adminConfig.desktop.icons[iconId].visible = willBeVisible;
+
+            saveAllAdminConfig(false);
+            renderAdminIconsList();
+            arrangeIconsGrid(false);
+        }
+
+        function rearrangeAdminIcons() {
+            arrangeIconsGrid(true);
+            showToast("Cuadrícula de escritorio reordenada!");
+        }
+
+        function resetAdminIconDefaults() {
+            adminConfig.desktop = JSON.parse(JSON.stringify(DEFAULT_ADMIN_CONFIG.desktop));
+            applyAdminConfigToDOM();
+            renderAdminIconsList();
+            arrangeIconsGrid(true);
+            saveAllAdminConfig(true);
+        }
+
+        // Tab 2: Render Windows List
+        function renderAdminWindowsList() {
+            const container = document.getElementById('admin-windows-list');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const windowKeys = Object.keys(adminConfig.windows);
+            windowKeys.forEach(winId => {
+                const winData = adminConfig.windows[winId];
+                const winEl = document.getElementById(winId);
+                if (!winEl) return;
+
+                const card = document.createElement('div');
+                card.className = "p-3 rounded-2xl bg-white/5 border border-white/10 space-y-2.5";
+                card.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <span class="font-mono font-bold text-xs text-pink-300">🪟 ${winId}</span>
+                        <button onclick="openWindow('${winId}')" class="px-2.5 py-1 rounded-lg bg-pink-500/20 hover:bg-pink-500/30 text-pink-300 border border-pink-500/30 font-mono text-[10px]">
+                            Probar / Abrir ↗
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <div class="sm:col-span-1">
+                            <label class="text-[10px] font-mono text-gray-400">Título de Barra</label>
+                            <input type="text" value="${winData.title || ''}" onchange="updateAdminWindowTitle('${winId}', this.value)" class="w-full bg-black/40 border border-white/15 rounded-lg px-2.5 py-1 text-xs font-mono text-white focus:outline-none focus:border-pink-400">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-mono text-gray-400">Ancho (ej: 720px o 85%)</label>
+                            <input type="text" value="${winData.width || ''}" onchange="updateAdminWindowDimensions('${winId}', this.value, null)" class="w-full bg-black/40 border border-white/15 rounded-lg px-2.5 py-1 text-xs font-mono text-white focus:outline-none focus:border-pink-400">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-mono text-gray-400">Alto (ej: 540px o auto)</label>
+                            <input type="text" value="${winData.height || ''}" onchange="updateAdminWindowDimensions('${winId}', null, this.value)" class="w-full bg-black/40 border border-white/15 rounded-lg px-2.5 py-1 text-xs font-mono text-white focus:outline-none focus:border-pink-400">
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function updateAdminWindowTitle(winId, newTitle) {
+            if (!adminConfig.windows[winId]) adminConfig.windows[winId] = {};
+            adminConfig.windows[winId].title = newTitle;
+            const winEl = document.getElementById(winId);
+            if (winEl) {
+                const t = winEl.querySelector('.xp-titlebar span');
+                if (t && winId !== 'win-admin') t.innerText = newTitle;
+            }
+            saveAllAdminConfig(false);
+        }
+
+        function updateAdminWindowDimensions(winId, width, height) {
+            if (!adminConfig.windows[winId]) adminConfig.windows[winId] = {};
+            if (width !== null) adminConfig.windows[winId].width = width;
+            if (height !== null) adminConfig.windows[winId].height = height;
+
+            const winEl = document.getElementById(winId);
+            if (winEl && !isMobileLayout()) {
+                if (width) winEl.style.width = width;
+                if (height && height !== 'auto') winEl.style.height = height;
+            }
+            saveAllAdminConfig(false);
+        }
+
+        // Tab 3: Render Widgets List
+        function renderAdminWidgetsList() {
+            const container = document.getElementById('admin-widgets-list');
+            if (!container) return;
+            container.innerHTML = '';
+
+            Object.keys(adminConfig.widgets).forEach(wId => {
+                const wData = adminConfig.widgets[wId];
+                const card = document.createElement('div');
+                card.className = "p-3.5 rounded-2xl bg-white/5 border border-white/10 space-y-2.5";
+                card.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <span class="font-mono font-bold text-xs text-yellow-300">🖼️ ${wId} (${wData.label})</span>
+                        <div class="space-x-2">
+                            <button onclick="toggleAdminWidgetVisibility('${wId}')" class="px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold ${wData.visible !== false ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'}">
+                                ${wData.visible !== false ? 'Activo' : 'Oculto'}
+                            </button>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <div>
+                            <label class="text-[10px] font-mono text-gray-400">URL de Imagen o GIF</label>
+                            <input type="text" value="${wData.url}" onchange="updateAdminWidgetURL('${wId}', this.value)" class="w-full bg-black/40 border border-white/15 rounded-lg px-2.5 py-1 text-xs font-mono text-cyan-200 focus:outline-none focus:border-yellow-400">
+                        </div>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                            <div>
+                                <label class="text-[10px] font-mono text-gray-400">Etiqueta</label>
+                                <input type="text" value="${wData.label}" onchange="updateAdminWidgetLabel('${wId}', this.value)" class="w-full bg-black/40 border border-white/15 rounded-lg px-2 py-1 text-xs font-mono text-white">
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-mono text-gray-400">Ancho (px)</label>
+                                <input type="number" value="${wData.width || 160}" onchange="updateAdminWidgetSize('${wId}', this.value, null)" class="w-full bg-black/40 border border-white/15 rounded-lg px-2 py-1 text-xs font-mono text-white">
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-mono text-gray-400">Alto (px)</label>
+                                <input type="number" value="${wData.height || 160}" onchange="updateAdminWidgetSize('${wId}', null, this.value)" class="w-full bg-black/40 border border-white/15 rounded-lg px-2 py-1 text-xs font-mono text-white">
+                            </div>
+                            <div class="flex items-end">
+                                <button onclick="resetSingleWidget('${wId}')" class="w-full py-1 rounded-lg bg-white/5 hover:bg-white/15 text-gray-300 border border-white/10 font-mono text-[10px]">
+                                    ↺ Reset
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function updateAdminWidgetURL(wId, url) {
+            if (!adminConfig.widgets[wId]) return;
+            adminConfig.widgets[wId].url = url;
+            const el = document.getElementById(wId);
+            if (el && el.querySelector('img')) el.querySelector('img').src = url;
+            saveAllAdminConfig(false);
+            showToast("Imagen de widget actualizada!");
+        }
+
+        function updateAdminWidgetLabel(wId, label) {
+            if (!adminConfig.widgets[wId]) return;
+            adminConfig.widgets[wId].label = label;
+            const el = document.getElementById(wId);
+            if (el && el.querySelector('span')) el.querySelector('span').innerText = label;
+            saveAllAdminConfig(false);
+        }
+
+        function updateAdminWidgetSize(wId, w, h) {
+            if (!adminConfig.widgets[wId]) return;
+            if (w) adminConfig.widgets[wId].width = parseInt(w);
+            if (h) adminConfig.widgets[wId].height = parseInt(h);
+            const el = document.getElementById(wId);
+            if (el) {
+                if (w) el.style.width = `${w}px`;
+                if (h) el.style.height = `${h}px`;
+            }
+            saveAllAdminConfig(false);
+        }
+
+        function toggleAdminWidgetVisibility(wId) {
+            if (!adminConfig.widgets[wId]) return;
+            const cur = adminConfig.widgets[wId].visible !== false;
+            adminConfig.widgets[wId].visible = !cur;
+            const el = document.getElementById(wId);
+            if (el) el.style.display = !cur ? '' : 'none';
+            saveAllAdminConfig(false);
+            renderAdminWidgetsList();
+        }
+
+        function resetSingleWidget(wId) {
+            if (DEFAULT_ADMIN_CONFIG.widgets[wId]) {
+                adminConfig.widgets[wId] = JSON.parse(JSON.stringify(DEFAULT_ADMIN_CONFIG.widgets[wId]));
+                const el = document.getElementById(wId);
+                if (el) {
+                    const img = el.querySelector('img');
+                    const label = el.querySelector('span');
+                    if (img) img.src = adminConfig.widgets[wId].url;
+                    if (label) label.innerText = adminConfig.widgets[wId].label;
+                    el.style.display = '';
+                }
+                saveAllAdminConfig(false);
+                renderAdminWidgetsList();
+                showToast("Widget restaurado!");
+            }
+        }
+
+        function resetAdminWidgets() {
+            adminConfig.widgets = JSON.parse(JSON.stringify(DEFAULT_ADMIN_CONFIG.widgets));
+            applyAdminConfigToDOM();
+            renderAdminWidgetsList();
+            saveAllAdminConfig(true);
+        }
+
+        // Tab 4: Effects & Starfield
+        function renderAdminEffectsSettings() {
+            document.getElementById('admin-color-top').value = adminConfig.effects.bgTop;
+            document.getElementById('admin-color-mid').value = adminConfig.effects.bgMiddle;
+            document.getElementById('admin-color-bot').value = adminConfig.effects.bgBottom;
+            document.getElementById('admin-color-top-val').innerText = adminConfig.effects.bgTop;
+            document.getElementById('admin-color-mid-val').innerText = adminConfig.effects.bgMiddle;
+            document.getElementById('admin-color-bot-val').innerText = adminConfig.effects.bgBottom;
+
+            document.getElementById('admin-star-count-slider').value = adminConfig.effects.starCount;
+            document.getElementById('admin-star-count-val').innerText = adminConfig.effects.starCount;
+
+            const speedVal = Math.round(adminConfig.effects.starSpeed * 10);
+            document.getElementById('admin-star-speed-slider').value = speedVal;
+            document.getElementById('admin-star-speed-val').innerText = `${adminConfig.effects.starSpeed}x`;
+
+            document.getElementById('admin-glass-blur-slider').value = adminConfig.effects.glassBlur;
+            document.getElementById('admin-glass-blur-val').innerText = `${adminConfig.effects.glassBlur}px`;
+        }
+
+        function updateAdminColors() {
+            adminConfig.effects.bgTop = document.getElementById('admin-color-top').value;
+            adminConfig.effects.bgMiddle = document.getElementById('admin-color-mid').value;
+            adminConfig.effects.bgBottom = document.getElementById('admin-color-bot').value;
+
+            document.getElementById('admin-color-top-val').innerText = adminConfig.effects.bgTop;
+            document.getElementById('admin-color-mid-val').innerText = adminConfig.effects.bgMiddle;
+            document.getElementById('admin-color-bot-val').innerText = adminConfig.effects.bgBottom;
+
+            document.documentElement.style.setProperty('--bg-top', adminConfig.effects.bgTop);
+            document.documentElement.style.setProperty('--bg-middle', adminConfig.effects.bgMiddle);
+            document.documentElement.style.setProperty('--bg-bottom', adminConfig.effects.bgBottom);
+
+            saveAllAdminConfig(false);
+        }
+
+        function applyAdminThemePreset(preset) {
+            if (preset === 'cyberpunk') {
+                adminConfig.effects.bgTop = '#050510';
+                adminConfig.effects.bgMiddle = '#160c28';
+                adminConfig.effects.bgBottom = '#3b1c3c';
+            } else if (preset === 'deepspace') {
+                adminConfig.effects.bgTop = '#020208';
+                adminConfig.effects.bgMiddle = '#0b132b';
+                adminConfig.effects.bgBottom = '#1c2541';
+            } else if (preset === 'sunset') {
+                adminConfig.effects.bgTop = '#1a0826';
+                adminConfig.effects.bgMiddle = '#3a0ca3';
+                adminConfig.effects.bgBottom = '#f72585';
+            } else if (preset === 'matrix') {
+                adminConfig.effects.bgTop = '#000c05';
+                adminConfig.effects.bgMiddle = '#022b17';
+                adminConfig.effects.bgBottom = '#04471c';
+            }
+            renderAdminEffectsSettings();
+            updateAdminColors();
+            showToast(`Preset visual aplicado: ${preset}`);
+        }
+
+        function updateAdminStarCount(val) {
+            adminConfig.effects.starCount = parseInt(val);
+            document.getElementById('admin-star-count-val').innerText = val;
+            window.starCountSetting = parseInt(val);
+            if (typeof initStars === 'function') initStars(window.starCountSetting);
+            saveAllAdminConfig(false);
+        }
+
+        function updateAdminStarSpeed(sliderVal) {
+            const speed = (parseInt(sliderVal) / 10).toFixed(1);
+            adminConfig.effects.starSpeed = parseFloat(speed);
+            document.getElementById('admin-star-speed-val').innerText = `${speed}x`;
+            window.starSpeedMultiplier = parseFloat(speed);
+            saveAllAdminConfig(false);
+        }
+
+        function updateAdminGlassBlur(val) {
+            adminConfig.effects.glassBlur = parseInt(val);
+            document.getElementById('admin-glass-blur-val').innerText = `${val}px`;
+            document.documentElement.style.setProperty('--glass-blur', `${val}px`);
+            saveAllAdminConfig(false);
+        }
+
+        // Tab 5: Security & System
+        function updateAdminPin() {
+            const input = document.getElementById('admin-new-pin-input');
+            if (!input) return;
+            const val = input.value.trim();
+            if (val.length === 4 && /^\d{4}$/.test(val)) {
+                adminConfig.security.adminPin = val;
+                saveAllAdminConfig(true);
+                input.value = '';
+                showToast(`PIN de Administrador actualizado con éxito! (${val})`);
+            } else {
+                alert("Por favor introduce exactamente 4 dígitos numéricos.");
+            }
+        }
+
+        function saveAllAdminConfig(showNotify = true) {
+            try {
+                localStorage.setItem('astro_os_admin_config', JSON.stringify(adminConfig));
+                if (showNotify) showToast("Configuración guardada en tu navegador!");
+            } catch (e) {
+                console.error("Failed to save config:", e);
+            }
+        }
+
+        function exportAdminConfigJSON() {
+            const blob = new Blob([JSON.stringify(adminConfig, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `astro_os_config_${new Date().toISOString().slice(0,10)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast("Archivo JSON de configuración exportado!");
+        }
+
+        function triggerImportAdminConfig() {
+            const f = document.getElementById('admin-import-file');
+            if (f) f.click();
+        }
+
+        function handleAdminImportFile(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    const parsed = JSON.parse(evt.target.result);
+                    adminConfig = parsed;
+                    applyAdminConfigToDOM();
+                    saveAllAdminConfig(true);
+                    renderAdminPanel();
+                    arrangeIconsGrid(true);
+                    showToast("Configuración importada y aplicada exitosamente!");
+                } catch (err) {
+                    alert("Error: El archivo no es un JSON de configuración válido.");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function resetFactorySettings() {
+            if (confirm("¿Estás seguro de que deseas restablecer toda la configuración a los valores por defecto?")) {
+                localStorage.removeItem('astro_os_admin_config');
+                adminConfig = JSON.parse(JSON.stringify(DEFAULT_ADMIN_CONFIG));
+                applyAdminConfigToDOM();
+                saveAllAdminConfig(true);
+                renderAdminPanel();
+                arrangeIconsGrid(true);
+                showToast("Valores de fábrica restablecidos.");
+            }
+        }
+
     </script>
 </body>
 </html>

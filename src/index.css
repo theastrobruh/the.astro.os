@@ -1,0 +1,137 @@
+@import "tailwindcss";
+
+:root {
+  --bg-top: #050510;
+  --bg-middle: #160c28;
+  --bg-bottom: #3b1c3c;
+  --primary-accent: #FF007A;
+  --secondary-accent: #00F0FF;
+  --glass-bg: rgba(15, 17, 36, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.16);
+  --glass-blur: 24px;
+}
+
+@layer base {
+  html, body, #root {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'DM Sans', system-ui, sans-serif;
+  }
+
+  h1, h2, h3, .font-display {
+    font-family: 'Outfit', system-ui, sans-serif;
+  }
+
+  .font-mono {
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.astro-wallpaper {
+  background: radial-gradient(circle at 50% 18%, var(--bg-middle) 0%, var(--bg-top) 62%, #020208 100%),
+              linear-gradient(180deg, var(--bg-top) 0%, var(--bg-middle) 52%, var(--bg-bottom) 100%);
+  background-blend-mode: screen, normal;
+}
+
+.astro-vignette {
+  background: radial-gradient(circle at center, transparent 42%, rgba(2, 2, 10, 0.72) 100%);
+  pointer-events: none;
+}
+
+.glass-window {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 22px 55px rgba(0, 0, 0, 0.72),
+              0 0 24px rgba(255, 0, 122, 0.14),
+              inset 0 1px 1px rgba(255, 255, 255, 0.18);
+  border-radius: 16px;
+}
+
+.glass-window.active-window {
+  border-color: rgba(255, 255, 255, 0.34);
+  box-shadow: 0 28px 68px rgba(0, 0, 0, 0.85),
+              0 0 32px color-mix(in srgb, var(--primary-accent) 32%, transparent),
+              inset 0 1px 2px rgba(255, 255, 255, 0.36);
+}
+
+.xp-titlebar {
+  background: linear-gradient(90deg, rgba(20, 26, 58, 0.72) 0%, rgba(12, 14, 34, 0.85) 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+}
+
+/* Transparent Glassmorphic Taskbar */
+.xp-taskbar {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(10, 14, 34, 0.32) 30%,
+    rgba(6, 8, 22, 0.44) 100%
+  );
+  backdrop-filter: blur(22px) saturate(165%);
+  -webkit-backdrop-filter: blur(22px) saturate(165%);
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+
+.xp-start-btn {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 0, 122, 0.18) 50%, rgba(0, 240, 255, 0.18) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  backdrop-filter: blur(12px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 4px 14px rgba(0, 0, 0, 0.3);
+}
+
+.xp-start-btn:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 0, 122, 0.28) 50%, rgba(0, 240, 255, 0.28) 100%);
+  border-color: rgba(255, 255, 255, 0.48);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 0 18px rgba(0, 240, 255, 0.35);
+}
+
+.cardgram-logo-text {
+  background: linear-gradient(90deg, #FFFFFF 0%, var(--primary-accent) 50%, var(--secondary-accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 200% auto;
+  animation: textShimmer 4s linear infinite;
+}
+
+@keyframes textShimmer {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes astroShake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-12px); }
+  40% { transform: translateX(12px); }
+  60% { transform: translateX(-8px); }
+  80% { transform: translateX(8px); }
+}
+
+.animate-shake {
+  animation: astroShake 0.42s ease;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-accent);
+}

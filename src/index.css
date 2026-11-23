@@ -139,6 +139,39 @@
   animation: cloneSpawn 0.55s ease-out forwards;
 }
 
+@keyframes windowOpen {
+  0% {
+    opacity: 0;
+    transform: scale(0.92) translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes windowClose {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0px);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.9) translateY(10px);
+    filter: blur(4px);
+  }
+}
+
+.window-anim-open {
+  animation: windowOpen 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.window-anim-close {
+  animation: windowClose 0.18s cubic-bezier(0.4, 0, 1, 1) forwards !important;
+  pointer-events: none !important;
+}
+
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;

@@ -16,7 +16,10 @@ export const CardGramApp: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-[11px] font-mono text-slate-300 flex-1 max-w-md truncate">
-            <span className="text-cyan-400">🔒</span>
+            <svg className="w-3 h-3 text-cyan-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
             <span className="truncate">{url}</span>
           </div>
         </div>

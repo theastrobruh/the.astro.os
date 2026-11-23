@@ -690,12 +690,14 @@ export default function App() {
         const h = cfg ? Math.min(cfg.height, window.innerHeight - 86) : cur.height;
         const x = cur.isOpen ? cur.x : Math.max(14, Math.round((window.innerWidth - w) / 2));
         const y = cur.isOpen ? cur.y : Math.max(12, Math.round((window.innerHeight - 58 - h) / 2));
+        const shouldMaximize = id === 'win-cardgram' ? true : cur.isMaximized;
         return {
           ...prev,
           [id]: {
             ...cur,
             isOpen: true,
             isMinimized: false,
+            isMaximized: shouldMaximize,
             zIndex: nextZ,
             width: w,
             height: h,
@@ -973,9 +975,7 @@ export default function App() {
           onEnter={(role) => {
             setUserRole(role);
             if (role === 'guest') {
-              setTimeout(() => {
-                openWindow('win-astroverse');
-              }, 400);
+              openWindow('win-astroverse');
             }
             showToast(
               role === 'admin'

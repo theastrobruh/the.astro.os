@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { PhysicsBody, WindowId, WindowRuntimeState } from '../types/os';
 import { PointerVelocityTracker } from '../engine/physics';
 import { astroSound } from '../engine/sound';
@@ -44,6 +44,9 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
   onDragEndBody,
   children,
 }) => {
+  const [isClosing, setIsClosing] = useState(false);
+  const closingTimeoutRef = useRef<number | null>(null);
+
   const trackerRef = useRef(new PointerVelocityTracker());
   const dragStateRef = useRef({
     active: false,
@@ -54,7 +57,28 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
     lastClientX: 0,
   });
 
+  useEffect(() => {
+    // When window is reopened or re-mounted, clear closing state
+    if (win.isOpen) {
+      setIsClosing(false);
+    }
+    return () => {
+      if (closingTimeoutRef.current) {
+        window.clearTimeout(closingTimeoutRef.current);
+      }
+    };
+  }, [win.isOpen]);
+
   if (!win.isOpen || win.isMinimized) return null;
+
+  const handleClose = () => {
+    astroSound.playWindowPop(false);
+    setIsClosing(true);
+    closingTimeoutRef.current = window.setTimeout(() => {
+      onClose(win.id);
+      setIsClosing(false);
+    }, 180);
+  };
 
   const isMaximized = win.isMaximized || isMobile;
 
@@ -174,7 +198,9 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
       onPointerDown={() => onFocus(win.id)}
       style={style}
       aria-label={title}
-      className={`glass-window flex flex-col overflow-hidden ${isActive ? 'active-window' : ''}`}
+      className={`glass-window flex flex-col overflow-hidden ${
+        isActive ? 'active-window' : ''
+      } ${isClosing ? 'window-anim-close' : 'window-anim-open'}`}
     >
       {/* Glassmorphic Titlebar */}
       <div
@@ -223,10 +249,7 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
             </button>
           )}
           <button
-            onClick={() => {
-              astroSound.playWindowPop(false);
-              onClose(win.id);
-            }}
+            onClick={handleClose}
             title="Close"
             className="w-7 h-7 rounded-lg bg-rose-500/35 hover:bg-rose-500/75 text-rose-100 flex items-center justify-center text-xs font-bold transition-colors"
           >

@@ -1239,40 +1239,42 @@ export default function App() {
             onClick={() => {
               const src = widgets.find((w) => w.id === ctxMenu.widgetId);
               if (src) {
+                const currentBody = bodiesRef.current.get(src.id);
+                const baseX = currentBody ? currentBody.x : src.x;
+                const baseY = currentBody ? currentBody.y : src.y;
+
                 const newId = `widget-clone-${Date.now()}`;
-                const offset = 32;
-                const newX = Math.min(window.innerWidth - src.width - 20, src.x + offset);
-                const newY = Math.min(window.innerHeight - src.height - 70, src.y + offset);
+                const offset = 36;
+                const newX = Math.max(16, Math.min(window.innerWidth - src.width - 24, baseX + offset));
+                const newY = Math.max(16, Math.min(window.innerHeight - src.height - 76, baseY + offset));
 
                 const cloned: MediaWidgetItem = {
                   ...src,
                   id: newId,
                   label: `${src.label} (Copy)`,
-                  x: newX,
-                  y: newY,
+                  x: Math.round(newX),
+                  y: Math.round(newY),
                 };
 
-                setWidgets((prev) => [...prev, cloned]);
-
-                // Physics body initialization with elastic impulse burst & sound
-                const b = bodiesRef.current;
-                b.set(newId, {
+                // Initialize physics body immediately at exact spawn location
+                bodiesRef.current.set(newId, {
                   id: newId,
                   kind: 'widget',
                   x: newX,
                   y: newY,
                   width: src.width,
                   height: src.height,
-                  vx: (Math.random() - 0.5) * 600,
-                  vy: -350,
-                  angle: (Math.random() - 0.5) * 15,
-                  angularVel: (Math.random() - 0.5) * 20,
+                  vx: (Math.random() - 0.5) * 450,
+                  vy: -280,
+                  angle: (Math.random() - 0.5) * 12,
+                  angularVel: (Math.random() - 0.5) * 18,
                   targetAngle: 0,
                   isDragging: false,
                   scale: 1,
                   mass: src.width * src.height * 1.4,
                 });
 
+                setWidgets((prev) => [...prev, cloned]);
                 astroSound.playStartupChime();
                 showToast(`Widget cloned: ${src.label}`);
               }

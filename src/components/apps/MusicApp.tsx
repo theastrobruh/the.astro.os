@@ -1,36 +1,19 @@
-import React, { useEffect, useRef, useSyncExternalStore } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ASTRO_AVATAR_IMG, RADIO_PRESETS } from '../../constants/defaults';
 import { globalMusic } from '../../engine/music';
 
 export const MusicApp: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  // Subscribe to persistent global music service state
-  useSyncExternalStore(
-    (cb) => globalMusic.subscribe(cb),
-    () => ({
-      isPlaying: globalMusic.isPlaying,
-      currentTime: globalMusic.currentTime,
-      duration: globalMusic.duration,
-      mode: globalMusic.mode,
-      activeRadioIdx: globalMusic.activeRadioIdx,
-      localIdx: globalMusic.localIdx,
-      volume: globalMusic.volume,
-      tracksCount: globalMusic.localTracks.length,
-      statusNote: globalMusic.statusNote,
-    }),
-    () => ({
-      isPlaying: false,
-      currentTime: 0,
-      duration: 0,
-      mode: 'radio' as const,
-      activeRadioIdx: 0,
-      localIdx: 0,
-      volume: 0.7,
-      tracksCount: 0,
-      statusNote: 'Ready',
-    })
-  );
+  // Safe React state tracking global music store
+  const [, setTick] = useState(0);
+
+  useEffect(() => {
+    const unsubscribe = globalMusic.subscribe(() => {
+      setTick((t) => t + 1);
+    });
+    return unsubscribe;
+  }, []);
 
   const { isPlaying, currentTime, duration, mode, activeRadioIdx, localIdx, volume, statusNote } = globalMusic;
   const localTracks = globalMusic.localTracks;
@@ -51,7 +34,7 @@ export const MusicApp: React.FC = () => {
       ctx.clearRect(0, 0, w, h);
 
       const bars = 32;
-      const barW = (w / bars) - 2;
+      const barW = w / bars - 2;
       const t = performance.now() * 0.003;
 
       for (let i = 0; i < bars; i++) {
@@ -115,6 +98,8 @@ export const MusicApp: React.FC = () => {
               if (mode === 'synth' && isPlaying) {
                 globalMusic.stopSynth();
                 globalMusic.isPlaying = false;
+                globalMusic.statusNote = 'Paused';
+                setTick((t) => t + 1);
               } else {
                 globalMusic.mode = 'synth';
                 globalMusic.startSynth();

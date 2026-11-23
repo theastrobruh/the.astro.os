@@ -240,6 +240,13 @@ function getIconTheme(winId: WindowId) {
         orb: '#00F0FF',
         glow: 'rgba(0, 240, 255, 0.45)',
       };
+    case 'win-youtube':
+      return {
+        borderGrad: 'from-red-400/85 via-rose-500/75 to-red-600/85',
+        surfaceGrad: 'from-[#2e0d13]/95 to-[#160609]/95',
+        orb: '#EF4444',
+        glow: 'rgba(239, 68, 68, 0.45)',
+      };
     case 'win-cardgram':
       return {
         borderGrad: 'from-rose-300/85 via-pink-400/70 to-cyan-300/80',
@@ -381,6 +388,19 @@ export function renderDefaultSvg(winId: WindowId) {
           <path d="M8 28L15.5 19.5L21 25L25.5 20L32 28H8Z" fill="#0F172A" opacity="0.65" />
           <circle cx="14" cy="15.5" r="2.6" fill="#FDE047" />
           <rect x="24" y="12.5" width="7" height="4" rx="1.5" fill="#FF007A" />
+        </svg>
+      );
+    case 'win-youtube':
+      return (
+        <svg className="w-[58%] h-[58%] group-hover:scale-110 transition-transform duration-300" viewBox="0 0 40 40" fill="none">
+          <defs>
+            <linearGradient id="icoYt" x1="6" y1="9" x2="34" y2="31" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#EF4444" />
+              <stop offset="100%" stopColor="#991B1B" />
+            </linearGradient>
+          </defs>
+          <rect x="6" y="10" width="28" height="20" rx="6" fill="url(#icoYt)" />
+          <path d="M17 15.5L25 20L17 24.5V15.5Z" fill="#FFFFFF" />
         </svg>
       );
     case 'win-cardgram':

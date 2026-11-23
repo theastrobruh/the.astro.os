@@ -27,8 +27,8 @@ export const TimezoneModal: React.FC<TimezoneModalProps> = ({ open, selected, on
   };
 
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-4">
-      <div className="glass-window w-full max-w-lg p-5 space-y-4 border border-pink-500/40">
+    <div className="fixed inset-0 bg-black/75 backdrop-blur-md z-50 flex items-center justify-center p-4">
+      <div className="glass-window w-full max-w-lg p-5 space-y-4 border border-pink-500/40 shadow-2xl">
         <div className="flex items-center justify-between border-b border-white/10 pb-3">
           <h3 className="text-sm font-mono font-bold text-pink-400">
             World Clocks (Select up to 4)
@@ -38,8 +38,8 @@ export const TimezoneModal: React.FC<TimezoneModalProps> = ({ open, selected, on
           </button>
         </div>
 
-        <p className="text-xs text-slate-300">
-          Active timezones in taskbar ({draft.length}/4):
+        <p className="text-xs text-slate-300 font-mono">
+          Active taskbar timezones ({draft.length}/4):
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[340px] overflow-y-auto pr-1">
@@ -55,20 +55,22 @@ export const TimezoneModal: React.FC<TimezoneModalProps> = ({ open, selected, on
                     : 'bg-white/5 border-white/10 text-slate-400 hover:text-slate-200'
                 }`}
               >
-                <div className="flex items-center gap-2">
-                  <span>{tz.flag}</span>
+                <div className="flex items-center gap-2.5">
+                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white/10 text-slate-200 border border-white/15">
+                    {tz.code}
+                  </span>
                   <span className="truncate">{tz.label}</span>
                 </div>
-                {active && <span className="text-[10px] text-pink-300 font-bold shrink-0">✓</span>}
+                {active && <span className="text-[11px] text-pink-300 font-bold shrink-0">✓</span>}
               </button>
             );
           })}
         </div>
 
-        <div className="flex items-center justify-end gap-2 pt-2 border-t border-white/10">
+        <div className="flex items-center justify-end gap-2 pt-2 border-t border-white/10 font-mono">
           <button
             onClick={onClose}
-            className="px-4 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-mono text-slate-300"
+            className="px-4 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-xs text-slate-300 transition-colors"
           >
             Cancel
           </button>
@@ -77,7 +79,7 @@ export const TimezoneModal: React.FC<TimezoneModalProps> = ({ open, selected, on
               onSave(draft);
               onClose();
             }}
-            className="px-4 py-1.5 rounded-xl bg-pink-500 hover:bg-pink-400 text-xs font-mono text-white font-bold"
+            className="px-4 py-1.5 rounded-xl bg-pink-500 hover:bg-pink-400 text-xs text-white font-bold transition-colors"
           >
             Apply Clocks
           </button>

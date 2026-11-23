@@ -29,15 +29,15 @@ export const WINDOW_META_MAP: Record<WindowId, WindowMeta> = WINDOW_META_LIST.re
 
 export const ICON_ORDER: Array<{ id: string; winId: WindowId; defaultName: string }> = [
   { id: 'icon-win-astroverse', winId: 'win-astroverse', defaultName: 'Astro.Verse' },
+  { id: 'icon-win-mediaflow', winId: 'win-mediaflow', defaultName: 'MediaFlow' },
   { id: 'icon-win-youtube', winId: 'win-youtube', defaultName: 'YouTube' },
+  { id: 'icon-win-themes', winId: 'win-themes', defaultName: 'Theme' },
   { id: 'icon-win-cardgram', winId: 'win-cardgram', defaultName: 'CardGram' },
+  { id: 'icon-win-admin', winId: 'win-admin', defaultName: 'Admin Panel' },
   { id: 'icon-win-music', winId: 'win-music', defaultName: 'Music' },
   { id: 'icon-win-draw', winId: 'win-draw', defaultName: 'Paint' },
   { id: 'icon-win-notes', winId: 'win-notes', defaultName: 'Notes' },
   { id: 'icon-win-terminal', winId: 'win-terminal', defaultName: 'Terminal' },
-  { id: 'icon-win-mediaflow', winId: 'win-mediaflow', defaultName: 'MediaFlow' },
-  { id: 'icon-win-themes', winId: 'win-themes', defaultName: 'Theme' },
-  { id: 'icon-win-admin', winId: 'win-admin', defaultName: 'Admin' },
 ];
 
 export const DEFAULT_ADMIN_CONFIG: AdminConfig = {
@@ -52,15 +52,15 @@ export const DEFAULT_ADMIN_CONFIG: AdminConfig = {
     gridGap: 16,
     icons: {
       'icon-win-astroverse': { name: 'Astro.Verse', visible: true },
+      'icon-win-mediaflow': { name: 'MediaFlow', visible: true },
       'icon-win-youtube': { name: 'YouTube', visible: true },
+      'icon-win-themes': { name: 'Theme', visible: true },
       'icon-win-cardgram': { name: 'CardGram', visible: true },
+      'icon-win-admin': { name: 'Admin Panel', visible: true },
       'icon-win-music': { name: 'Music', visible: true },
       'icon-win-draw': { name: 'Paint', visible: true },
       'icon-win-notes': { name: 'Notes', visible: true },
       'icon-win-terminal': { name: 'Terminal', visible: true },
-      'icon-win-mediaflow': { name: 'MediaFlow', visible: true },
-      'icon-win-themes': { name: 'Theme', visible: true },
-      'icon-win-admin': { name: 'Admin', visible: true },
     },
   },
   windows: {
@@ -103,17 +103,95 @@ export function createDefaultWidgets(viewportW: number, viewportH: number): Medi
   const safeH = Math.max(480, viewportH);
   const isMobile = safeW < 768;
 
+  if (isMobile) {
+    return [
+      {
+        id: 'media-widget-3',
+        url: DAHYUN_GIF_URL,
+        label: 'Dahyun.gif',
+        width: 120,
+        height: 120,
+        defaultWidth: 164,
+        defaultHeight: 164,
+        x: 20,
+        y: Math.round(safeH * 0.56),
+        visible: true,
+        isGif: true,
+        fallbackScene: 'pulse',
+      },
+      {
+        id: 'media-widget-1',
+        url: COSMOS_WIDGET_IMG,
+        label: 'Cosmos.jpg',
+        width: 128,
+        height: 128,
+        defaultWidth: 176,
+        defaultHeight: 176,
+        x: safeW - 150,
+        y: 64,
+        visible: true,
+        isGif: false,
+        fallbackScene: 'cosmos',
+      },
+      {
+        id: 'media-widget-2',
+        url: ASTRO_CITY_WIDGET_IMG,
+        label: 'AstroCity.png',
+        width: 148,
+        height: 112,
+        defaultWidth: 196,
+        defaultHeight: 148,
+        x: safeW - 172,
+        y: Math.max(180, safeH - 210),
+        visible: true,
+        isGif: false,
+        fallbackScene: 'city',
+      },
+    ];
+  }
+
+  // Desktop positioning matching the reference screenshot exactly:
+  // Dahyun (portrait) at top right adjacent to Cosmos square, AstroCity right below Cosmos
+  const cosmosW = 168;
+  const cosmosH = 168;
+  const cosmosX = Math.max(300, safeW - cosmosW - 24);
+  const cosmosY = 24;
+
+  const dahyunW = 120;
+  const dahyunH = 168;
+  const dahyunX = cosmosX - dahyunW - 16;
+  const dahyunY = 24;
+
+  const cityW = 168;
+  const cityH = 118;
+  const cityX = cosmosX;
+  const cityY = cosmosY + cosmosH + 16;
+
   return [
+    {
+      id: 'media-widget-3',
+      url: DAHYUN_GIF_URL,
+      label: 'Dahyun.gif',
+      width: dahyunW,
+      height: dahyunH,
+      defaultWidth: dahyunW,
+      defaultHeight: dahyunH,
+      x: dahyunX,
+      y: dahyunY,
+      visible: true,
+      isGif: true,
+      fallbackScene: 'pulse',
+    },
     {
       id: 'media-widget-1',
       url: COSMOS_WIDGET_IMG,
       label: 'Cosmos.jpg',
-      width: isMobile ? 128 : 176,
-      height: isMobile ? 128 : 176,
-      defaultWidth: 176,
-      defaultHeight: 176,
-      x: Math.max(20, safeW - (isMobile ? 150 : 240)),
-      y: isMobile ? 64 : Math.round(safeH * 0.11),
+      width: cosmosW,
+      height: cosmosH,
+      defaultWidth: cosmosW,
+      defaultHeight: cosmosH,
+      x: cosmosX,
+      y: cosmosY,
       visible: true,
       isGif: false,
       fallbackScene: 'cosmos',
@@ -122,29 +200,15 @@ export function createDefaultWidgets(viewportW: number, viewportH: number): Medi
       id: 'media-widget-2',
       url: ASTRO_CITY_WIDGET_IMG,
       label: 'AstroCity.png',
-      width: isMobile ? 148 : 196,
-      height: isMobile ? 112 : 148,
-      defaultWidth: 196,
-      defaultHeight: 148,
-      x: Math.max(20, safeW - (isMobile ? 172 : 380)),
-      y: Math.max(180, safeH - (isMobile ? 210 : 250)),
+      width: cityW,
+      height: cityH,
+      defaultWidth: cityW,
+      defaultHeight: cityH,
+      x: cityX,
+      y: cityY,
       visible: true,
       isGif: false,
       fallbackScene: 'city',
-    },
-    {
-      id: 'media-widget-3',
-      url: DAHYUN_GIF_URL,
-      label: 'Dahyun.gif',
-      width: isMobile ? 120 : 164,
-      height: isMobile ? 120 : 164,
-      defaultWidth: 164,
-      defaultHeight: 164,
-      x: isMobile ? 20 : Math.round(safeW * 0.22),
-      y: isMobile ? Math.round(safeH * 0.56) : Math.round(safeH * 0.48),
-      visible: true,
-      isGif: true,
-      fallbackScene: 'pulse',
     },
   ];
 }

@@ -1,85 +1,41 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useSyncExternalStore } from 'react';
 import { ASTRO_AVATAR_IMG, RADIO_PRESETS } from '../../constants/defaults';
-
-interface LocalTrack {
-  name: string;
-  url: string;
-}
+import { globalMusic } from '../../engine/music';
 
 export const MusicApp: React.FC = () => {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const synthTimerRef = useRef<number | null>(null);
-  const synthCtxRef = useRef<AudioContext | null>(null);
 
-  const [mode, setMode] = useState<'radio' | 'local' | 'synth'>('radio');
-  const [activeRadioIdx, setActiveRadioIdx] = useState<number>(0);
-  const [localTracks, setLocalTracks] = useState<LocalTrack[]>([]);
-  const [localIdx, setLocalIdx] = useState<number>(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState(0.7);
-  const [statusNote, setStatusNote] = useState('Ready to play');
+  // Subscribe to persistent global music service state
+  useSyncExternalStore(
+    (cb) => globalMusic.subscribe(cb),
+    () => ({
+      isPlaying: globalMusic.isPlaying,
+      currentTime: globalMusic.currentTime,
+      duration: globalMusic.duration,
+      mode: globalMusic.mode,
+      activeRadioIdx: globalMusic.activeRadioIdx,
+      localIdx: globalMusic.localIdx,
+      volume: globalMusic.volume,
+      tracksCount: globalMusic.localTracks.length,
+      statusNote: globalMusic.statusNote,
+    }),
+    () => ({
+      isPlaying: false,
+      currentTime: 0,
+      duration: 0,
+      mode: 'radio' as const,
+      activeRadioIdx: 0,
+      localIdx: 0,
+      volume: 0.7,
+      tracksCount: 0,
+      statusNote: 'Ready',
+    })
+  );
 
-  const currentTitle =
-    mode === 'synth'
-      ? 'Astro Ambient Synth (Local Procedural)'
-      : mode === 'local' && localTracks[localIdx]
-      ? localTracks[localIdx].name
-      : RADIO_PRESETS[activeRadioIdx].name;
-
-  const currentSub =
-    mode === 'synth'
-      ? 'Web Audio Synth · Offline'
-      : mode === 'local'
-      ? 'Local Audio File'
-      : `${RADIO_PRESETS[activeRadioIdx].genre} · Online Stream`;
-
-  const stopSynth = () => {
-    if (synthTimerRef.current !== null) {
-      window.clearInterval(synthTimerRef.current);
-      synthTimerRef.current = null;
-    }
-  };
-
-  const startSynth = () => {
-    stopSynth();
-    const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-    if (!AudioCtx) return;
-    if (!synthCtxRef.current) synthCtxRef.current = new AudioCtx();
-    const ctx = synthCtxRef.current;
-    if (ctx.state === 'suspended') ctx.resume().catch(() => {});
-
-    const pentatonic = [196, 220, 261.63, 293.66, 329.63, 392, 440, 523.25];
-    const playNote = () => {
-      const now = ctx.currentTime;
-      const freq = pentatonic[Math.floor(Math.random() * pentatonic.length)];
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = Math.random() > 0.4 ? 'sine' : 'triangle';
-      osc.frequency.setValueAtTime(freq, now);
-      gain.gain.setValueAtTime(0.001, now);
-      gain.gain.exponentialRampToValueAtTime(0.04, now + 0.1);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.2);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(now);
-      osc.stop(now + 1.3);
-    };
-
-    playNote();
-    synthTimerRef.current = window.setInterval(playNote, 620);
-  };
-
-  useEffect(() => {
-    return () => {
-      stopSynth();
-      if (synthCtxRef.current) {
-        synthCtxRef.current.close().catch(() => {});
-      }
-    };
-  }, []);
+  const { isPlaying, currentTime, duration, mode, activeRadioIdx, localIdx, volume, statusNote } = globalMusic;
+  const localTracks = globalMusic.localTracks;
+  const currentTitle = globalMusic.getCurrentTitle();
+  const currentSub = globalMusic.getCurrentSub();
 
   // Visualizer loop
   useEffect(() => {
@@ -119,92 +75,6 @@ export const MusicApp: React.FC = () => {
     return () => cancelAnimationFrame(raf);
   }, [isPlaying]);
 
-  const playRadio = (idx: number) => {
-    stopSynth();
-    setActiveRadioIdx(idx);
-    setMode('radio');
-    const audio = audioRef.current;
-    if (!audio) return;
-    setStatusNote('Connecting stream...');
-    audio.src = RADIO_PRESETS[idx].url;
-    audio.volume = volume;
-    audio
-      .play()
-      .then(() => {
-        setIsPlaying(true);
-        setStatusNote('Streaming Live');
-      })
-      .catch(() => {
-        setIsPlaying(false);
-        setStatusNote('Stream unavailable, switching to Synth');
-        setMode('synth');
-        startSynth();
-        setIsPlaying(true);
-      });
-  };
-
-  const playLocal = (idx: number, list = localTracks) => {
-    if (!list[idx]) return;
-    stopSynth();
-    setLocalIdx(idx);
-    setMode('local');
-    const audio = audioRef.current;
-    if (!audio) return;
-    audio.src = list[idx].url;
-    audio.volume = volume;
-    audio
-      .play()
-      .then(() => {
-        setIsPlaying(true);
-        setStatusNote('Playing local file');
-      })
-      .catch(() => {
-        setIsPlaying(false);
-        setStatusNote('Could not play track');
-      });
-  };
-
-  const togglePlay = () => {
-    if (mode === 'synth') {
-      if (isPlaying) {
-        stopSynth();
-        setIsPlaying(false);
-        setStatusNote('Paused');
-      } else {
-        startSynth();
-        setIsPlaying(true);
-        setStatusNote('Synth Active');
-      }
-      return;
-    }
-
-    const audio = audioRef.current;
-    if (!audio) return;
-    if (!audio.src) {
-      playRadio(activeRadioIdx);
-      return;
-    }
-
-    if (isPlaying) {
-      audio.pause();
-      setIsPlaying(false);
-      setStatusNote('Paused');
-    } else {
-      audio
-        .play()
-        .then(() => {
-          setIsPlaying(true);
-          setStatusNote(mode === 'radio' ? 'Streaming Live' : 'Playing');
-        })
-        .catch(() => {
-          setMode('synth');
-          setIsPlaying(true);
-          setStatusNote('Cosmic Synth Active');
-          startSynth();
-        });
-    }
-  };
-
   const handleFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
@@ -212,8 +82,7 @@ export const MusicApp: React.FC = () => {
       name: f.name,
       url: URL.createObjectURL(f),
     }));
-    setLocalTracks(mapped);
-    playLocal(0, mapped);
+    globalMusic.playLocal(0, mapped);
   };
 
   const formatTime = (secs: number) => {
@@ -225,18 +94,6 @@ export const MusicApp: React.FC = () => {
 
   return (
     <div className="p-4 flex-1 flex flex-col justify-between overflow-y-auto space-y-3">
-      <audio
-        ref={audioRef}
-        onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
-        onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
-        onEnded={() => {
-          if (mode === 'local' && localTracks.length > 0) {
-            playLocal((localIdx + 1) % localTracks.length);
-          }
-        }}
-        className="hidden"
-      />
-
       {/* Now Playing Header & Compact Visualizer */}
       <div className="p-3 rounded-2xl bg-black/45 border border-white/15 space-y-2.5">
         <div className="flex items-center gap-3">
@@ -256,14 +113,11 @@ export const MusicApp: React.FC = () => {
           <button
             onClick={() => {
               if (mode === 'synth' && isPlaying) {
-                stopSynth();
-                setIsPlaying(false);
+                globalMusic.stopSynth();
+                globalMusic.isPlaying = false;
               } else {
-                audioRef.current?.pause();
-                setMode('synth');
-                setIsPlaying(true);
-                setStatusNote('Synth Active');
-                startSynth();
+                globalMusic.mode = 'synth';
+                globalMusic.startSynth();
               }
             }}
             className={`px-2.5 py-1 rounded-xl text-[10px] font-mono border transition-colors shrink-0 ${
@@ -288,11 +142,7 @@ export const MusicApp: React.FC = () => {
             min={0}
             max={duration || 100}
             value={duration ? currentTime : 0}
-            onChange={(e) => {
-              if (audioRef.current && duration) {
-                audioRef.current.currentTime = Number(e.target.value);
-              }
-            }}
+            onChange={(e) => globalMusic.seek(Number(e.target.value))}
             className="flex-1 accent-violet-400 h-1.5 cursor-pointer"
           />
           <span className="w-9 text-right">{duration ? formatTime(duration) : 'LIVE'}</span>
@@ -303,9 +153,9 @@ export const MusicApp: React.FC = () => {
             <button
               onClick={() => {
                 if (mode === 'local' && localTracks.length > 0) {
-                  playLocal((localIdx - 1 + localTracks.length) % localTracks.length);
+                  globalMusic.playLocal((localIdx - 1 + localTracks.length) % localTracks.length);
                 } else {
-                  playRadio((activeRadioIdx - 1 + RADIO_PRESETS.length) % RADIO_PRESETS.length);
+                  globalMusic.playRadio((activeRadioIdx - 1 + RADIO_PRESETS.length) % RADIO_PRESETS.length);
                 }
               }}
               className="p-2 rounded-xl bg-white/5 hover:bg-white/15 text-slate-200 text-xs"
@@ -314,7 +164,7 @@ export const MusicApp: React.FC = () => {
               ⏮
             </button>
             <button
-              onClick={togglePlay}
+              onClick={() => globalMusic.togglePlay()}
               className="px-3.5 py-1.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-mono text-xs font-bold shadow-md shadow-violet-600/35 transition-colors"
             >
               {isPlaying ? '⏸ Pause' : '▶ Play'}
@@ -322,9 +172,9 @@ export const MusicApp: React.FC = () => {
             <button
               onClick={() => {
                 if (mode === 'local' && localTracks.length > 0) {
-                  playLocal((localIdx + 1) % localTracks.length);
+                  globalMusic.playLocal((localIdx + 1) % localTracks.length);
                 } else {
-                  playRadio((activeRadioIdx + 1) % RADIO_PRESETS.length);
+                  globalMusic.playRadio((activeRadioIdx + 1) % RADIO_PRESETS.length);
                 }
               }}
               className="p-2 rounded-xl bg-white/5 hover:bg-white/15 text-slate-200 text-xs"
@@ -342,7 +192,7 @@ export const MusicApp: React.FC = () => {
               max={1}
               step={0.05}
               value={volume}
-              onChange={(e) => setVolume(Number(e.target.value))}
+              onChange={(e) => globalMusic.setVolume(Number(e.target.value))}
               className="w-16 accent-pink-400 cursor-pointer"
             />
           </div>
@@ -363,7 +213,7 @@ export const MusicApp: React.FC = () => {
             return (
               <button
                 key={r.name}
-                onClick={() => playRadio(i)}
+                onClick={() => globalMusic.playRadio(i)}
                 className={`p-2 rounded-xl border text-left transition-all ${
                   active
                     ? 'bg-violet-600/25 border-violet-400 text-white'

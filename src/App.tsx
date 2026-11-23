@@ -47,6 +47,7 @@ import { CardGramApp } from './components/apps/CardGramApp';
 import { IconManagerApp } from './components/apps/IconManagerApp';
 import { YouTubeApp } from './components/apps/YouTubeApp';
 import { AdminPanelApp } from './components/apps/AdminPanelApp';
+import { globalMusic } from './engine/music';
 
 const STORAGE_CONFIG_KEY = 'astro_os_v3_config';
 const STORAGE_WIDGETS_KEY = 'astro_os_v3_widgets';
@@ -274,18 +275,17 @@ function computeGridIconPositions(
     return positions;
   }
 
-  // Desktop vertical column layout
+  // Desktop 2-column layout matching reference screenshot (5 rows per column)
   const cellW = Math.max(92, iconSize + 28);
   const cellH = iconSize + 38;
   const padTop = 18;
-  const padBottom = 76;
-  const availH = Math.max(180, vh - padTop - padBottom);
-  const rowsPerCol = Math.max(1, Math.floor(availH / (cellH + gap)));
+  const padLeft = 18;
+  const rowsPerCol = 5;
 
   ICON_ORDER.forEach((item, index) => {
     const col = Math.floor(index / rowsPerCol);
     const row = index % rowsPerCol;
-    const x = Math.min(vw - cellW - 12, 18 + col * (cellW + 12));
+    const x = padLeft + col * (cellW + 12);
     const y = padTop + row * (cellH + gap);
     positions[item.id] = { x, y };
   });
@@ -751,12 +751,13 @@ export default function App() {
 
   const closeMusicPermanently = useCallback(() => {
     setMusicInTray(false);
+    globalMusic.stopCompletely();
     setWindows((prev) => ({
       ...prev,
       ['win-music']: { ...prev['win-music'], isOpen: false, isMinimized: false },
     }));
     setActiveWindowId((cur) => (cur === 'win-music' ? null : cur));
-    showToast('Music closed');
+    showToast('Music closed and stopped');
   }, [showToast]);
 
   const handleTaskbarWindowClick = useCallback(
@@ -980,19 +981,21 @@ export default function App() {
         />
       )}
 
-      <MobileStatusBar
-        osTitle={config.security.osTitle}
-        primaryTimezone={selectedTimezones[0] || 'America/Lima'}
-        physicsMode={config.physics.mode}
-        soundEnabled={config.physics.soundEnabled}
-        onToggleSound={() =>
-          setConfig((p) => ({
-            ...p,
-            physics: { ...p.physics, soundEnabled: !p.physics.soundEnabled },
-          }))
-        }
-        onOpenTimezoneModal={() => setTimezoneModalOpen(true)}
-      />
+      {isMobile && (
+        <MobileStatusBar
+          osTitle={config.security.osTitle}
+          primaryTimezone={selectedTimezones[0] || 'America/Lima'}
+          physicsMode={config.physics.mode}
+          soundEnabled={config.physics.soundEnabled}
+          onToggleSound={() =>
+            setConfig((p) => ({
+              ...p,
+              physics: { ...p.physics, soundEnabled: !p.physics.soundEnabled },
+            }))
+          }
+          onOpenTimezoneModal={() => setTimezoneModalOpen(true)}
+        />
+      )}
 
       <DesktopDrawCanvas
         active={desktopDrawActive}
@@ -1194,7 +1197,7 @@ export default function App() {
         soundEnabled={config.physics.soundEnabled}
         selectedTimezones={selectedTimezones}
         isMobile={isMobile}
-        musicMinimizedToTray={musicInTray}
+        musicClosedToTray={musicInTray}
         onToggleStartMenu={() => setStartMenuOpen((v) => !v)}
         onRearrangeIcons={rearrangeIcons}
         onToggleDesktopDraw={() => setDesktopDrawActive((v) => !v)}

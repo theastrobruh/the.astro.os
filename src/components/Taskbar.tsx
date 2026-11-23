@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { PhysicsMode, WindowId, WindowRuntimeState } from '../types/os';
 import { AVAILABLE_TIMEZONES, WINDOW_META_MAP } from '../constants/defaults';
+import { globalMusic } from '../engine/music';
 
 interface TaskbarProps {
   windows: Record<WindowId, WindowRuntimeState>;
@@ -11,7 +12,7 @@ interface TaskbarProps {
   soundEnabled: boolean;
   selectedTimezones: string[];
   isMobile: boolean;
-  musicMinimizedToTray?: boolean;
+  musicClosedToTray: boolean;
   onToggleStartMenu: () => void;
   onRearrangeIcons: () => void;
   onToggleDesktopDraw: () => void;
@@ -21,16 +22,57 @@ interface TaskbarProps {
   onImpulseBurst: () => void;
   onToggleSound: () => void;
   onOpenTimezoneModal: () => void;
-  onRestoreMusic?: () => void;
-  onCloseMusicPermanently?: () => void;
+  onRestoreMusic: () => void;
+  onCloseMusicPermanently: () => void;
 }
 
-const PHYSICS_LABELS: Record<PhysicsMode, { icon: string; name: string }> = {
-  tactile: { icon: '💨', name: 'Tactile' },
-  earth: { icon: '🍎', name: 'Gravity' },
-  'zero-g': { icon: '🪐', name: 'Zero-G' },
-  static: { icon: '📌', name: 'Static' },
+const PHYSICS_DESCRIPTIONS: Record<PhysicsMode, string> = {
+  tactile: 'Tactile',
+  earth: 'Gravity',
+  'zero-g': 'Zero-G',
+  static: 'Static',
 };
+
+// Clean vector SVG badge for each country instead of emojis
+function renderCountryBadge(code: string) {
+  return (
+    <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-white/10 text-slate-200 border border-white/15">
+      {code}
+    </span>
+  );
+}
+
+// Clean physics SVG icon
+function renderPhysicsIcon(mode: PhysicsMode) {
+  switch (mode) {
+    case 'tactile':
+      return (
+        <svg className="w-3.5 h-3.5 text-cyan-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+      );
+    case 'earth':
+      return (
+        <svg className="w-3.5 h-3.5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+        </svg>
+      );
+    case 'zero-g':
+      return (
+        <svg className="w-3.5 h-3.5 text-purple-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+          <circle cx="12" cy="12" r="7" />
+          <path d="M4 16C7 19 17 19 20 8" strokeLinecap="round" />
+        </svg>
+      );
+    case 'static':
+      return (
+        <svg className="w-3.5 h-3.5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+          <circle cx="12" cy="12" r="3" fill="currentColor" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 2v4m0 12v4M2 12h4m12 0h4" />
+        </svg>
+      );
+  }
+}
 
 export const Taskbar: React.FC<TaskbarProps> = ({
   windows,
@@ -41,7 +83,7 @@ export const Taskbar: React.FC<TaskbarProps> = ({
   soundEnabled,
   selectedTimezones,
   isMobile,
-  musicMinimizedToTray = false,
+  musicClosedToTray,
   onToggleStartMenu,
   onRearrangeIcons,
   onToggleDesktopDraw,
@@ -63,8 +105,9 @@ export const Taskbar: React.FC<TaskbarProps> = ({
     return () => clearInterval(id);
   }, []);
 
+  // When music is closed to tray, hide it from the center taskbar buttons
   const openWindows = (Object.values(windows) as WindowRuntimeState[]).filter(
-    (w) => w.isOpen && !(w.id === 'win-music' && musicMinimizedToTray)
+    (w) => w.isOpen && !(w.id === 'win-music' && musicClosedToTray)
   );
 
   const StartPlanetSvg = (
@@ -92,7 +135,10 @@ export const Taskbar: React.FC<TaskbarProps> = ({
             title="Theme Studio"
             className="w-9 h-9 rounded-xl bg-white/10 active:scale-95 flex items-center justify-center text-fuchsia-300 border border-white/15"
           >
-            🌈
+            <svg className="w-4 h-4 text-fuchsia-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M7 21a4 4 0 01-4-4 4 4 0 014-4h4a4 4 0 014 4 4 4 0 01-4 4H7z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 3h6v6l-7 7-6-6 7-7z" />
+            </svg>
           </button>
         </div>
 
@@ -110,16 +156,19 @@ export const Taskbar: React.FC<TaskbarProps> = ({
             title="Physics"
             className="w-9 h-9 rounded-xl bg-white/10 active:scale-95 flex items-center justify-center text-sm border border-white/15"
           >
-            {PHYSICS_LABELS[physicsMode].icon}
+            {renderPhysicsIcon(physicsMode)}
           </button>
 
-          {musicMinimizedToTray && (
+          {musicClosedToTray && (
             <button
               onClick={onRestoreMusic}
-              title="Music Tray"
-              className="w-9 h-9 rounded-xl bg-violet-600/35 border border-violet-400/50 flex items-center justify-center text-xs animate-pulse"
+              title="Astro.Radio Tray"
+              className="w-9 h-9 rounded-xl bg-violet-600/35 border border-violet-400/50 flex items-center justify-center text-xs animate-pulse text-violet-200"
             >
-              📻
+              <svg className="w-4 h-4 text-cyan-300 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <circle cx="12" cy="12" r="9" />
+                <path d="M12 8v8m-4-4h8" />
+              </svg>
             </button>
           )}
         </div>
@@ -127,10 +176,10 @@ export const Taskbar: React.FC<TaskbarProps> = ({
     );
   }
 
-  // Desktop & Tablet View
+  // Desktop View
   return (
     <footer className="w-full h-12 xp-taskbar px-3 flex items-center justify-between gap-2 z-40 relative shrink-0">
-      {/* Left: Start + Quick Actions */}
+      {/* Left: Start + Quick Desktop Draw & YouTube */}
       <div className="flex items-center gap-2 shrink-0">
         <button
           onClick={onToggleStartMenu}
@@ -162,12 +211,14 @@ export const Taskbar: React.FC<TaskbarProps> = ({
             title="YouTube Player"
             className="p-1.5 rounded-xl bg-white/8 hover:bg-white/18 border border-white/10 text-red-400 transition-colors"
           >
-            <span className="text-xs">▶</span>
+            <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+            </svg>
           </button>
         </div>
       </div>
 
-      {/* Center: Open Windows */}
+      {/* Center: Open Windows (if minimized to taskbar or focused) */}
       <div className="flex-1 flex items-center justify-start md:justify-center gap-1.5 overflow-x-auto px-2 min-w-0">
         {openWindows.map((w) => {
           const meta = WINDOW_META_MAP[w.id];
@@ -196,39 +247,42 @@ export const Taskbar: React.FC<TaskbarProps> = ({
         })}
       </div>
 
-      {/* Right Tray: Reset Icons, Themes, Physics, Ares Music Tray, Sound, Clocks */}
+      {/* Right Tray: Reset, Theme, Physics, Music Tray, Clocks */}
       <div className="flex items-center gap-1.5 shrink-0 relative">
-        {/* Reset Icons Button right next to Physics & Themes */}
+        {/* Reset Icons Button */}
         <button
           onClick={onRearrangeIcons}
           title="Reset desktop icons to grid"
-          className="h-8 px-2 rounded-xl bg-white/8 hover:bg-white/18 border border-white/15 flex items-center gap-1 text-xs font-mono text-slate-200 transition-colors"
+          className="h-8 px-2.5 rounded-xl bg-white/8 hover:bg-white/18 border border-white/15 flex items-center gap-1.5 text-xs font-mono text-slate-200 transition-colors"
         >
-          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <svg className="w-3.5 h-3.5 text-cyan-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
           </svg>
           <span className="hidden xl:inline">Reset</span>
         </button>
 
-        {/* Quick Themes Button */}
+        {/* Theme Button with clean design palette SVG */}
         <button
           onClick={() => onOpenWindow('win-themes')}
           title="Theme Studio"
-          className="h-8 px-2 rounded-xl bg-white/8 hover:bg-white/18 border border-white/15 flex items-center gap-1 text-xs font-mono text-fuchsia-300 transition-colors"
+          className="h-8 px-2.5 rounded-xl bg-white/8 hover:bg-white/18 border border-white/15 flex items-center gap-1.5 text-xs font-mono text-fuchsia-300 transition-colors"
         >
-          <span>🌈</span>
+          <svg className="w-3.5 h-3.5 text-fuchsia-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M7 21a4 4 0 01-4-4 4 4 0 014-4h4a4 4 0 014 4 4 4 0 01-4 4H7z" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 3h6v6l-7 7-6-6 7-7z" />
+          </svg>
           <span className="hidden xl:inline">Theme</span>
         </button>
 
-        {/* Physics Switcher */}
+        {/* Physics Button with clean SVG */}
         <div className="relative">
           <button
             onClick={() => setPhysicsPopoverOpen((v) => !v)}
             title="Physics Engine"
-            className="h-8 px-2 rounded-xl bg-white/8 hover:bg-white/18 border border-white/15 flex items-center gap-1 text-xs font-mono text-cyan-200 transition-colors"
+            className="h-8 px-2.5 rounded-xl bg-white/8 hover:bg-white/18 border border-white/15 flex items-center gap-1.5 text-xs font-mono text-cyan-200 transition-colors"
           >
-            <span>{PHYSICS_LABELS[physicsMode].icon}</span>
-            <span className="hidden xl:inline">{PHYSICS_LABELS[physicsMode].name}</span>
+            {renderPhysicsIcon(physicsMode)}
+            <span className="hidden xl:inline">{PHYSICS_DESCRIPTIONS[physicsMode]}</span>
           </button>
 
           {physicsPopoverOpen && (
@@ -236,7 +290,7 @@ export const Taskbar: React.FC<TaskbarProps> = ({
               <div className="px-2 py-1 text-[11px] font-mono font-bold text-cyan-300 border-b border-white/10">
                 Physics Kernel
               </div>
-              {(Object.keys(PHYSICS_LABELS) as PhysicsMode[]).map((m) => (
+              {(Object.keys(PHYSICS_DESCRIPTIONS) as PhysicsMode[]).map((m) => (
                 <button
                   key={m}
                   onClick={() => {
@@ -250,10 +304,10 @@ export const Taskbar: React.FC<TaskbarProps> = ({
                   }`}
                 >
                   <span className="flex items-center gap-2">
-                    <span>{PHYSICS_LABELS[m].icon}</span>
-                    <span>{PHYSICS_LABELS[m].name}</span>
+                    {renderPhysicsIcon(m)}
+                    <span>{PHYSICS_DESCRIPTIONS[m]}</span>
                   </span>
-                  {physicsMode === m && <span className="text-[10px] text-cyan-300">Active</span>}
+                  {physicsMode === m && <span className="text-[10px] text-cyan-300 font-bold">Active</span>}
                 </button>
               ))}
               <div className="pt-1 border-t border-white/10">
@@ -262,17 +316,20 @@ export const Taskbar: React.FC<TaskbarProps> = ({
                     onImpulseBurst();
                     setPhysicsPopoverOpen(false);
                   }}
-                  className="w-full px-2 py-1.5 rounded-xl text-xs font-mono font-semibold bg-pink-500/20 hover:bg-pink-500/35 text-pink-200 border border-pink-500/30 transition-colors"
+                  className="w-full px-2 py-1.5 rounded-xl text-xs font-mono font-semibold bg-pink-500/20 hover:bg-pink-500/35 text-pink-200 border border-pink-500/30 transition-colors flex items-center justify-center gap-1.5"
                 >
-                  ⚡ Cosmic Impulse
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  <span>Cosmic Impulse</span>
                 </button>
               </div>
             </div>
           )}
         </div>
 
-        {/* Music Ares-Style System Tray Icon */}
-        {musicMinimizedToTray && (
+        {/* Music Ares-Style System Tray Icon (Next to Clocks) */}
+        {musicClosedToTray && (
           <div className="relative">
             <button
               onClick={onRestoreMusic}
@@ -280,11 +337,13 @@ export const Taskbar: React.FC<TaskbarProps> = ({
                 e.preventDefault();
                 setMusicTrayMenuOpen((v) => !v);
               }}
-              title="Astro.Radio Tray (Right click for menu)"
-              className="h-8 px-2 rounded-xl bg-violet-600/30 hover:bg-violet-600/50 border border-violet-400/50 flex items-center gap-1 text-xs font-mono text-violet-200 transition-colors animate-pulse"
+              title="Astro.Radio Tray (Right-click to exit)"
+              className="h-8 px-2.5 rounded-xl bg-violet-600/30 hover:bg-violet-600/50 border border-violet-400/50 flex items-center gap-1.5 text-xs font-mono text-violet-200 transition-colors animate-pulse"
             >
-              <span>📻</span>
-              <span className="text-[10px] text-cyan-300">Playing</span>
+              <svg className="w-3.5 h-3.5 text-pink-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z" />
+              </svg>
+              <span className="text-[10px] text-cyan-300 font-bold hidden sm:inline">Playing</span>
             </button>
 
             {musicTrayMenuOpen && (
@@ -295,7 +354,7 @@ export const Taskbar: React.FC<TaskbarProps> = ({
                 <button
                   onClick={() => {
                     setMusicTrayMenuOpen(false);
-                    onRestoreMusic?.();
+                    onRestoreMusic();
                   }}
                   className="w-full px-2.5 py-1.5 rounded-lg text-left text-xs font-mono text-white hover:bg-white/10"
                 >
@@ -305,11 +364,11 @@ export const Taskbar: React.FC<TaskbarProps> = ({
                 <button
                   onClick={() => {
                     setMusicTrayMenuOpen(false);
-                    onCloseMusicPermanently?.();
+                    onCloseMusicPermanently();
                   }}
                   className="w-full px-2.5 py-1.5 rounded-lg text-left text-xs font-mono text-rose-400 hover:bg-rose-500/20"
                 >
-                  Quit Music (Close)
+                  Close & Stop Music
                 </button>
               </div>
             )}
@@ -319,12 +378,21 @@ export const Taskbar: React.FC<TaskbarProps> = ({
         <button
           onClick={onToggleSound}
           title={soundEnabled ? 'Mute sound effects' : 'Unmute sound effects'}
-          className="h-8 w-8 rounded-xl bg-white/8 hover:bg-white/18 border border-white/15 flex items-center justify-center text-xs transition-colors"
+          className="h-8 w-8 rounded-xl bg-white/8 hover:bg-white/18 border border-white/15 flex items-center justify-center text-xs text-slate-300 transition-colors"
         >
-          {soundEnabled ? '🔊' : '🔇'}
+          {soundEnabled ? (
+            <svg className="w-3.5 h-3.5 text-cyan-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+            </svg>
+          ) : (
+            <svg className="w-3.5 h-3.5 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+            </svg>
+          )}
         </button>
 
-        {/* Multi-Timezone Clock Pill */}
+        {/* Multi-Timezone Clocks Pill with Country Badges (NO EMOJIS) */}
         <button
           onClick={onOpenTimezoneModal}
           title="Configure timezones"
@@ -346,12 +414,12 @@ export const Taskbar: React.FC<TaskbarProps> = ({
             return (
               <span
                 key={`${tzId}-${idx}`}
-                className={`items-center gap-1.5 px-1.5 text-xs font-mono text-slate-100 ${
+                className={`items-center gap-1.5 px-2 text-xs font-mono text-slate-100 ${
                   idx >= 2 ? 'hidden lg:flex' : 'flex'
                 } ${idx > 0 ? 'border-l border-white/15' : ''}`}
               >
-                <span>{tz.flag}</span>
-                <span className="tabular-nums">{timeStr}</span>
+                {renderCountryBadge(tz.code)}
+                <span className="tabular-nums font-semibold">{timeStr}</span>
               </span>
             );
           })}

@@ -44,6 +44,7 @@ import { TerminalApp } from './components/apps/TerminalApp';
 import { ThemesApp } from './components/apps/ThemesApp';
 import { MusicApp } from './components/apps/MusicApp';
 import { MediaFlowApp } from './components/apps/MediaFlowApp';
+import { PressmarkApp } from './components/apps/PressmarkApp';
 import { CardGramApp } from './components/apps/CardGramApp';
 import { IconManagerApp } from './components/apps/IconManagerApp';
 import { YouTubeApp } from './components/apps/YouTubeApp';
@@ -1160,6 +1161,7 @@ export default function App() {
               {meta.id === 'win-mediaflow' && (
                 <MediaFlowApp onSpawnWidget={spawnWidget} onToast={showToast} />
               )}
+              {meta.id === 'win-pressmark' && <PressmarkApp />}
               {meta.id === 'win-cardgram' && <CardGramApp />}
               {meta.id === 'win-youtube' && <YouTubeApp />}
               {meta.id === 'win-icon-manager' && (

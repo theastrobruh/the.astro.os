@@ -6,6 +6,7 @@ export type WindowId =
   | 'win-themes'
   | 'win-music'
   | 'win-mediaflow'
+  | 'win-pressmark'
   | 'win-cardgram'
   | 'win-icon-manager'
   | 'win-youtube'

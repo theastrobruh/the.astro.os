@@ -16,6 +16,7 @@ export const WINDOW_META_LIST: WindowMeta[] = [
   { id: 'win-themes', title: 'Theme Studio • Personalization', shortTitle: 'Theme.XP', accentColor: '#E879F9', defaultWidth: 560, defaultHeight: 500, resizable: true },
   { id: 'win-music', title: 'Astro.Radio • Cyber Beats', shortTitle: 'Music', accentColor: '#A78BFA', defaultWidth: 640, defaultHeight: 580, resizable: true },
   { id: 'win-mediaflow', title: 'MediaFlow Studio — Images & GIFs', shortTitle: 'MediaFlow', accentColor: '#22D3EE', defaultWidth: 900, defaultHeight: 620, resizable: true },
+  { id: 'win-pressmark', title: 'Pressmark • Watermark & Media Multi-Tool', shortTitle: 'Pressmark', accentColor: '#06B6D4', defaultWidth: 880, defaultHeight: 600, resizable: true },
   { id: 'win-cardgram', title: 'CardGram • Web Identity', shortTitle: 'CardGram', accentColor: '#F472B6', defaultWidth: 880, defaultHeight: 580, resizable: true },
   { id: 'win-icon-manager', title: 'Customize Icons', shortTitle: 'Icons', accentColor: '#38BDF8', defaultWidth: 600, defaultHeight: 500, resizable: true },
   { id: 'win-youtube', title: 'YouTube Player • Cosmic Stream', shortTitle: 'YouTube', accentColor: '#EF4444', defaultWidth: 760, defaultHeight: 540, resizable: true },
@@ -29,7 +30,7 @@ export const WINDOW_META_MAP: Record<WindowId, WindowMeta> = WINDOW_META_LIST.re
 
 export const ICON_ORDER: Array<{ id: string; winId: WindowId; defaultName: string }> = [
   { id: 'icon-win-astroverse', winId: 'win-astroverse', defaultName: 'Astro.Verse' },
-  { id: 'icon-win-mediaflow', winId: 'win-mediaflow', defaultName: 'MediaFlow' },
+  { id: 'icon-win-pressmark', winId: 'win-pressmark', defaultName: 'Pressmark' },
   { id: 'icon-win-youtube', winId: 'win-youtube', defaultName: 'YouTube' },
   { id: 'icon-win-themes', winId: 'win-themes', defaultName: 'Theme' },
   { id: 'icon-win-cardgram', winId: 'win-cardgram', defaultName: 'CardGram' },
@@ -51,7 +52,7 @@ export const DEFAULT_ADMIN_CONFIG: AdminConfig = {
     gridGap: 16,
     icons: {
       'icon-win-astroverse': { name: 'Astro.Verse', visible: true },
-      'icon-win-mediaflow': { name: 'MediaFlow', visible: true },
+      'icon-win-pressmark': { name: 'Pressmark', visible: true },
       'icon-win-youtube': { name: 'YouTube', visible: true },
       'icon-win-themes': { name: 'Theme', visible: true },
       'icon-win-cardgram': { name: 'CardGram', visible: true },
@@ -69,6 +70,7 @@ export const DEFAULT_ADMIN_CONFIG: AdminConfig = {
     'win-themes': { title: 'Theme Studio • Personalization', width: 560, height: 500 },
     'win-music': { title: 'Astro.Radio • Cyber Beats', width: 640, height: 580 },
     'win-mediaflow': { title: 'MediaFlow Studio — Images & GIFs', width: 900, height: 620 },
+    'win-pressmark': { title: 'Pressmark • Watermark & Media Multi-Tool', width: 880, height: 600 },
     'win-cardgram': { title: 'CardGram • Web Identity', width: 880, height: 580 },
     'win-icon-manager': { title: 'Customize Icons', width: 600, height: 500 },
     'win-youtube': { title: 'YouTube Player • Cosmic Stream', width: 760, height: 540 },

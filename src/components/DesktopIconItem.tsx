@@ -240,6 +240,13 @@ function getIconTheme(winId: WindowId) {
         orb: '#00F0FF',
         glow: 'rgba(0, 240, 255, 0.45)',
       };
+    case 'win-pressmark':
+      return {
+        borderGrad: 'from-cyan-400/85 via-teal-400/70 to-blue-500/85',
+        surfaceGrad: 'from-[#082333]/95 to-[#061524]/95',
+        orb: '#06B6D4',
+        glow: 'rgba(6, 182, 212, 0.45)',
+      };
     case 'win-youtube':
       return {
         borderGrad: 'from-red-400/85 via-rose-500/75 to-red-600/85',
@@ -388,6 +395,35 @@ export function renderDefaultSvg(winId: WindowId) {
           <path d="M8 28L15.5 19.5L21 25L25.5 20L32 28H8Z" fill="#0F172A" opacity="0.65" />
           <circle cx="14" cy="15.5" r="2.6" fill="#FDE047" />
           <rect x="24" y="12.5" width="7" height="4" rx="1.5" fill="#FF007A" />
+        </svg>
+      );
+    case 'win-pressmark':
+      return (
+        <svg className="w-[60%] h-[60%] group-hover:scale-110 transition-transform duration-300" viewBox="0 0 40 40" fill="none">
+          <defs>
+            <linearGradient id="icoPressmark" x1="6" y1="6" x2="34" y2="34" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#22D3EE" />
+              <stop offset="50%" stopColor="#06B6D4" />
+              <stop offset="100%" stopColor="#3B82F6" />
+            </linearGradient>
+          </defs>
+          {/* Document / Media Stamp Frame */}
+          <rect x="7" y="7" width="26" height="26" rx="6" fill="#071b2c" stroke="url(#icoPressmark)" strokeWidth="2.2" />
+          
+          {/* Stamp / Watermark Badge (P & Check / Stamp Mark) */}
+          <path
+            d="M13 14H21C23.2 14 25 15.8 25 18C25 20.2 23.2 22 21 22H16V27"
+            stroke="#00F0FF"
+            strokeWidth="2.4"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          {/* Watermark Diagonal Waves / Multi-tool Layers */}
+          <circle cx="21" cy="18" r="2" fill="#22D3EE" />
+          <path d="M22 25L27 27" stroke="#38BDF8" strokeWidth="2" strokeLinecap="round" strokeDasharray="1.5 2.5" />
+          <path d="M19 28L25 30" stroke="#06B6D4" strokeWidth="2" strokeLinecap="round" strokeDasharray="1.5 2.5" />
+          {/* Verification / Conversion Pip */}
+          <rect x="23" y="10" width="7" height="4" rx="1.2" fill="#38BDF8" />
         </svg>
       );
     case 'win-youtube':

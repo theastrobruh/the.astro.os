@@ -167,19 +167,19 @@ export const StartMenu: React.FC<StartMenuProps> = ({
             <span className="text-xs font-mono font-bold text-white">Terminal</span>
           </button>
 
-          {/* MediaFlow */}
+          {/* Pressmark */}
           <button
-            onClick={() => launch(() => onOpenWindow('win-mediaflow'))}
+            onClick={() => launch(() => onOpenWindow('win-pressmark'))}
             className="p-2.5 rounded-2xl bg-white/8 hover:bg-white/15 border border-white/10 hover:border-cyan-500/50 flex flex-col items-center justify-center gap-1.5 text-center transition-all active:scale-95 shadow-sm"
           >
             <div className="w-7 h-7 rounded-lg bg-cyan-500/20 text-cyan-300 flex items-center justify-center">
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                 <rect x="3" y="3" width="18" height="18" rx="4" />
-                <circle cx="8.5" cy="8.5" r="1.5" />
-                <path d="M21 15l-5-5L5 21" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M7 8h5a3 3 0 010 6H9v4" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M15 15l3 3" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
-            <span className="text-xs font-mono font-bold text-white">MediaFlow</span>
+            <span className="text-xs font-mono font-bold text-white">Pressmark</span>
           </button>
 
           {/* Admin Panel */}

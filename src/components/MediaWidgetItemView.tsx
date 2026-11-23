@@ -139,6 +139,8 @@ export const MediaWidgetItemView: React.FC<MediaWidgetItemViewProps> = ({
         willChange: 'transform',
       }}
       className={`group rounded-2xl p-1 bg-black/45 border backdrop-blur-md shadow-2xl overflow-hidden cursor-grab active:cursor-grabbing touch-none select-none z-[8] transition-colors ${
+        widget.id.includes('clone') ? 'animate-clone-spawn' : ''
+      } ${
         isSelected
           ? 'border-cyan-400/80 shadow-[0_0_0_1px_rgba(0,240,255,0.45),0_18px_40px_rgba(0,0,0,0.65)]'
           : 'border-white/20 hover:border-pink-400/50'

@@ -5,50 +5,51 @@ export const CardGramApp: React.FC = () => {
   const [reloadKey, setReloadKey] = useState(0);
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#0a0515] text-white overflow-hidden items-center justify-center p-2 sm:p-4">
-      {/* Phone container mockup */}
-      <div className="w-full max-w-[360px] h-full max-h-[640px] bg-slate-950 rounded-[36px] border-[3px] border-slate-700/60 shadow-2xl flex flex-col overflow-hidden relative ring-1 ring-white/10">
-        {/* Dynamic Island / Notch */}
-        <div className="h-6 w-full bg-slate-950 flex items-center justify-between px-5 text-[10px] font-mono text-slate-400 shrink-0 select-none">
-          <span>9:41</span>
-          <div className="w-16 h-3 bg-black rounded-full" />
-          <div className="flex items-center gap-1">
-            <span>5G</span>
-            <span>100%</span>
+    <div className="flex-1 flex flex-col h-full bg-[#0a0515] text-white overflow-hidden">
+      {/* Top Browser Bar */}
+      <div className="h-9 px-3 bg-black/60 border-b border-white/10 flex items-center justify-between gap-2 shrink-0 select-none">
+        <div className="flex items-center gap-2 min-w-0 flex-1">
+          <div className="flex items-center gap-1 shrink-0">
+            <span className="w-2.5 h-2.5 rounded-full bg-rose-500/80 inline-block" />
+            <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80 inline-block" />
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80 inline-block" />
+          </div>
+
+          <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-[11px] font-mono text-slate-300 flex-1 max-w-md truncate">
+            <span className="text-cyan-400">🔒</span>
+            <span className="truncate">{url}</span>
           </div>
         </div>
 
-        {/* Embedded CardGram Live App */}
-        <div className="flex-1 w-full bg-black relative">
-          <iframe
-            key={reloadKey}
-            src={url}
-            title="CardGram Mobile"
-            className="w-full h-full border-0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope"
-          />
-        </div>
-
-        {/* Phone Bottom Home Indicator */}
-        <div className="h-7 w-full bg-slate-950 flex items-center justify-between px-3 shrink-0 border-t border-white/5">
+        <div className="flex items-center gap-1.5 shrink-0">
           <button
             onClick={() => setReloadKey((k) => k + 1)}
-            title="Reload"
-            className="text-[11px] text-slate-400 hover:text-white px-2 py-0.5 rounded font-mono"
+            title="Reload frame"
+            className="p-1.5 rounded-lg bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white text-xs transition-colors"
           >
-            ↻ Reload
+            ↻
           </button>
-          <div className="w-24 h-1 bg-white/30 rounded-full" />
           <a
             href={url}
             target="_blank"
             rel="noopener noreferrer"
-            title="Open in external browser"
-            className="text-[11px] text-pink-400 hover:text-pink-300 px-2 py-0.5 rounded font-mono"
+            title="Open in new browser tab"
+            className="px-2.5 py-1 rounded-lg bg-pink-500/20 hover:bg-pink-500/35 border border-pink-400/40 text-pink-300 text-xs font-mono font-bold transition-colors"
           >
             ↗ External
           </a>
         </div>
+      </div>
+
+      {/* Responsive Full-Height Embedded CardGram Web App */}
+      <div className="flex-1 w-full bg-black relative">
+        <iframe
+          key={reloadKey}
+          src={url}
+          title="CardGram Desktop"
+          className="w-full h-full border-0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope"
+        />
       </div>
     </div>
   );

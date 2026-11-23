@@ -120,6 +120,28 @@
   animation: astroShake 0.42s ease;
 }
 
+@keyframes cloneSpawn {
+  0% {
+    transform: scale(0.6) rotate(-8deg);
+    opacity: 0.2;
+    filter: brightness(2) drop-shadow(0 0 25px #00F0FF);
+  }
+  50% {
+    transform: scale(1.12) rotate(4deg);
+    opacity: 0.95;
+    filter: brightness(1.4) drop-shadow(0 0 35px #FF007A);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+    filter: brightness(1) drop-shadow(0 0 10px rgba(0, 240, 255, 0.4));
+  }
+}
+
+.animate-clone-spawn {
+  animation: cloneSpawn 0.55s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;

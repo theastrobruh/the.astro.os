@@ -1233,8 +1233,57 @@ export default function App() {
         <div
           onClick={(e) => e.stopPropagation()}
           style={{ left: ctxMenu.x, top: ctxMenu.y }}
-          className="fixed z-50 w-48 bg-slate-950/95 backdrop-blur-xl border border-white/20 rounded-xl p-1.5 shadow-2xl space-y-0.5"
+          className="fixed z-50 w-52 bg-slate-950/95 backdrop-blur-xl border border-white/20 rounded-xl p-1.5 shadow-2xl space-y-0.5"
         >
+          <button
+            onClick={() => {
+              const src = widgets.find((w) => w.id === ctxMenu.widgetId);
+              if (src) {
+                const newId = `widget-clone-${Date.now()}`;
+                const offset = 32;
+                const newX = Math.min(window.innerWidth - src.width - 20, src.x + offset);
+                const newY = Math.min(window.innerHeight - src.height - 70, src.y + offset);
+
+                const cloned: MediaWidgetItem = {
+                  ...src,
+                  id: newId,
+                  label: `${src.label} (Copy)`,
+                  x: newX,
+                  y: newY,
+                };
+
+                setWidgets((prev) => [...prev, cloned]);
+
+                // Physics body initialization with elastic impulse burst & sound
+                const b = bodiesRef.current;
+                b.set(newId, {
+                  id: newId,
+                  kind: 'widget',
+                  x: newX,
+                  y: newY,
+                  width: src.width,
+                  height: src.height,
+                  vx: (Math.random() - 0.5) * 600,
+                  vy: -350,
+                  angle: (Math.random() - 0.5) * 15,
+                  angularVel: (Math.random() - 0.5) * 20,
+                  targetAngle: 0,
+                  isDragging: false,
+                  scale: 1,
+                  mass: src.width * src.height * 1.4,
+                });
+
+                astroSound.playStartupChime();
+                showToast(`Widget cloned: ${src.label}`);
+              }
+              setCtxMenu(null);
+            }}
+            className="w-full px-3 py-2 rounded-lg hover:bg-cyan-500/20 text-left text-xs font-mono text-cyan-300 font-bold transition-colors flex items-center justify-between"
+          >
+            <span>✨ Duplicate / Clone</span>
+            <span className="text-[10px] text-cyan-400">Clone</span>
+          </button>
+          <div className="h-px bg-white/10 my-0.5" />
           <button
             onClick={() => {
               widgetToReplaceRef.current = ctxMenu.widgetId;
@@ -1243,7 +1292,7 @@ export default function App() {
             }}
             className="w-full px-3 py-2 rounded-lg hover:bg-white/10 text-left text-xs font-mono text-slate-200 transition-colors"
           >
-            Cambiar imagen / GIF
+            Change Image / GIF
           </button>
           <button
             onClick={() => {
@@ -1258,7 +1307,7 @@ export default function App() {
             }}
             className="w-full px-3 py-2 rounded-lg hover:bg-white/10 text-left text-xs font-mono text-slate-200 transition-colors"
           >
-            Tamaño original
+            Reset Size
           </button>
           <button
             onClick={() => {
@@ -1270,9 +1319,9 @@ export default function App() {
               }
               setCtxMenu(null);
             }}
-            className="w-full px-3 py-2 rounded-lg hover:bg-white/10 text-left text-xs font-mono text-cyan-300 transition-colors"
+            className="w-full px-3 py-2 rounded-lg hover:bg-white/10 text-left text-xs font-mono text-pink-300 transition-colors"
           >
-            ⚡ Lanzar widget
+            ⚡ Throw Widget
           </button>
           <div className="h-px bg-white/10 my-1" />
           <button
@@ -1282,7 +1331,7 @@ export default function App() {
             }}
             className="w-full px-3 py-2 rounded-lg hover:bg-rose-500/20 text-left text-xs font-mono text-rose-400 transition-colors"
           >
-            Eliminar widget
+            Delete Widget
           </button>
         </div>
       )}

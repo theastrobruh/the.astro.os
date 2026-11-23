@@ -972,10 +972,15 @@ export default function App() {
           adminPin={config.security.adminPin}
           onEnter={(role) => {
             setUserRole(role);
+            if (role === 'guest') {
+              setTimeout(() => {
+                openWindow('win-astroverse');
+              }, 400);
+            }
             showToast(
               role === 'admin'
-                ? 'Sesión de Administrador iniciada'
-                : 'Bienvenido a the.astro.os (Invitado)'
+                ? 'Administrator session active'
+                : 'Welcome to the.astro.os'
             );
           }}
         />

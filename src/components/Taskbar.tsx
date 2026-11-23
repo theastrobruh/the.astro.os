@@ -119,51 +119,14 @@ export const Taskbar: React.FC<TaskbarProps> = ({
 
   if (isMobile) {
     return (
-      <footer className="w-full h-12 xp-taskbar px-3 flex items-center justify-between z-40 relative shrink-0">
-        <div className="flex items-center gap-1.5">
-          <button
-            onClick={onRearrangeIcons}
-            title="Reset Icons"
-            className="w-9 h-9 rounded-xl bg-white/10 active:scale-95 flex items-center justify-center text-slate-100 border border-white/15"
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-            </svg>
-          </button>
-          <button
-            onClick={() => onOpenWindow('win-themes')}
-            title="Theme Studio"
-            className="w-9 h-9 rounded-xl bg-white/10 active:scale-95 flex items-center justify-center text-fuchsia-300 border border-white/15"
-          >
-            <svg className="w-4 h-4 text-fuchsia-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M7 21a4 4 0 01-4-4 4 4 0 014-4h4a4 4 0 014 4 4 4 0 01-4 4H7z" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 3h6v6l-7 7-6-6 7-7z" />
-            </svg>
-          </button>
-        </div>
-
-        <button
-          onClick={onToggleStartMenu}
-          aria-label="Start"
-          className="xp-start-btn w-11 h-10 rounded-2xl flex items-center justify-center transition-transform active:scale-95"
-        >
-          {StartPlanetSvg}
-        </button>
-
-        <div className="flex items-center gap-1.5 relative">
-          <button
-            onClick={() => setPhysicsPopoverOpen((v) => !v)}
-            title="Physics"
-            className="w-9 h-9 rounded-xl bg-white/10 active:scale-95 flex items-center justify-center text-sm border border-white/15"
-          >
-            {renderPhysicsIcon(physicsMode)}
-          </button>
-
+      <footer className="w-full h-12 xp-taskbar px-4 flex items-center justify-between z-40 relative shrink-0">
+        {/* Left spacer / Tray placeholder */}
+        <div className="w-10 flex items-center">
           {musicClosedToTray && (
             <button
               onClick={onRestoreMusic}
               title="Astro.Radio Tray"
-              className="w-9 h-9 rounded-xl bg-violet-600/35 border border-violet-400/50 flex items-center justify-center text-xs animate-pulse text-violet-200"
+              className="w-8 h-8 rounded-xl bg-violet-600/35 border border-violet-400/50 flex items-center justify-center text-xs animate-pulse text-violet-200"
             >
               <svg className="w-4 h-4 text-cyan-300 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                 <circle cx="12" cy="12" r="9" />
@@ -172,6 +135,18 @@ export const Taskbar: React.FC<TaskbarProps> = ({
             </button>
           )}
         </div>
+
+        {/* Perfectly Centered Start Button */}
+        <button
+          onClick={onToggleStartMenu}
+          aria-label="Start"
+          className="xp-start-btn w-12 h-9 rounded-2xl flex items-center justify-center transition-transform active:scale-95 shadow-lg shadow-pink-500/20"
+        >
+          {StartPlanetSvg}
+        </button>
+
+        {/* Right balance spacer */}
+        <div className="w-10" />
       </footer>
     );
   }
@@ -179,7 +154,7 @@ export const Taskbar: React.FC<TaskbarProps> = ({
   // Desktop View
   return (
     <footer className="w-full h-12 xp-taskbar px-3 flex items-center justify-between gap-2 z-40 relative shrink-0">
-      {/* Left: Start + Quick Desktop Draw & YouTube */}
+      {/* Left: Start + Quick Desktop Draw */}
       <div className="flex items-center gap-2 shrink-0">
         <button
           onClick={onToggleStartMenu}
@@ -203,16 +178,6 @@ export const Taskbar: React.FC<TaskbarProps> = ({
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-            </svg>
-          </button>
-
-          <button
-            onClick={() => onOpenWindow('win-youtube')}
-            title="YouTube Player"
-            className="p-1.5 rounded-xl bg-white/8 hover:bg-white/18 border border-white/10 text-red-400 transition-colors"
-          >
-            <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
             </svg>
           </button>
         </div>

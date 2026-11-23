@@ -212,12 +212,15 @@ function createInitialWindows(): Record<WindowId, WindowRuntimeState> {
     const h = Math.min(meta.defaultHeight, Math.max(280, vh - 96));
     const x = Math.max(14, Math.round((vw - w) / 2) + (idx % 3) * 16 - 16);
     const y = Math.max(14, Math.round((vh - 56 - h) / 2) + (idx % 3) * 14 - 14);
+    
+    // theAstroBruh starts opened by default for seamless entry
+    const isAstroVerse = meta.id === 'win-astroverse';
     result[meta.id] = {
       id: meta.id,
-      isOpen: false,
+      isOpen: isAstroVerse,
       isMinimized: false,
       isMaximized: false,
-      zIndex: 30 + idx,
+      zIndex: isAstroVerse ? 50 : 30 + idx,
       x,
       y,
       width: w,
@@ -240,17 +243,17 @@ function computeGridIconPositions(
   if (tier === 'mobile') {
     // Clean centered 3-column smartphone app launcher grid
     const effectiveSize = Math.min(58, iconSize);
-    const cellW = Math.max(88, Math.floor((vw - 24) / 3));
-    const cellH = effectiveSize + 38;
+    const cellW = Math.max(96, Math.floor((vw - 24) / 3));
+    const cellH = effectiveSize + 46;
     const cols = 3;
-    const startX = Math.max(8, Math.round((vw - cellW * cols) / 2));
+    const startX = Math.max(6, Math.round((vw - cellW * cols) / 2));
     const startY = 14;
 
     ICON_ORDER.forEach((item, index) => {
       const col = index % cols;
       const row = Math.floor(index / cols);
       positions[item.id] = {
-        x: startX + col * cellW + Math.round((cellW - (effectiveSize + 24)) / 2),
+        x: startX + col * cellW + Math.round((cellW - (effectiveSize + 28)) / 2),
         y: startY + row * (cellH + 8),
       };
     });
@@ -259,8 +262,8 @@ function computeGridIconPositions(
 
   if (tier === 'tablet') {
     // Clean 2-column vertical left layout tailored for iPad / Tablets
-    const cellW = Math.max(92, iconSize + 28);
-    const cellH = iconSize + 38;
+    const cellW = Math.max(104, iconSize + 36);
+    const cellH = iconSize + 46;
     const padTop = 20;
     const availH = Math.max(240, vh - 96);
     const rowsPerCol = Math.max(3, Math.floor(availH / (cellH + gap)));
@@ -277,8 +280,8 @@ function computeGridIconPositions(
   }
 
   // Desktop 2-column layout matching reference screenshot (5 rows per column)
-  const cellW = Math.max(92, iconSize + 28);
-  const cellH = iconSize + 38;
+  const cellW = Math.max(108, iconSize + 36);
+  const cellH = iconSize + 46;
   const padTop = 18;
   const padLeft = 18;
   const rowsPerCol = 5;
@@ -295,11 +298,11 @@ function computeGridIconPositions(
 
 export default function App() {
   const [config, setConfig] = useState<AdminConfig>(loadInitialConfig);
-  const [userRole, setUserRole] = useState<UserRole>(null);
+  const [userRole, setUserRole] = useState<UserRole>('guest');
   const [isBooting, setIsBooting] = useState(true);
   const [widgets, setWidgets] = useState<MediaWidgetItem[]>(loadInitialWidgets);
   const [windows, setWindows] = useState<Record<WindowId, WindowRuntimeState>>(createInitialWindows);
-  const [activeWindowId, setActiveWindowId] = useState<WindowId | null>(null);
+  const [activeWindowId, setActiveWindowId] = useState<WindowId | null>('win-astroverse');
   const zCounterRef = useRef(40);
 
   const [viewportTier, setViewportTier] = useState<ViewportTier>(() =>
@@ -1036,6 +1039,9 @@ export default function App() {
             }))
           }
           onOpenTimezoneModal={() => setTimezoneModalOpen(true)}
+          onRearrangeIcons={rearrangeIcons}
+          onOpenWindow={openWindow}
+          onChangePhysicsMode={changePhysicsMode}
         />
       )}
 

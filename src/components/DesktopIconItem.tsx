@@ -122,7 +122,7 @@ export const DesktopIconItem: React.FC<DesktopIconItemProps> = ({
         position: 'absolute',
         left: 0,
         top: 0,
-        width: Math.max(84, iconSize + 24),
+        width: Math.max(96, iconSize + 34),
         transform: `translate3d(${initialX}px, ${initialY}px, 0)`,
         willChange: 'transform',
       }}
@@ -134,7 +134,7 @@ export const DesktopIconItem: React.FC<DesktopIconItemProps> = ({
           onOpenWindow(icon.winId);
         }
       }}
-      className="group flex flex-col items-center justify-center p-1.5 rounded-2xl cursor-grab active:cursor-grabbing touch-none select-none z-10 focus-visible:outline-2 focus-visible:outline-cyan-400"
+      className="group flex flex-col items-center justify-center p-1 rounded-2xl cursor-grab active:cursor-grabbing touch-none select-none z-10 focus-visible:outline-2 focus-visible:outline-cyan-400"
     >
       {/* Premium Squircle Glass Icon Container */}
       <div
@@ -181,7 +181,7 @@ export const DesktopIconItem: React.FC<DesktopIconItemProps> = ({
 
       <span
         style={{ fontSize }}
-        className="mt-1.5 font-semibold font-mono tracking-tight text-center text-slate-100 group-hover:text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.95)] select-none leading-tight max-w-full truncate px-1.5 py-0.5 rounded-md group-hover:bg-white/10 transition-colors"
+        className="mt-1 font-semibold font-mono tracking-tight text-center text-slate-100 group-hover:text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.95)] select-none leading-tight whitespace-normal break-words max-w-[110px] px-1 py-0.5 rounded-md group-hover:bg-white/10 transition-colors"
       >
         {icon.name}
       </span>

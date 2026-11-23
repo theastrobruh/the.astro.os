@@ -154,17 +154,30 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
     window.addEventListener('pointerup', onUp);
   };
 
+  // Custom mobile sizing: allow compact windows like Astro.Verse to take only needed space instead of full screen
+  const isAstroVerse = win.id === 'win-astroverse';
+
   const style: React.CSSProperties = isMobile
-    ? {
-        position: 'fixed',
-        left: 8,
-        right: 8,
-        top: 38,
-        bottom: 56,
-        zIndex: win.zIndex,
-        transform: 'none',
-        maxHeight: 'calc(100vh - 94px)',
-      }
+    ? isAstroVerse
+      ? {
+          position: 'fixed',
+          left: 14,
+          right: 14,
+          top: '50%',
+          transform: 'translateY(-50%)',
+          maxHeight: 'min(380px, calc(100vh - 110px))',
+          zIndex: win.zIndex,
+        }
+      : {
+          position: 'fixed',
+          left: 8,
+          right: 8,
+          top: 42,
+          bottom: 56,
+          zIndex: win.zIndex,
+          transform: 'none',
+          maxHeight: 'calc(100vh - 98px)',
+        }
     : isMaximized
     ? {
         position: 'absolute',

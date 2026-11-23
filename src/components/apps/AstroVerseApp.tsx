@@ -19,20 +19,20 @@ export const AstroVerseApp: React.FC<AstroVerseAppProps> = ({ onOpenWindow }) =>
     {
       code: 'IK',
       title: 'Inkra',
-      subtitle: 'Creative digital design & illustration tool',
+      subtitle: 'Creative illustration & digital studio',
       url: 'https://theastrobruh.github.io/Inkra/inkra.html',
       accent: 'text-fuchsia-300 bg-fuchsia-500/15 border-fuchsia-400/30',
     },
     {
       code: 'BH',
       title: 'BioHub',
-      subtitle: 'Personal bio hub & centralized links',
+      subtitle: 'Personal bio & centralized links',
       url: 'https://theastrobruh.github.io/BioHub/',
       accent: 'text-pink-300 bg-pink-500/15 border-pink-400/30',
     },
     {
       code: 'GH',
-      title: 'GitHub · theastrobruh',
+      title: 'GitHub Repo',
       subtitle: 'github.com/theastrobruh/the.astro.os',
       url: 'https://github.com/theastrobruh/the.astro.os',
       accent: 'text-slate-200 bg-white/10 border-white/25',
@@ -40,42 +40,35 @@ export const AstroVerseApp: React.FC<AstroVerseAppProps> = ({ onOpenWindow }) =>
   ];
 
   return (
-    <div className="p-5 flex-1 overflow-y-auto space-y-5">
+    <div className="p-4 flex-1 flex flex-col justify-between overflow-y-auto space-y-3">
       {/* Creator Profile */}
       <div className="flex flex-col items-center text-center">
-        <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-pink-500 via-purple-500 to-cyan-400 p-[2.5px] shadow-xl shadow-pink-500/25">
+        <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-pink-500 via-purple-500 to-cyan-400 p-[2px] shadow-lg shadow-pink-500/25">
           <img
             src={ASTRO_AVATAR_IMG}
-            alt="theAstroBruh Avatar"
+            alt="theAstroBruh"
             referrerPolicy="no-referrer"
             className="w-full h-full rounded-full object-cover bg-slate-950"
           />
         </div>
-        <h2 className="mt-3 text-base font-bold text-white font-display tracking-wide">
+        <h2 className="mt-2 text-sm font-bold text-white font-display tracking-wide">
           theAstroBruh
         </h2>
-        <p className="text-[11px] font-mono text-cyan-300/90 tracking-wider mt-0.5">
-          Creative Developer · Content Creator
-        </p>
-        <p className="text-xs text-slate-300 leading-relaxed mt-2.5 max-w-[310px]">
-          Creative developer & content creator blending design, video editing and interactive physics into cosmic web experiences.
+        <p className="text-[11px] font-mono text-cyan-300/90">
+          Creative Developer · Cosmic Web OS
         </p>
       </div>
 
-      {/* Links */}
-      <div className="pt-4 border-t border-white/10 space-y-2">
-        <p className="text-[11px] font-mono font-semibold text-pink-300 mb-2">
-          Desarrollado por theAstroBruh
-        </p>
-
+      {/* Links Grid / List */}
+      <div className="pt-2 border-t border-white/10 space-y-1.5">
         {links.map((item) => (
           <div
             key={item.code}
-            className="flex items-center justify-between p-2.5 rounded-xl bg-white/5 border border-white/10 hover:border-cyan-400/40 hover:bg-white/10 transition-all gap-2"
+            className="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/10 hover:border-cyan-400/40 hover:bg-white/10 transition-all gap-2"
           >
-            <div className="flex items-center gap-2.5 min-w-0">
+            <div className="flex items-center gap-2 min-w-0">
               <span
-                className={`w-8 h-8 rounded-lg border font-mono text-[10px] font-bold flex items-center justify-center shrink-0 ${item.accent}`}
+                className={`w-7 h-7 rounded-lg border font-mono text-[10px] font-bold flex items-center justify-center shrink-0 ${item.accent}`}
               >
                 {item.code}
               </span>
@@ -83,7 +76,7 @@ export const AstroVerseApp: React.FC<AstroVerseAppProps> = ({ onOpenWindow }) =>
                 <div className="text-xs font-mono font-semibold text-slate-100 truncate">
                   {item.title}
                 </div>
-                <div className="text-[11px] text-slate-400 truncate">{item.subtitle}</div>
+                <div className="text-[10px] text-slate-400 truncate">{item.subtitle}</div>
               </div>
             </div>
 
@@ -91,16 +84,16 @@ export const AstroVerseApp: React.FC<AstroVerseAppProps> = ({ onOpenWindow }) =>
               {item.internalWin && (
                 <button
                   onClick={() => onOpenWindow(item.internalWin!)}
-                  className="px-2.5 py-1 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/35 text-cyan-200 border border-cyan-400/30 text-[11px] font-mono transition-colors"
+                  className="px-2 py-0.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/35 text-cyan-200 border border-cyan-400/30 text-[10px] font-mono transition-colors"
                 >
-                  Abrir
+                  Open
                 </button>
               )}
               <a
                 href={item.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                title={`Visitar ${item.title}`}
+                title={`Visit ${item.title}`}
                 className="p-1.5 rounded-lg bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white transition-colors"
               >
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

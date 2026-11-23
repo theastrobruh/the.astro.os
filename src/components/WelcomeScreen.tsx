@@ -77,7 +77,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ osTitle, adminPin,
         isLeaving ? 'opacity-0 scale-105 pointer-events-none' : 'opacity-100 scale-100'
       }`}
     >
-      <div className="w-full max-w-xl glass-window border border-white/20 p-6 md:p-8 flex flex-col items-center text-center shadow-2xl">
+      <div className="w-full max-w-md glass-window border border-white/20 p-6 md:p-8 flex flex-col items-center text-center shadow-2xl">
         {/* Saturn OS Logo */}
         <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-pink-500 via-purple-500 to-cyan-400 p-[2px] shadow-xl shadow-pink-500/25 mb-3">
           <div className="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center text-3xl">
@@ -89,7 +89,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ osTitle, adminPin,
           {osTitle}
         </h1>
         <p className="text-xs font-mono text-slate-400 mt-1 mb-6">
-          by <span className="text-pink-400 font-semibold">theAstroBruh</span> · Cosmic Physics OS
+          v.0.5.0 · Cosmic Physics OS
         </p>
 
         {view === 'select' ? (
@@ -108,15 +108,15 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ osTitle, adminPin,
                     👑
                   </span>
                   <span className="text-[11px] font-mono font-semibold text-pink-300">
-                    PIN {adminPin}
+                    PIN Required
                   </span>
                 </div>
                 <div>
                   <h2 className="text-sm font-bold font-mono text-white group-hover:text-pink-300 transition-colors">
-                    Administrador
+                    Administrator
                   </h2>
                   <p className="text-xs text-slate-400 mt-1 leading-snug">
-                    Control total: edita pantallas, físicas, widgets GIF, iconos y ajustes.
+                    Full access: physics tuning, widgets, themes & system settings.
                   </p>
                 </div>
               </button>
@@ -131,23 +131,19 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ osTitle, adminPin,
                     🚀
                   </span>
                   <span className="text-[11px] font-mono font-semibold text-emerald-300">
-                    Acceso Libre
+                    Direct Access
                   </span>
                 </div>
                 <div>
                   <h2 className="text-sm font-bold font-mono text-white group-hover:text-cyan-300 transition-colors">
-                    Invitado
+                    Guest User
                   </h2>
                   <p className="text-xs text-slate-400 mt-1 leading-snug">
-                    Explora aplicaciones interactivas, físicas, pintura y radio libremente.
+                    Explore interactive apps, physics canvas, paint & live radio.
                   </p>
                 </div>
               </button>
             </div>
-
-            <p className="text-[11px] font-mono text-slate-400 pt-1">
-              Motor de físicas 2D, colisiones elásticas y widgets GIF listos para interactuar
-            </p>
           </div>
         ) : (
           <div className="w-full flex flex-col items-center">
@@ -158,69 +154,60 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ osTitle, adminPin,
                   setPinBuffer('');
                   setPinError(false);
                 }}
-                className="text-xs font-mono text-slate-400 hover:text-pink-300 px-2 py-1 rounded-lg hover:bg-white/5 transition-colors"
+                className="text-xs font-mono text-slate-400 hover:text-white flex items-center gap-1 transition-colors"
               >
-                ← Volver
+                ← Back
               </button>
               <span className="text-xs font-mono font-bold text-pink-300">
-                👑 Modo Administrador
+                Enter Admin PIN
               </span>
-              <div className="w-14" />
             </div>
 
-            <p className="text-xs text-slate-300 mb-3 font-mono">
-              Ingresa el PIN de seguridad (por defecto: <span className="text-pink-400 font-bold">{adminPin}</span>)
-            </p>
-
-            {/* 4 PIN Dots */}
-            <div className={`flex items-center gap-4 mb-2 ${pinError ? 'animate-shake' : ''}`}>
-              {[0, 1, 2, 3].map((i) => {
-                const filled = i < pinBuffer.length;
+            {/* PIN Dots */}
+            <div className="flex items-center justify-center gap-3 my-4">
+              {[0, 1, 2, 3].map((idx) => {
+                const filled = pinBuffer.length > idx;
                 return (
                   <div
-                    key={i}
-                    className={`w-4 h-4 rounded-full border-2 transition-all duration-150 ${
+                    key={idx}
+                    className={`w-4 h-4 rounded-full border transition-all duration-200 ${
                       pinError
-                        ? 'border-rose-500 bg-rose-500 shadow-md shadow-rose-500/50'
+                        ? 'border-rose-500 bg-rose-500 shadow-lg shadow-rose-500/50'
                         : filled
-                        ? 'border-pink-400 bg-pink-400 scale-110 shadow-md shadow-pink-500/50'
-                        : 'border-white/40 bg-white/10'
+                        ? 'border-pink-400 bg-pink-500 shadow-lg shadow-pink-500/40 scale-110'
+                        : 'border-white/30 bg-white/5'
                     }`}
                   />
                 );
               })}
             </div>
 
-            <div className="h-5 text-[11px] font-mono text-rose-400 font-semibold mb-2">
-              {pinError ? 'PIN incorrecto. Intenta de nuevo.' : ''}
-            </div>
-
             {/* Keypad */}
-            <div className="grid grid-cols-3 gap-2.5 w-64 max-w-full">
-              {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((d) => (
+            <div className="grid grid-cols-3 gap-2.5 w-full max-w-[240px] mt-2">
+              {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((digit) => (
                 <button
-                  key={d}
-                  onClick={() => handleDigit(d)}
-                  className="h-11 rounded-xl bg-white/5 hover:bg-white/15 border border-white/15 text-sm font-mono font-bold hover:border-pink-500/50 active:scale-95 transition-all"
+                  key={digit}
+                  onClick={() => handleDigit(digit)}
+                  className="h-12 rounded-2xl bg-white/5 hover:bg-white/15 border border-white/15 active:scale-95 text-base font-mono font-bold text-white transition-all"
                 >
-                  {d}
+                  {digit}
                 </button>
               ))}
               <button
                 onClick={handleClear}
-                className="h-11 rounded-xl bg-rose-500/15 hover:bg-rose-500/30 border border-rose-500/30 text-xs font-mono font-bold text-rose-300 active:scale-95 transition-all"
+                className="h-12 rounded-2xl bg-white/5 hover:bg-white/15 border border-white/10 active:scale-95 text-xs font-mono text-slate-400 hover:text-white transition-all"
               >
-                ✕
+                C
               </button>
               <button
                 onClick={() => handleDigit('0')}
-                className="h-11 rounded-xl bg-white/5 hover:bg-white/15 border border-white/15 text-sm font-mono font-bold hover:border-pink-500/50 active:scale-95 transition-all"
+                className="h-12 rounded-2xl bg-white/5 hover:bg-white/15 border border-white/15 active:scale-95 text-base font-mono font-bold text-white transition-all"
               >
                 0
               </button>
               <button
                 onClick={handleBackspace}
-                className="h-11 rounded-xl bg-white/5 hover:bg-white/15 border border-white/15 text-sm font-mono font-bold hover:border-pink-500/50 active:scale-95 transition-all"
+                className="h-12 rounded-2xl bg-white/5 hover:bg-white/15 border border-white/10 active:scale-95 text-xs font-mono text-slate-400 hover:text-white transition-all"
               >
                 ⌫
               </button>

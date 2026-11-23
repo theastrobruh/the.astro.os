@@ -45,6 +45,7 @@ import { MusicApp } from './components/apps/MusicApp';
 import { MediaFlowApp } from './components/apps/MediaFlowApp';
 import { CardGramApp } from './components/apps/CardGramApp';
 import { IconManagerApp } from './components/apps/IconManagerApp';
+import { YouTubeApp } from './components/apps/YouTubeApp';
 import { AdminPanelApp } from './components/apps/AdminPanelApp';
 
 const STORAGE_CONFIG_KEY = 'astro_os_v3_config';
@@ -392,6 +393,15 @@ export default function App() {
   }, [widgets]);
 
   useEffect(() => {
+    const handleContextMenu = (e: MouseEvent) => {
+      // Prevent browser default context menu, inspect element, etc.
+      e.preventDefault();
+    };
+    window.addEventListener('contextmenu', handleContextMenu);
+    return () => window.removeEventListener('contextmenu', handleContextMenu);
+  }, []);
+
+  useEffect(() => {
     localStorage.setItem(STORAGE_TIMEZONES_KEY, JSON.stringify(selectedTimezones));
   }, [selectedTimezones]);
 
@@ -713,13 +723,41 @@ export default function App() {
     }));
   }, []);
 
+  const [musicInTray, setMusicInTray] = useState(false);
+
   const closeWindow = useCallback((id: WindowId) => {
+    if (id === 'win-music') {
+      // Ares-style minimize to system tray instead of closing
+      setMusicInTray(true);
+      setWindows((prev) => ({
+        ...prev,
+        [id]: { ...prev[id], isMinimized: true },
+      }));
+      setActiveWindowId((cur) => (cur === id ? null : cur));
+      showToast('Music minimized to system tray (Ares style)');
+      return;
+    }
     setWindows((prev) => ({
       ...prev,
       [id]: { ...prev[id], isOpen: false, isMinimized: false },
     }));
     setActiveWindowId((cur) => (cur === id ? null : cur));
-  }, []);
+  }, [showToast]);
+
+  const restoreMusicFromTray = useCallback(() => {
+    setMusicInTray(false);
+    focusWindow('win-music');
+  }, [focusWindow]);
+
+  const closeMusicPermanently = useCallback(() => {
+    setMusicInTray(false);
+    setWindows((prev) => ({
+      ...prev,
+      ['win-music']: { ...prev['win-music'], isOpen: false, isMinimized: false },
+    }));
+    setActiveWindowId((cur) => (cur === 'win-music' ? null : cur));
+    showToast('Music closed');
+  }, [showToast]);
 
   const handleTaskbarWindowClick = useCallback(
     (id: WindowId) => {
@@ -1072,6 +1110,7 @@ export default function App() {
                 <MediaFlowApp onSpawnWidget={spawnWidget} onToast={showToast} />
               )}
               {meta.id === 'win-cardgram' && <CardGramApp />}
+              {meta.id === 'win-youtube' && <YouTubeApp />}
               {meta.id === 'win-icon-manager' && (
                 <IconManagerApp
                   icons={desktopIcons}
@@ -1155,6 +1194,7 @@ export default function App() {
         soundEnabled={config.physics.soundEnabled}
         selectedTimezones={selectedTimezones}
         isMobile={isMobile}
+        musicMinimizedToTray={musicInTray}
         onToggleStartMenu={() => setStartMenuOpen((v) => !v)}
         onRearrangeIcons={rearrangeIcons}
         onToggleDesktopDraw={() => setDesktopDrawActive((v) => !v)}
@@ -1169,6 +1209,8 @@ export default function App() {
           }))
         }
         onOpenTimezoneModal={() => setTimezoneModalOpen(true)}
+        onRestoreMusic={restoreMusicFromTray}
+        onCloseMusicPermanently={closeMusicPermanently}
       />
 
       <StartMenu

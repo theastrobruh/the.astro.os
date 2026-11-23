@@ -20,21 +20,21 @@ export const MusicApp: React.FC = () => {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(0.7);
-  const [statusNote, setStatusNote] = useState('Listo para reproducir');
+  const [statusNote, setStatusNote] = useState('Ready to play');
 
   const currentTitle =
     mode === 'synth'
-      ? 'Astro Ambient Synth (Generador Local)'
+      ? 'Astro Ambient Synth (Local Procedural)'
       : mode === 'local' && localTracks[localIdx]
       ? localTracks[localIdx].name
       : RADIO_PRESETS[activeRadioIdx].name;
 
   const currentSub =
     mode === 'synth'
-      ? 'Sintetizador Web Audio · Offline Ready'
+      ? 'Web Audio Synth · Offline'
       : mode === 'local'
-      ? 'Archivo local cargado'
-      : `${RADIO_PRESETS[activeRadioIdx].genre} · Radio Online`;
+      ? 'Local Audio File'
+      : `${RADIO_PRESETS[activeRadioIdx].genre} · Online Stream`;
 
   const stopSynth = () => {
     if (synthTimerRef.current !== null) {
@@ -51,129 +51,116 @@ export const MusicApp: React.FC = () => {
     const ctx = synthCtxRef.current;
     if (ctx.state === 'suspended') ctx.resume().catch(() => {});
 
-    const chords = [
-      [220, 261.63, 329.63, 392.0],
-      [174.61, 220, 261.63, 349.23],
-      [196.0, 246.94, 293.66, 392.0],
-      [164.81, 196.0, 246.94, 329.63],
-    ];
-    let step = 0;
-
-    const playChord = () => {
-      if (!synthCtxRef.current) return;
+    const pentatonic = [196, 220, 261.63, 293.66, 329.63, 392, 440, 523.25];
+    const playNote = () => {
       const now = ctx.currentTime;
-      const chord = chords[step % chords.length];
-      step++;
-      chord.forEach((freq) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, now);
-        gain.gain.setValueAtTime(0.001, now);
-        gain.gain.linearRampToValueAtTime(0.03 * volume, now + 0.6);
-        gain.gain.exponentialRampToValueAtTime(0.0005, now + 2.6);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(now);
-        osc.stop(now + 2.7);
-      });
+      const freq = pentatonic[Math.floor(Math.random() * pentatonic.length)];
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = Math.random() > 0.4 ? 'sine' : 'triangle';
+      osc.frequency.setValueAtTime(freq, now);
+      gain.gain.setValueAtTime(0.001, now);
+      gain.gain.exponentialRampToValueAtTime(0.04, now + 0.1);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.2);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 1.3);
     };
 
-    playChord();
-    synthTimerRef.current = window.setInterval(playChord, 2600);
+    playNote();
+    synthTimerRef.current = window.setInterval(playNote, 620);
   };
 
   useEffect(() => {
     return () => {
       stopSynth();
+      if (synthCtxRef.current) {
+        synthCtxRef.current.close().catch(() => {});
+      }
     };
   }, []);
 
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = volume;
-    }
-  }, [volume]);
-
-  // Spectrum Visualizer Canvas
+  // Visualizer loop
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    let rafId = 0;
-    const bars = 28;
-    const heights = new Array(bars).fill(6);
-
-    const draw = (timeMs: number) => {
-      const t = timeMs * 0.004;
+    let raf = 0;
+    const draw = () => {
       const w = canvas.width;
       const h = canvas.height;
       ctx.clearRect(0, 0, w, h);
 
-      const barW = w / bars;
+      const bars = 32;
+      const barW = (w / bars) - 2;
+      const t = performance.now() * 0.003;
+
       for (let i = 0; i < bars; i++) {
-        const target = isPlaying
-          ? 10 + Math.abs(Math.sin(t + i * 0.45) * Math.cos(t * 0.6 - i * 0.2)) * (h - 14)
-          : 5;
-        heights[i] += (target - heights[i]) * 0.18;
-
-        const grad = ctx.createLinearGradient(0, h, 0, h - heights[i]);
+        let barH = 4;
+        if (isPlaying) {
+          const s1 = Math.sin(t * 1.8 + i * 0.4);
+          const s2 = Math.cos(t * 2.4 - i * 0.3);
+          barH = Math.max(4, Math.abs(s1 + s2) * (h * 0.42));
+        }
+        const grad = ctx.createLinearGradient(0, h, 0, 0);
         grad.addColorStop(0, '#7C3AED');
-        grad.addColorStop(0.5, '#FF007A');
-        grad.addColorStop(1, '#00F0FF');
-
+        grad.addColorStop(1, '#EC4899');
         ctx.fillStyle = grad;
-        ctx.fillRect(i * barW + 2, h - heights[i], Math.max(2, barW - 4), heights[i]);
+        ctx.fillRect(i * (barW + 2), h - barH, barW, barH);
       }
 
-      rafId = requestAnimationFrame(draw);
+      raf = requestAnimationFrame(draw);
     };
 
-    rafId = requestAnimationFrame(draw);
-    return () => cancelAnimationFrame(rafId);
+    draw();
+    return () => cancelAnimationFrame(raf);
   }, [isPlaying]);
 
   const playRadio = (idx: number) => {
     stopSynth();
-    setMode('radio');
     setActiveRadioIdx(idx);
+    setMode('radio');
     const audio = audioRef.current;
     if (!audio) return;
+    setStatusNote('Connecting stream...');
     audio.src = RADIO_PRESETS[idx].url;
-    setStatusNote('Conectando a radio...');
+    audio.volume = volume;
     audio
       .play()
       .then(() => {
         setIsPlaying(true);
-        setStatusNote('En vivo');
-      })
-      .catch(() => {
-        // Auto-switch to procedural synth if external stream blocked in sandbox
-        setMode('synth');
-        setIsPlaying(true);
-        setStatusNote('Stream bloqueado por red: Sintetizador Cósmico activo');
-        startSynth();
-      });
-  };
-
-  const playLocal = (idx: number, tracksList = localTracks) => {
-    stopSynth();
-    const track = tracksList[idx];
-    if (!track || !audioRef.current) return;
-    setMode('local');
-    setLocalIdx(idx);
-    audioRef.current.src = track.url;
-    audioRef.current
-      .play()
-      .then(() => {
-        setIsPlaying(true);
-        setStatusNote('Reproduciendo archivo local');
+        setStatusNote('Streaming Live');
       })
       .catch(() => {
         setIsPlaying(false);
-        setStatusNote('No se pudo reproducir el archivo');
+        setStatusNote('Stream unavailable, switching to Synth');
+        setMode('synth');
+        startSynth();
+        setIsPlaying(true);
+      });
+  };
+
+  const playLocal = (idx: number, list = localTracks) => {
+    if (!list[idx]) return;
+    stopSynth();
+    setLocalIdx(idx);
+    setMode('local');
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.src = list[idx].url;
+    audio.volume = volume;
+    audio
+      .play()
+      .then(() => {
+        setIsPlaying(true);
+        setStatusNote('Playing local file');
+      })
+      .catch(() => {
+        setIsPlaying(false);
+        setStatusNote('Could not play track');
       });
   };
 
@@ -182,18 +169,17 @@ export const MusicApp: React.FC = () => {
       if (isPlaying) {
         stopSynth();
         setIsPlaying(false);
-        setStatusNote('Pausado');
+        setStatusNote('Paused');
       } else {
         startSynth();
         setIsPlaying(true);
-        setStatusNote('Sintetizador activo');
+        setStatusNote('Synth Active');
       }
       return;
     }
 
     const audio = audioRef.current;
     if (!audio) return;
-
     if (!audio.src) {
       playRadio(activeRadioIdx);
       return;
@@ -202,18 +188,18 @@ export const MusicApp: React.FC = () => {
     if (isPlaying) {
       audio.pause();
       setIsPlaying(false);
-      setStatusNote('Pausado');
+      setStatusNote('Paused');
     } else {
       audio
         .play()
         .then(() => {
           setIsPlaying(true);
-          setStatusNote(mode === 'radio' ? 'En vivo' : 'Reproduciendo');
+          setStatusNote(mode === 'radio' ? 'Streaming Live' : 'Playing');
         })
         .catch(() => {
           setMode('synth');
           setIsPlaying(true);
-          setStatusNote('Sintetizador Cósmico activo');
+          setStatusNote('Cosmic Synth Active');
           startSynth();
         });
     }
@@ -238,7 +224,7 @@ export const MusicApp: React.FC = () => {
   };
 
   return (
-    <div className="p-5 flex-1 overflow-y-auto space-y-4">
+    <div className="p-4 flex-1 flex flex-col justify-between overflow-y-auto space-y-3">
       <audio
         ref={audioRef}
         onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
@@ -251,21 +237,21 @@ export const MusicApp: React.FC = () => {
         className="hidden"
       />
 
-      {/* Now Playing & Visualizer */}
-      <div className="p-4 rounded-2xl bg-black/45 border border-white/15 space-y-3">
-        <div className="flex items-center gap-3.5">
+      {/* Now Playing Header & Compact Visualizer */}
+      <div className="p-3 rounded-2xl bg-black/45 border border-white/15 space-y-2.5">
+        <div className="flex items-center gap-3">
           <img
             src={ASTRO_AVATAR_IMG}
-            alt="Album Art"
+            alt="Art"
             referrerPolicy="no-referrer"
-            className={`w-14 h-14 rounded-xl object-cover border border-violet-400/40 shrink-0 ${
+            className={`w-12 h-12 rounded-xl object-cover border border-violet-400/40 shrink-0 ${
               isPlaying ? 'ring-2 ring-pink-500/50' : ''
             }`}
           />
           <div className="min-w-0 flex-1">
-            <h3 className="text-sm font-mono font-bold text-white truncate">{currentTitle}</h3>
-            <p className="text-xs text-violet-300 truncate">{currentSub}</p>
-            <p className="text-[11px] font-mono text-slate-400 mt-0.5">{statusNote}</p>
+            <h3 className="text-xs font-mono font-bold text-white truncate">{currentTitle}</h3>
+            <p className="text-[11px] text-violet-300 truncate">{currentSub}</p>
+            <p className="text-[10px] font-mono text-slate-400">{statusNote}</p>
           </div>
           <button
             onClick={() => {
@@ -276,27 +262,27 @@ export const MusicApp: React.FC = () => {
                 audioRef.current?.pause();
                 setMode('synth');
                 setIsPlaying(true);
-                setStatusNote('Sintetizador Cósmico activo');
+                setStatusNote('Synth Active');
                 startSynth();
               }
             }}
-            className={`px-3 py-1.5 rounded-xl text-[11px] font-mono border transition-colors shrink-0 ${
+            className={`px-2.5 py-1 rounded-xl text-[10px] font-mono border transition-colors shrink-0 ${
               mode === 'synth'
                 ? 'bg-cyan-500/25 border-cyan-400 text-cyan-200'
                 : 'bg-white/5 border-white/15 text-slate-300 hover:bg-white/10'
             }`}
           >
-            Synth Local
+            Synth
           </button>
         </div>
 
-        <canvas ref={canvasRef} width={480} height={64} className="w-full h-16 rounded-xl bg-slate-950/70" />
+        <canvas ref={canvasRef} width={480} height={44} className="w-full h-11 rounded-xl bg-slate-950/70" />
       </div>
 
-      {/* Controls */}
-      <div className="bg-black/45 p-4 rounded-2xl border border-white/10 space-y-3">
-        <div className="flex items-center gap-3 text-xs font-mono text-slate-400">
-          <span className="w-11">{formatTime(currentTime)}</span>
+      {/* Controls Bar */}
+      <div className="bg-black/45 p-3 rounded-2xl border border-white/10 space-y-2">
+        <div className="flex items-center gap-2 text-[11px] font-mono text-slate-400">
+          <span className="w-9">{formatTime(currentTime)}</span>
           <input
             type="range"
             min={0}
@@ -309,11 +295,11 @@ export const MusicApp: React.FC = () => {
             }}
             className="flex-1 accent-violet-400 h-1.5 cursor-pointer"
           />
-          <span className="w-11 text-right">{duration ? formatTime(duration) : 'LIVE'}</span>
+          <span className="w-9 text-right">{duration ? formatTime(duration) : 'LIVE'}</span>
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5">
             <button
               onClick={() => {
                 if (mode === 'local' && localTracks.length > 0) {
@@ -322,16 +308,16 @@ export const MusicApp: React.FC = () => {
                   playRadio((activeRadioIdx - 1 + RADIO_PRESETS.length) % RADIO_PRESETS.length);
                 }
               }}
-              className="p-2.5 rounded-xl bg-white/5 hover:bg-white/15 text-slate-200 transition-colors"
-              title="Anterior"
+              className="p-2 rounded-xl bg-white/5 hover:bg-white/15 text-slate-200 text-xs"
+              title="Previous"
             >
               ⏮
             </button>
             <button
               onClick={togglePlay}
-              className="px-4 py-2.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-mono text-xs font-bold shadow-lg shadow-violet-600/35 transition-colors"
+              className="px-3.5 py-1.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-mono text-xs font-bold shadow-md shadow-violet-600/35 transition-colors"
             >
-              {isPlaying ? '⏸ Pausar' : '▶ Reproducir'}
+              {isPlaying ? '⏸ Pause' : '▶ Play'}
             </button>
             <button
               onClick={() => {
@@ -341,15 +327,15 @@ export const MusicApp: React.FC = () => {
                   playRadio((activeRadioIdx + 1) % RADIO_PRESETS.length);
                 }
               }}
-              className="p-2.5 rounded-xl bg-white/5 hover:bg-white/15 text-slate-200 transition-colors"
-              title="Siguiente"
+              className="p-2 rounded-xl bg-white/5 hover:bg-white/15 text-slate-200 text-xs"
+              title="Next"
             >
               ⏭
             </button>
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-mono text-slate-400">Vol</span>
+          <div className="flex items-center gap-1.5">
+            <span className="text-[10px] font-mono text-slate-400">Vol</span>
             <input
               type="range"
               min={0}
@@ -357,62 +343,43 @@ export const MusicApp: React.FC = () => {
               step={0.05}
               value={volume}
               onChange={(e) => setVolume(Number(e.target.value))}
-              className="w-20 accent-pink-400 cursor-pointer"
+              className="w-16 accent-pink-400 cursor-pointer"
             />
           </div>
 
-          <label className="px-3 py-1.5 bg-white/10 hover:bg-white/20 border border-white/15 text-xs font-mono text-violet-300 rounded-xl cursor-pointer transition-colors">
-            Cargar Audio Local
+          <label className="px-2.5 py-1 bg-white/10 hover:bg-white/20 border border-white/15 text-[10px] font-mono text-violet-300 rounded-xl cursor-pointer transition-colors">
+            + File
             <input type="file" multiple accept="audio/*" onChange={handleFiles} className="hidden" />
           </label>
         </div>
       </div>
 
-      {/* Online Radio Presets */}
-      <div className="space-y-2">
-        <h4 className="text-xs font-mono font-bold text-slate-400">Radios Online Gratuitas</h4>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+      {/* Radio Presets Grid */}
+      <div className="space-y-1.5">
+        <h4 className="text-[11px] font-mono font-bold text-slate-400">Live Cosmic Stations</h4>
+        <div className="grid grid-cols-2 gap-1.5">
           {RADIO_PRESETS.map((r, i) => {
             const active = mode === 'radio' && activeRadioIdx === i && isPlaying;
             return (
               <button
                 key={r.name}
                 onClick={() => playRadio(i)}
-                className={`p-3 rounded-xl border text-left transition-all ${
+                className={`p-2 rounded-xl border text-left transition-all ${
                   active
                     ? 'bg-violet-600/25 border-violet-400 text-white'
                     : 'bg-white/5 border-white/10 hover:bg-white/10 text-slate-300'
                 }`}
               >
-                <div className="text-xs font-mono font-bold flex items-center justify-between">
+                <div className="text-[11px] font-mono font-bold flex items-center justify-between">
                   <span className="truncate">{r.name}</span>
-                  {active && <span className="text-[10px] text-cyan-300">LIVE</span>}
+                  {active && <span className="text-[9px] text-cyan-300">LIVE</span>}
                 </div>
-                <div className="text-[11px] text-slate-400 mt-0.5">{r.genre}</div>
+                <div className="text-[10px] text-slate-400 mt-0.5 truncate">{r.genre}</div>
               </button>
             );
           })}
         </div>
       </div>
-
-      {localTracks.length > 0 && (
-        <div className="space-y-1.5">
-          <h4 className="text-xs font-mono font-bold text-slate-400">Pistas Locales</h4>
-          {localTracks.map((t, idx) => (
-            <button
-              key={t.url}
-              onClick={() => playLocal(idx)}
-              className={`w-full px-3 py-2 rounded-xl border text-left text-xs font-mono truncate ${
-                mode === 'local' && localIdx === idx
-                  ? 'bg-pink-500/20 border-pink-400 text-white'
-                  : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10'
-              }`}
-            >
-              {idx + 1}. {t.name}
-            </button>
-          ))}
-        </div>
-      )}
     </div>
   );
 };

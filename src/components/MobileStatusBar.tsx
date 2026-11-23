@@ -38,13 +38,13 @@ export const MobileStatusBar: React.FC<MobileStatusBarProps> = ({
   let timeStr = '--:--';
   let dateStr = '--';
   try {
-    timeStr = now.toLocaleTimeString('es-ES', {
+    timeStr = now.toLocaleTimeString('en-US', {
       timeZone: tz.id,
       hour: '2-digit',
       minute: '2-digit',
       hour12: false,
     });
-    dateStr = now.toLocaleDateString('es-ES', {
+    dateStr = now.toLocaleDateString('en-US', {
       timeZone: tz.id,
       day: '2-digit',
       month: 'short',
@@ -54,27 +54,33 @@ export const MobileStatusBar: React.FC<MobileStatusBarProps> = ({
   }
 
   return (
-    <header className="md:hidden w-full h-11 px-3.5 bg-slate-950/35 backdrop-blur-xl border-b border-white/15 flex items-center justify-between z-40 shrink-0">
-      <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-white">
-        <span>🪐</span>
-        <span className="tracking-tight">{osTitle}</span>
+    <header className="w-full h-8 px-3 bg-slate-950/80 backdrop-blur-md border-b border-white/10 flex items-center justify-between z-40 shrink-0 text-xs font-mono select-none">
+      <div className="flex items-center gap-1.5">
+        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+        <span className="font-bold text-slate-200 tracking-tight text-[11px]">{osTitle}</span>
+        <span className="text-[10px] text-slate-400">v.0.5.0</span>
       </div>
 
-      <button
-        onClick={onOpenTimezoneModal}
-        className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/8 border border-white/10 text-xs font-mono text-slate-100"
-      >
-        <span>{tz.flag}</span>
-        <span className="font-bold tabular-nums">{timeStr}</span>
-        <span className="text-[10px] text-slate-400">{dateStr}</span>
-      </button>
+      <div className="flex items-center gap-2 text-slate-300">
+        <button
+          onClick={onOpenTimezoneModal}
+          className="flex items-center gap-1 text-[11px] text-cyan-300 hover:text-cyan-200"
+          title="World Clocks"
+        >
+          <span>{tz.flag}</span>
+          <span className="font-semibold tabular-nums">{timeStr}</span>
+        </button>
 
-      <div className="flex items-center gap-2 text-xs font-mono">
-        <span title="Modo físico activo">{MODE_BADGE[physicsMode]}</span>
+        <span className="text-[10px] text-slate-400 hidden xs:inline">{dateStr}</span>
+
+        <span className="text-xs" title={`Physics: ${physicsMode}`}>
+          {MODE_BADGE[physicsMode]}
+        </span>
+
         <button
           onClick={onToggleSound}
-          aria-label="Sonido"
-          className="w-7 h-7 rounded-lg bg-white/8 flex items-center justify-center text-xs"
+          className="text-xs text-slate-300 hover:text-white"
+          title={soundEnabled ? 'Mute' : 'Sound'}
         >
           {soundEnabled ? '🔊' : '🔇'}
         </button>

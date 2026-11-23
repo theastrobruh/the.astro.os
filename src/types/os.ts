@@ -8,6 +8,7 @@ export type WindowId =
   | 'win-mediaflow'
   | 'win-cardgram'
   | 'win-icon-manager'
+  | 'win-youtube'
   | 'win-admin';
 
 export type UserRole = 'admin' | 'guest' | null;

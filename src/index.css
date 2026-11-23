@@ -17,6 +17,9 @@
     height: 100%;
     overflow: hidden;
     font-family: 'DM Sans', system-ui, sans-serif;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
   }
 
   h1, h2, h3, .font-display {

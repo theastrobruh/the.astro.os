@@ -28,10 +28,10 @@ export const TimezoneModal: React.FC<TimezoneModalProps> = ({ open, selected, on
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-4">
-      <div className="glass-window w-full max-w-md p-5 space-y-4 border border-pink-500/40">
+      <div className="glass-window w-full max-w-lg p-5 space-y-4 border border-pink-500/40">
         <div className="flex items-center justify-between border-b border-white/10 pb-3">
           <h3 className="text-sm font-mono font-bold text-pink-400">
-            Configurar Zonas Horarias (Hasta 4)
+            World Clocks (Select up to 4)
           </h3>
           <button onClick={onClose} className="text-slate-400 hover:text-white text-xs font-mono">
             ✕
@@ -39,10 +39,10 @@ export const TimezoneModal: React.FC<TimezoneModalProps> = ({ open, selected, on
         </div>
 
         <p className="text-xs text-slate-300">
-          Selecciona las zonas horarias activas en la barra de tareas ({draft.length}/4):
+          Active timezones in taskbar ({draft.length}/4):
         </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[340px] overflow-y-auto pr-1">
           {AVAILABLE_TIMEZONES.map((tz) => {
             const active = draft.includes(tz.id);
             return (
@@ -51,35 +51,35 @@ export const TimezoneModal: React.FC<TimezoneModalProps> = ({ open, selected, on
                 onClick={() => toggleTz(tz.id)}
                 className={`p-2.5 rounded-xl border text-left text-xs font-mono flex items-center justify-between transition-colors ${
                   active
-                    ? 'bg-pink-500/20 border-pink-400 text-white'
-                    : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10'
+                    ? 'bg-pink-500/25 border-pink-400 text-white'
+                    : 'bg-white/5 border-white/10 text-slate-400 hover:text-slate-200'
                 }`}
               >
-                <span className="flex items-center gap-2 truncate">
+                <div className="flex items-center gap-2">
                   <span>{tz.flag}</span>
                   <span className="truncate">{tz.label}</span>
-                </span>
-                {active && <span className="text-pink-300 text-[10px]">✓</span>}
+                </div>
+                {active && <span className="text-[10px] text-pink-300 font-bold shrink-0">✓</span>}
               </button>
             );
           })}
         </div>
 
-        <div className="pt-2 flex justify-end gap-2">
+        <div className="flex items-center justify-end gap-2 pt-2 border-t border-white/10">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-white/10 hover:bg-white/20 text-slate-200 font-mono text-xs rounded-xl transition-colors"
+            className="px-4 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-mono text-slate-300"
           >
-            Cancelar
+            Cancel
           </button>
           <button
             onClick={() => {
               onSave(draft);
               onClose();
             }}
-            className="px-5 py-2 bg-pink-500 hover:bg-pink-400 text-white font-mono text-xs font-bold rounded-xl shadow-lg transition-colors"
+            className="px-4 py-1.5 rounded-xl bg-pink-500 hover:bg-pink-400 text-xs font-mono text-white font-bold"
           >
-            Guardar Cambios
+            Apply Clocks
           </button>
         </div>
       </div>

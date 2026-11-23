@@ -135,10 +135,11 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
         position: 'fixed',
         left: 8,
         right: 8,
-        top: 50,
-        bottom: 108,
+        top: 38,
+        bottom: 56,
         zIndex: win.zIndex,
         transform: 'none',
+        maxHeight: 'calc(100vh - 94px)',
       }
     : isMaximized
     ? {
@@ -202,12 +203,12 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
               astroSound.playWindowPop(false);
               onMinimize(win.id);
             }}
-            title="Minimizar"
+            title="Minimize"
             className={`${
               isMobile ? 'px-2.5 h-7 text-[11px]' : 'w-7 h-7 text-xs'
             } rounded-lg bg-white/10 hover:bg-white/25 flex items-center justify-center text-slate-200 font-mono transition-colors`}
           >
-            {isMobile ? 'Ocultar' : '_'}
+            {isMobile ? 'Hide' : '_'}
           </button>
           {resizable && !isMobile && (
             <button
@@ -215,7 +216,7 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
                 astroSound.playKeyTap(600);
                 onToggleMaximize(win.id);
               }}
-              title={win.isMaximized ? 'Restaurar' : 'Maximizar'}
+              title={win.isMaximized ? 'Restore' : 'Maximize'}
               className="w-7 h-7 rounded-lg bg-white/10 hover:bg-white/25 flex items-center justify-center text-xs text-slate-200 transition-colors"
             >
               {win.isMaximized ? '❐' : '□'}
@@ -226,7 +227,7 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
               astroSound.playWindowPop(false);
               onClose(win.id);
             }}
-            title="Cerrar"
+            title="Close"
             className="w-7 h-7 rounded-lg bg-rose-500/35 hover:bg-rose-500/75 text-rose-100 flex items-center justify-center text-xs font-bold transition-colors"
           >
             ✕

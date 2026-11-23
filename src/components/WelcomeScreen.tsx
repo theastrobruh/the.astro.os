@@ -73,15 +73,27 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ osTitle, adminPin,
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/55 backdrop-blur-2xl transition-all duration-500 ${
+      className={`fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#060814]/75 backdrop-blur-3xl overflow-hidden transition-all duration-500 ${
         isLeaving ? 'opacity-0 scale-105 pointer-events-none' : 'opacity-100 scale-100'
       }`}
     >
-      <div className="w-full max-w-md glass-window border border-white/20 p-6 md:p-8 flex flex-col items-center text-center shadow-2xl">
+      {/* Dynamic Subtle Lava Lamp Fluid Layers */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-[12%] left-[18%] w-[380px] h-[380px] rounded-full bg-pink-600/25 blur-[90px] animate-lava-1 mix-blend-screen" />
+        <div className="absolute bottom-[16%] right-[15%] w-[420px] h-[420px] rounded-full bg-cyan-500/20 blur-[100px] animate-lava-2 mix-blend-screen" />
+        <div className="absolute top-[45%] right-[32%] w-[320px] h-[320px] rounded-full bg-purple-600/30 blur-[85px] animate-lava-3 mix-blend-screen" />
+        <div className="absolute bottom-[30%] left-[28%] w-[290px] h-[290px] rounded-full bg-indigo-500/25 blur-[80px] animate-lava-4 mix-blend-screen" />
+      </div>
+
+      <div className="relative z-10 w-full max-w-md glass-window border border-white/20 p-6 md:p-8 flex flex-col items-center text-center shadow-2xl backdrop-blur-xl">
         {/* Saturn OS Logo */}
         <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-pink-500 via-purple-500 to-cyan-400 p-[2px] shadow-xl shadow-pink-500/25 mb-3">
-          <div className="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center text-3xl">
-            🪐
+          <div className="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
+            <svg className="w-8 h-8 text-cyan-300 drop-shadow-[0_0_8px_#00F0FF]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="5" />
+              <path d="M4.5 14.5C2.5 13.5 2.5 11 5 9.5C9.5 7 17 6 20.5 8C22.5 9 22 11.5 19.5 13" />
+              <path d="M7 16C9 17.5 14 18 17.5 16.5" />
+            </svg>
           </div>
         </div>
 
@@ -104,8 +116,10 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ osTitle, adminPin,
                 className="group relative p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/15 hover:border-pink-500/60 transition-all duration-200 text-left flex flex-col justify-between overflow-hidden shadow-lg active:scale-[0.98]"
               >
                 <div className="flex items-center justify-between mb-3">
-                  <span className="w-10 h-10 rounded-xl bg-pink-500/20 border border-pink-500/40 flex items-center justify-center text-xl">
-                    👑
+                  <span className="w-10 h-10 rounded-xl bg-pink-500/20 border border-pink-500/40 flex items-center justify-center text-pink-300">
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14" />
+                    </svg>
                   </span>
                   <span className="text-[11px] font-mono font-semibold text-pink-300">
                     PIN Required
@@ -127,8 +141,13 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ osTitle, adminPin,
                 className="group relative p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/15 hover:border-cyan-400/60 transition-all duration-200 text-left flex flex-col justify-between overflow-hidden shadow-lg active:scale-[0.98]"
               >
                 <div className="flex items-center justify-between mb-3">
-                  <span className="w-10 h-10 rounded-xl bg-cyan-400/20 border border-cyan-400/40 flex items-center justify-center text-xl">
-                    🚀
+                  <span className="w-10 h-10 rounded-xl bg-cyan-400/20 border border-cyan-400/40 flex items-center justify-center text-cyan-300">
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
+                      <path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
+                      <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
+                      <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
+                    </svg>
                   </span>
                   <span className="text-[11px] font-mono font-semibold text-emerald-300">
                     Direct Access

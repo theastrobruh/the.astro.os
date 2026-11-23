@@ -26,6 +26,7 @@ import {
   WindowRuntimeState,
 } from './types/os';
 import { StarfieldCanvas } from './components/StarfieldCanvas';
+import { BootScreen } from './components/BootScreen';
 import { DesktopDrawCanvas } from './components/DesktopDrawCanvas';
 import { WelcomeScreen } from './components/WelcomeScreen';
 import { DesktopIconItem } from './components/DesktopIconItem';
@@ -295,6 +296,7 @@ function computeGridIconPositions(
 export default function App() {
   const [config, setConfig] = useState<AdminConfig>(loadInitialConfig);
   const [userRole, setUserRole] = useState<UserRole>(null);
+  const [isBooting, setIsBooting] = useState(true);
   const [widgets, setWidgets] = useState<MediaWidgetItem[]>(loadInitialWidgets);
   const [windows, setWindows] = useState<Record<WindowId, WindowRuntimeState>>(createInitialWindows);
   const [activeWindowId, setActiveWindowId] = useState<WindowId | null>(null);
@@ -691,6 +693,37 @@ export default function App() {
         const x = cur.isOpen ? cur.x : Math.max(14, Math.round((window.innerWidth - w) / 2));
         const y = cur.isOpen ? cur.y : Math.max(12, Math.round((window.innerHeight - 58 - h) / 2));
         const shouldMaximize = id === 'win-cardgram' ? true : cur.isMaximized;
+
+        // Sync or register physics body immediately to prevent snapping to (0,0) or corners
+        const body = bodiesRef.current.get(id);
+        if (body) {
+          body.x = x;
+          body.y = y;
+          body.vx = 0;
+          body.vy = 0;
+          body.angle = 0;
+          body.angularVel = 0;
+          body.width = w;
+          body.height = h;
+        } else {
+          bodiesRef.current.set(id, {
+            id,
+            kind: 'window',
+            x,
+            y,
+            width: w,
+            height: h,
+            vx: 0,
+            vy: 0,
+            angle: 0,
+            angularVel: 0,
+            targetAngle: 0,
+            isDragging: false,
+            scale: 1,
+            mass: w * h * 3,
+          });
+        }
+
         return {
           ...prev,
           [id]: {
@@ -968,7 +1001,11 @@ export default function App() {
 
       <div className="astro-vignette fixed inset-0 z-0" />
 
-      {userRole === null && (
+      {isBooting && (
+        <BootScreen onComplete={() => setIsBooting(false)} />
+      )}
+
+      {!isBooting && userRole === null && (
         <WelcomeScreen
           osTitle={config.security.osTitle}
           adminPin={config.security.adminPin}

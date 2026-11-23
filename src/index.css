@@ -142,23 +142,21 @@
 @keyframes windowOpen {
   0% {
     opacity: 0;
-    transform: scale(0.92) translateY(12px);
+    filter: blur(4px);
   }
   100% {
     opacity: 1;
-    transform: scale(1) translateY(0);
+    filter: blur(0px);
   }
 }
 
 @keyframes windowClose {
   0% {
     opacity: 1;
-    transform: scale(1) translateY(0);
     filter: blur(0px);
   }
   100% {
     opacity: 0;
-    transform: scale(0.9) translateY(10px);
     filter: blur(4px);
   }
 }
@@ -170,6 +168,65 @@
 .window-anim-close {
   animation: windowClose 0.18s cubic-bezier(0.4, 0, 1, 1) forwards !important;
   pointer-events: none !important;
+}
+
+/* Fluid Lava Lamp Organic Movement */
+@keyframes lavaBlob1 {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(45px, -65px) scale(1.18);
+  }
+  66% {
+    transform: translate(-35px, 40px) scale(0.88);
+  }
+}
+
+@keyframes lavaBlob2 {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(-50px, 60px) scale(1.12);
+  }
+  66% {
+    transform: translate(40px, -45px) scale(0.92);
+  }
+}
+
+@keyframes lavaBlob3 {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  50% {
+    transform: translate(60px, 50px) scale(1.25);
+  }
+}
+
+@keyframes lavaBlob4 {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(0.9);
+  }
+  50% {
+    transform: translate(-60px, -40px) scale(1.15);
+  }
+}
+
+.animate-lava-1 {
+  animation: lavaBlob1 18s ease-in-out infinite;
+}
+
+.animate-lava-2 {
+  animation: lavaBlob2 22s ease-in-out infinite;
+}
+
+.animate-lava-3 {
+  animation: lavaBlob3 25s ease-in-out infinite;
+}
+
+.animate-lava-4 {
+  animation: lavaBlob4 20s ease-in-out infinite;
 }
 
 ::-webkit-scrollbar {

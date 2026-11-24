@@ -7,28 +7,44 @@ interface AstroVerseAppProps {
 }
 
 export const AstroVerseApp: React.FC<AstroVerseAppProps> = ({ onOpenWindow }) => {
-  const links = [
+  const links: Array<{
+    code: string;
+    title: string;
+    subtitle: string;
+    url: string;
+    accent: string;
+    internalWin?: WindowId;
+  }> = [
     {
       code: 'CG',
       title: 'CardGram',
       subtitle: 'Digital cards & web identity platform',
       url: 'https://theastrobruh.github.io/CardGram/#/home',
-      accent: 'text-cyan-300 bg-cyan-500/15 border-cyan-400/30',
-      internalWin: 'win-cardgram' as WindowId,
+      accent: 'text-cyan-300 bg-cyan-500/15 border-cyan-400/35',
+      internalWin: 'win-cardgram',
     },
     {
       code: 'IK',
       title: 'Inkra',
       subtitle: 'Creative illustration & digital studio',
       url: 'https://theastrobruh.github.io/Inkra/inkra.html',
-      accent: 'text-fuchsia-300 bg-fuchsia-500/15 border-fuchsia-400/30',
+      accent: 'text-fuchsia-300 bg-fuchsia-500/15 border-fuchsia-400/35',
+      internalWin: 'win-inkra',
     },
     {
       code: 'BH',
       title: 'BioHub',
       subtitle: 'Personal bio & centralized links',
       url: 'https://theastrobruh.github.io/BioHub/',
-      accent: 'text-pink-300 bg-pink-500/15 border-pink-400/30',
+      accent: 'text-pink-300 bg-pink-500/15 border-pink-400/35',
+    },
+    {
+      code: 'PM',
+      title: 'Pressmark',
+      subtitle: 'Watermark & Media Multi-Tool',
+      url: 'https://theastrobruh.github.io/Pressmark/',
+      accent: 'text-sky-300 bg-sky-500/15 border-sky-400/35',
+      internalWin: 'win-pressmark',
     },
     {
       code: 'GH',
@@ -41,9 +57,8 @@ export const AstroVerseApp: React.FC<AstroVerseAppProps> = ({ onOpenWindow }) =>
 
   return (
     <div className="p-3 sm:p-4 flex-1 flex flex-col justify-start overflow-y-auto space-y-2.5">
-      {/* Creator Profile */}
       <div className="flex flex-col items-center text-center">
-        <div className="w-13 h-13 sm:w-16 sm:h-16 rounded-full bg-gradient-to-tr from-pink-500 via-purple-500 to-cyan-400 p-[2px] shadow-lg shadow-pink-500/25">
+        <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-tr from-pink-500 via-purple-500 to-cyan-400 p-[2px] shadow-lg shadow-pink-500/25">
           <img
             src={ASTRO_AVATAR_IMG}
             alt="theAstroBruh"
@@ -59,7 +74,6 @@ export const AstroVerseApp: React.FC<AstroVerseAppProps> = ({ onOpenWindow }) =>
         </p>
       </div>
 
-      {/* Links Grid / List */}
       <div className="pt-2 border-t border-white/10 space-y-1.5">
         {links.map((item) => (
           <div
@@ -73,13 +87,12 @@ export const AstroVerseApp: React.FC<AstroVerseAppProps> = ({ onOpenWindow }) =>
                 {item.code}
               </span>
               <div className="min-w-0">
-                <div className="text-[11px] sm:text-xs font-mono font-semibold text-slate-100 truncate">
+                <div className="text-[11px] sm:text-xs font-mono font-semibold text-slate-100 leading-tight">
                   {item.title}
                 </div>
-                <div className="text-[9px] sm:text-[10px] text-slate-400 truncate">{item.subtitle}</div>
+                <div className="text-[9px] sm:text-[10px] text-slate-400 leading-tight break-all">{item.subtitle}</div>
               </div>
             </div>
-
             <div className="flex items-center gap-1 shrink-0">
               {item.internalWin && (
                 <button

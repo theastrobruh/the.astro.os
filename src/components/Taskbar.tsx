@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { PhysicsMode, WindowId, WindowRuntimeState } from '../types/os';
 import { AVAILABLE_TIMEZONES, WINDOW_META_MAP } from '../constants/defaults';
-import { globalMusic } from '../engine/music';
+import { AstroLogoSvg } from './DesktopIconItem';
 
 interface TaskbarProps {
   windows: Record<WindowId, WindowRuntimeState>;
@@ -9,6 +9,7 @@ interface TaskbarProps {
   startMenuOpen: boolean;
   desktopDrawActive: boolean;
   physicsMode: PhysicsMode;
+  windowCollisions: boolean;
   soundEnabled: boolean;
   selectedTimezones: string[];
   isMobile: boolean;
@@ -19,6 +20,7 @@ interface TaskbarProps {
   onOpenWindow: (id: WindowId) => void;
   onTaskbarWindowClick: (id: WindowId) => void;
   onChangePhysicsMode: (mode: PhysicsMode) => void;
+  onToggleWindowCollisions: () => void;
   onImpulseBurst: () => void;
   onToggleSound: () => void;
   onOpenTimezoneModal: () => void;
@@ -33,7 +35,6 @@ const PHYSICS_DESCRIPTIONS: Record<PhysicsMode, string> = {
   static: 'Static',
 };
 
-// Clean vector SVG badge for each country instead of emojis
 function renderCountryBadge(code: string) {
   return (
     <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-white/10 text-slate-200 border border-white/15">
@@ -42,7 +43,6 @@ function renderCountryBadge(code: string) {
   );
 }
 
-// Clean physics SVG icon
 function renderPhysicsIcon(mode: PhysicsMode) {
   switch (mode) {
     case 'tactile':
@@ -80,6 +80,7 @@ export const Taskbar: React.FC<TaskbarProps> = ({
   startMenuOpen,
   desktopDrawActive,
   physicsMode,
+  windowCollisions,
   soundEnabled,
   selectedTimezones,
   isMobile,
@@ -90,6 +91,7 @@ export const Taskbar: React.FC<TaskbarProps> = ({
   onOpenWindow,
   onTaskbarWindowClick,
   onChangePhysicsMode,
+  onToggleWindowCollisions,
   onImpulseBurst,
   onToggleSound,
   onOpenTimezoneModal,
@@ -99,101 +101,124 @@ export const Taskbar: React.FC<TaskbarProps> = ({
   const [physicsPopoverOpen, setPhysicsPopoverOpen] = useState(false);
   const [musicTrayMenuOpen, setMusicTrayMenuOpen] = useState(false);
   const [now, setNow] = useState(() => new Date());
+  const footerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(id);
   }, []);
 
-  // When music is closed to tray, hide it from the center taskbar buttons
+  useEffect(() => {
+    if (!physicsPopoverOpen && !musicTrayMenuOpen) return;
+    const handleOutside = (e: PointerEvent) => {
+      if (footerRef.current && !footerRef.current.contains(e.target as Node)) {
+        setPhysicsPopoverOpen(false);
+        setMusicTrayMenuOpen(false);
+      }
+    };
+    window.addEventListener('pointerdown', handleOutside);
+    return () => window.removeEventListener('pointerdown', handleOutside);
+  }, [physicsPopoverOpen, musicTrayMenuOpen]);
+
   const openWindows = (Object.values(windows) as WindowRuntimeState[]).filter(
     (w) => w.isOpen && !(w.id === 'win-music' && musicClosedToTray)
   );
 
-  const StartPlanetSvg = (
-    <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-      <circle cx="12" cy="12" r="7" stroke="currentColor" fill="rgba(255,255,255,0.15)" />
-      <path d="M4.5 15.5C7.5 19 16.5 19 19.5 8.5" stroke="currentColor" strokeLinecap="round" />
-    </svg>
-  );
-
   if (isMobile) {
     return (
-      <footer className="w-full h-12 xp-taskbar px-4 flex items-center justify-between z-40 relative shrink-0">
-        {/* Left spacer / Tray placeholder */}
-        <div className="w-10 flex items-center">
+      <footer
+        ref={footerRef}
+        onClick={(e) => e.stopPropagation()}
+        className="w-full h-12 xp-taskbar px-4 grid grid-cols-[1fr_auto_1fr] items-center z-40 relative shrink-0"
+      >
+        <div className="flex items-center justify-self-start">
           {musicClosedToTray && (
             <button
+              type="button"
               onClick={onRestoreMusic}
               title="Astro.Radio Tray"
-              className="w-8 h-8 rounded-xl bg-violet-600/35 border border-violet-400/50 flex items-center justify-center text-xs animate-pulse text-violet-200"
+              className="w-8 h-8 rounded-xl bg-violet-600/35 border border-violet-400/50 flex items-center justify-center text-xs text-violet-200"
             >
-              <svg className="w-4 h-4 text-cyan-300 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                <circle cx="12" cy="12" r="9" />
-                <path d="M12 8v8m-4-4h8" />
+              <svg className="w-4 h-4 text-cyan-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z" />
               </svg>
             </button>
           )}
         </div>
 
-        {/* Perfectly Centered Start Button */}
         <button
-          onClick={onToggleStartMenu}
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            setPhysicsPopoverOpen(false);
+            setMusicTrayMenuOpen(false);
+            onToggleStartMenu();
+          }}
           aria-label="Start"
-          className="xp-start-btn w-12 h-9 rounded-2xl flex items-center justify-center transition-transform active:scale-95 shadow-lg shadow-pink-500/20"
+          aria-expanded={startMenuOpen}
+          className="xp-start-btn w-12 h-9 rounded-2xl flex items-center justify-center transition-transform active:scale-95 shadow-lg shadow-pink-500/20 justify-self-center"
         >
-          {StartPlanetSvg}
+          <AstroLogoSvg className="w-6 h-6" />
         </button>
 
-        {/* Right balance spacer */}
-        <div className="w-10" />
+        <div className="justify-self-end" />
       </footer>
     );
   }
 
-  // Desktop View
   return (
-    <footer className="w-full h-12 xp-taskbar px-3 flex items-center justify-between gap-2 z-40 relative shrink-0">
+    <footer
+      ref={footerRef}
+      onClick={(e) => e.stopPropagation()}
+      className="w-full h-12 xp-taskbar px-3 flex items-center justify-between gap-2 z-40 relative shrink-0"
+    >
       {/* Left: Start + Quick Desktop Draw */}
       <div className="flex items-center gap-2 shrink-0">
         <button
-          onClick={onToggleStartMenu}
-          title="Start"
-          aria-label="Start Menu"
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            setPhysicsPopoverOpen(false);
+            setMusicTrayMenuOpen(false);
+            onToggleStartMenu();
+          }}
           aria-expanded={startMenuOpen}
-          className="xp-start-btn w-10 h-8 rounded-xl flex items-center justify-center transition-transform active:scale-95"
+          className={`xp-start-btn h-9 px-3 rounded-xl flex items-center gap-2 text-xs font-display font-bold text-white transition-all whitespace-nowrap ${
+            startMenuOpen ? 'ring-2 ring-cyan-400/60' : ''
+          }`}
         >
-          {StartPlanetSvg}
+          <AstroLogoSvg className="w-6 h-6 shrink-0" />
+          <span>Astro</span>
         </button>
 
-        <div className="flex items-center gap-1">
-          <button
-            onClick={onToggleDesktopDraw}
-            title="Draw on Desktop"
-            className={`p-1.5 rounded-xl border transition-colors ${
-              desktopDrawActive
-                ? 'bg-yellow-400 text-slate-950 border-yellow-300'
-                : 'bg-white/8 hover:bg-white/18 border-white/10 text-yellow-300'
-            }`}
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-            </svg>
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={onToggleDesktopDraw}
+          title="Draw directly on desktop"
+          className={`h-8 px-2.5 rounded-xl border text-xs font-mono flex items-center gap-1.5 transition-colors whitespace-nowrap ${
+            desktopDrawActive
+              ? 'bg-yellow-400/25 border-yellow-400 text-yellow-200 font-bold'
+              : 'bg-white/8 hover:bg-white/18 border-white/15 text-slate-200'
+          }`}
+        >
+          <svg className="w-3.5 h-3.5 text-yellow-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+          </svg>
+          <span className="hidden lg:inline">Draw</span>
+        </button>
       </div>
 
-      {/* Center: Open Windows (if minimized to taskbar or focused) */}
-      <div className="flex-1 flex items-center justify-start md:justify-center gap-1.5 overflow-x-auto px-2 min-w-0">
+      {/* Center: Open Windows Tabs */}
+      <div className="flex-1 min-w-0 flex items-center gap-1.5 overflow-x-auto px-1">
         {openWindows.map((w) => {
           const meta = WINDOW_META_MAP[w.id];
-          if (!meta) return null;
           const isActive = activeWindowId === w.id && !w.isMinimized;
           return (
             <button
+              type="button"
               key={w.id}
               onClick={() => onTaskbarWindowClick(w.id)}
-              className={`px-2.5 py-1 rounded-xl text-xs font-mono flex items-center gap-1.5 whitespace-nowrap shrink-0 transition-all backdrop-blur-md ${
+              className={`h-8 px-3 rounded-xl flex items-center gap-2 text-xs font-mono whitespace-nowrap shrink-0 transition-all backdrop-blur-md ${
                 isActive
                   ? 'bg-pink-500/30 border border-pink-400/70 text-white font-semibold shadow-md shadow-pink-500/20'
                   : w.isMinimized
@@ -205,58 +230,62 @@ export const Taskbar: React.FC<TaskbarProps> = ({
                 className="w-2 h-2 rounded-full shrink-0"
                 style={{ backgroundColor: meta.accentColor }}
               />
-              <span className="max-w-[96px] truncate">{meta.shortTitle}</span>
+              <span className="whitespace-nowrap">{meta.shortTitle}</span>
               {w.isMinimized && <span className="text-[10px] text-cyan-300">_</span>}
             </button>
           );
         })}
       </div>
 
-      {/* Right Tray: Reset, Theme, Physics, Music Tray, Clocks */}
+      {/* Right Tray: Reset, Theme, Physics, Music Tray, Sound, Clocks */}
       <div className="flex items-center gap-1.5 shrink-0 relative">
-        {/* Reset Icons Button */}
         <button
+          type="button"
           onClick={onRearrangeIcons}
           title="Reset desktop icons to grid"
-          className="h-8 px-2.5 rounded-xl bg-white/8 hover:bg-white/18 border border-white/15 flex items-center gap-1.5 text-xs font-mono text-slate-200 transition-colors"
+          className="h-8 w-8 rounded-xl bg-white/8 hover:bg-white/18 border border-white/15 flex items-center justify-center text-slate-200 transition-colors"
         >
           <svg className="w-3.5 h-3.5 text-cyan-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
           </svg>
-          <span className="hidden xl:inline">Reset</span>
         </button>
 
-        {/* Theme Button with clean design palette SVG */}
         <button
+          type="button"
           onClick={() => onOpenWindow('win-themes')}
           title="Theme Studio"
-          className="h-8 px-2.5 rounded-xl bg-white/8 hover:bg-white/18 border border-white/15 flex items-center gap-1.5 text-xs font-mono text-fuchsia-300 transition-colors"
+          className="h-8 w-8 rounded-xl bg-white/8 hover:bg-white/18 border border-white/15 flex items-center justify-center text-fuchsia-300 transition-colors"
         >
           <svg className="w-3.5 h-3.5 text-fuchsia-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M7 21a4 4 0 01-4-4 4 4 0 014-4h4a4 4 0 014 4 4 4 0 01-4 4H7z" />
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 3h6v6l-7 7-6-6 7-7z" />
           </svg>
-          <span className="hidden xl:inline">Theme</span>
         </button>
 
-        {/* Physics Button with clean SVG */}
         <div className="relative">
           <button
-            onClick={() => setPhysicsPopoverOpen((v) => !v)}
-            title="Physics Engine"
-            className="h-8 px-2.5 rounded-xl bg-white/8 hover:bg-white/18 border border-white/15 flex items-center gap-1.5 text-xs font-mono text-cyan-200 transition-colors"
+            type="button"
+            onClick={() => {
+              setMusicTrayMenuOpen(false);
+              setPhysicsPopoverOpen((v) => !v);
+            }}
+            title={`Physics: ${PHYSICS_DESCRIPTIONS[physicsMode]}`}
+            className="h-8 w-8 rounded-xl bg-white/8 hover:bg-white/18 border border-white/15 flex items-center justify-center text-cyan-200 transition-colors"
           >
             {renderPhysicsIcon(physicsMode)}
-            <span className="hidden xl:inline">{PHYSICS_DESCRIPTIONS[physicsMode]}</span>
           </button>
 
           {physicsPopoverOpen && (
-            <div className="absolute bottom-11 right-0 w-56 bg-slate-950/95 backdrop-blur-2xl border border-white/20 rounded-2xl p-2 shadow-2xl z-50 space-y-1">
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="absolute bottom-11 right-0 w-60 bg-slate-950/95 backdrop-blur-2xl border border-white/20 rounded-2xl p-2 shadow-2xl z-50 space-y-1"
+            >
               <div className="px-2 py-1 text-[11px] font-mono font-bold text-cyan-300 border-b border-white/10">
-                Physics Kernel
+                Rigid-Body Physics Kernel
               </div>
               {(Object.keys(PHYSICS_DESCRIPTIONS) as PhysicsMode[]).map((m) => (
                 <button
+                  type="button"
                   key={m}
                   onClick={() => {
                     onChangePhysicsMode(m);
@@ -275,8 +304,21 @@ export const Taskbar: React.FC<TaskbarProps> = ({
                   {physicsMode === m && <span className="text-[10px] text-cyan-300 font-bold">Active</span>}
                 </button>
               ))}
-              <div className="pt-1 border-t border-white/10">
+              <div className="pt-1 border-t border-white/10 space-y-1">
                 <button
+                  type="button"
+                  onClick={onToggleWindowCollisions}
+                  className={`w-full px-2 py-1.5 rounded-xl text-left text-[11px] font-mono flex items-center justify-between border transition-colors ${
+                    windowCollisions
+                      ? 'bg-emerald-500/15 border-emerald-400/35 text-emerald-200'
+                      : 'bg-white/5 border-white/10 text-slate-400'
+                  }`}
+                >
+                  <span>Window Collisions</span>
+                  <span className="font-bold">{windowCollisions ? 'ON' : 'OFF'}</span>
+                </button>
+                <button
+                  type="button"
                   onClick={() => {
                     onImpulseBurst();
                     setPhysicsPopoverOpen(false);
@@ -293,30 +335,30 @@ export const Taskbar: React.FC<TaskbarProps> = ({
           )}
         </div>
 
-        {/* Music Ares-Style System Tray Icon (Next to Clocks) */}
         {musicClosedToTray && (
           <div className="relative">
             <button
+              type="button"
               onClick={onRestoreMusic}
               onContextMenu={(e) => {
                 e.preventDefault();
+                setPhysicsPopoverOpen(false);
                 setMusicTrayMenuOpen((v) => !v);
               }}
               title="Astro.Radio Tray (Right-click to exit)"
-              className="h-8 px-2.5 rounded-xl bg-violet-600/30 hover:bg-violet-600/50 border border-violet-400/50 flex items-center gap-1.5 text-xs font-mono text-violet-200 transition-colors animate-pulse"
+              className="h-8 w-8 rounded-xl bg-violet-600/30 hover:bg-violet-600/50 border border-violet-400/50 flex items-center justify-center text-violet-200 transition-colors"
             >
               <svg className="w-3.5 h-3.5 text-pink-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z" />
               </svg>
-              <span className="text-[10px] text-cyan-300 font-bold hidden sm:inline">Playing</span>
             </button>
-
             {musicTrayMenuOpen && (
               <div
                 onClick={(e) => e.stopPropagation()}
                 className="absolute bottom-11 right-0 w-44 bg-slate-950/95 backdrop-blur-2xl border border-white/20 rounded-xl p-1.5 shadow-2xl z-50 space-y-1"
               >
                 <button
+                  type="button"
                   onClick={() => {
                     setMusicTrayMenuOpen(false);
                     onRestoreMusic();
@@ -327,6 +369,7 @@ export const Taskbar: React.FC<TaskbarProps> = ({
                 </button>
                 <div className="h-px bg-white/10 my-0.5" />
                 <button
+                  type="button"
                   onClick={() => {
                     setMusicTrayMenuOpen(false);
                     onCloseMusicPermanently();
@@ -341,6 +384,7 @@ export const Taskbar: React.FC<TaskbarProps> = ({
         )}
 
         <button
+          type="button"
           onClick={onToggleSound}
           title={soundEnabled ? 'Mute sound effects' : 'Unmute sound effects'}
           className="h-8 w-8 rounded-xl bg-white/8 hover:bg-white/18 border border-white/15 flex items-center justify-center text-xs text-slate-300 transition-colors"
@@ -350,41 +394,42 @@ export const Taskbar: React.FC<TaskbarProps> = ({
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
             </svg>
           ) : (
-            <svg className="w-3.5 h-3.5 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+            <svg className="w-3.5 h-3.5 text-rose-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
               <path strokeLinecap="round" strokeLinejoin="round" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
             </svg>
           )}
         </button>
 
-        {/* Multi-Timezone Clocks Pill with Country Badges (NO EMOJIS) */}
+        {/* World Clocks */}
         <button
+          type="button"
           onClick={onOpenTimezoneModal}
-          title="Configure timezones"
-          className="flex items-center bg-white/8 hover:bg-white/18 border border-white/15 hover:border-pink-400/50 rounded-xl px-2 h-8 transition-colors"
+          title="Configure World Clocks"
+          className="h-8 px-2.5 rounded-xl bg-white/8 hover:bg-white/18 border border-white/15 flex items-center gap-2 text-xs font-mono text-slate-200 transition-colors"
         >
           {selectedTimezones.slice(0, 4).map((tzId, idx) => {
-            const tz = AVAILABLE_TIMEZONES.find((t) => t.id === tzId) || AVAILABLE_TIMEZONES[0];
+            const meta = AVAILABLE_TIMEZONES.find((t) => t.id === tzId);
             let timeStr = '--:--';
             try {
-              timeStr = now.toLocaleTimeString('en-US', {
-                timeZone: tz.id,
+              timeStr = now.toLocaleTimeString([], {
+                timeZone: tzId,
                 hour: '2-digit',
                 minute: '2-digit',
                 hour12: false,
               });
             } catch {
-              timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+              timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
             }
             return (
               <span
                 key={`${tzId}-${idx}`}
-                className={`items-center gap-1.5 px-2 text-xs font-mono text-slate-100 ${
+                className={`items-center gap-1 whitespace-nowrap ${
                   idx >= 2 ? 'hidden lg:flex' : 'flex'
-                } ${idx > 0 ? 'border-l border-white/15' : ''}`}
+                } ${idx > 0 ? 'border-l border-white/15 pl-2' : ''}`}
               >
-                {renderCountryBadge(tz.code)}
-                <span className="tabular-nums font-semibold">{timeStr}</span>
+                {renderCountryBadge(meta?.code || 'UTC')}
+                <span className="tabular-nums text-[11px] font-semibold text-white">{timeStr}</span>
               </span>
             );
           })}

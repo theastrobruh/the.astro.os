@@ -16,7 +16,7 @@ export const TimezoneModal: React.FC<TimezoneModalProps> = ({ open, selected, on
   const toggleTz = (id: string) => {
     setDraft((prev) => {
       if (prev.includes(id)) {
-        if (prev.length === 1) return prev; // Keep at least 1
+        if (prev.length === 1) return prev;
         return prev.filter((x) => x !== id);
       }
       if (prev.length >= 4) {

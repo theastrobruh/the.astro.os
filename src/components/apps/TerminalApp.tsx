@@ -27,7 +27,7 @@ export const TerminalApp: React.FC<TerminalAppProps> = ({
   onApplyThemePreset,
 }) => {
   const [logs, setLogs] = useState<LogLine[]>([
-    { id: 1, kind: 'accent', text: 'the.astro.os — Astro Console bash v2.5 (Physics Kernel Ready)' },
+    { id: 1, kind: 'accent', text: 'the.astro.os — Astro Console bash v2.5 (SAT Rigid-Body Kernel Ready)' },
     { id: 2, kind: 'out', text: "Escribe 'help' para ver los comandos disponibles." },
   ]);
   const [input, setInput] = useState('');
@@ -62,7 +62,7 @@ export const TerminalApp: React.FC<TerminalAppProps> = ({
       append('out', '  physics <modo>       tactile | earth | zero-g | static');
       append('out', '  impulse              Dispara un impulso cósmico a los widgets');
       append('out', '  theme <preset>       cyber | sunset | matrix | synth');
-      append('out', '  paint | music | notes | mediaflow | cardgram | admin');
+      append('out', '  paint | music | notes | mediaflow | cardgram | pressmark | youtube | admin');
       append('out', '  draw                 Activa/desactiva dibujo en el escritorio');
       append('out', '  bio                  Abre Astro.Verse (theAstroBruh)');
       append('out', '  whoami | date | clear');
@@ -73,11 +73,11 @@ export const TerminalApp: React.FC<TerminalAppProps> = ({
     } else if (cmd === 'date') {
       append('out', new Date().toString());
     } else if (cmd === 'neofetch') {
-      append('accent', '       🪐  the.astro.os v3.0');
+      append('accent', '       the.astro.os v0.5.0');
       append('out', '  ---------------------------');
       append('out', `  Usuario:  ${userRole || 'guest'}`);
-      append('out', `  Física:   ${physicsMode} (60fps RigidBody + SpringDamper)`);
-      append('out', '  Gráficos: Starfield Parallax + Glassmorphism');
+      append('out', `  Física:   ${physicsMode} (60fps SAT OBB + Momento de Inercia + Coulomb)`);
+      append('out', '  Gráficos: Starfield Parallax + Impact Sparks + Glassmorphism');
       append('out', '  Autor:    github.com/theastrobruh/the.astro.os');
     } else if (cmd === 'physics') {
       if (arg === 'tactile' || arg === 'earth' || arg === 'zero-g' || arg === 'static') {
@@ -102,7 +102,7 @@ export const TerminalApp: React.FC<TerminalAppProps> = ({
       append('out', 'Alternando modo dibujo sobre el escritorio...');
     } else if (cmd === 'paint') {
       onOpenWindow('win-draw');
-      append('out', 'Abriendo Pintura Studio...');
+      append('out', 'Abriendo Studio Paint...');
     } else if (cmd === 'music') {
       onOpenWindow('win-music');
       append('out', 'Abriendo Astro.Radio...');
@@ -115,6 +115,12 @@ export const TerminalApp: React.FC<TerminalAppProps> = ({
     } else if (cmd === 'cardgram') {
       onOpenWindow('win-cardgram');
       append('out', 'Abriendo CardGram...');
+    } else if (cmd === 'pressmark') {
+      onOpenWindow('win-pressmark');
+      append('out', 'Abriendo Pressmark...');
+    } else if (cmd === 'youtube') {
+      onOpenWindow('win-youtube');
+      append('out', 'Abriendo YouTube Player...');
     } else if (cmd === 'bio') {
       onOpenWindow('win-astroverse');
       append('out', 'Abriendo Astro.Verse...');

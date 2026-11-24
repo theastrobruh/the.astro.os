@@ -1,83 +1,66 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { UserRole } from '../types/os';
 import { astroSound } from '../engine/sound';
+import { AstroLogoSvg } from './DesktopIconItem';
 
 interface WelcomeScreenProps {
   osTitle: string;
   adminPin: string;
-  onEnter: (role: Exclude<UserRole, null>) => void;
+  onEnterDesktop: (role: UserRole) => void;
 }
 
-export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ osTitle, adminPin, onEnter }) => {
+export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
+  osTitle,
+  adminPin,
+  onEnterDesktop,
+}) => {
   const [view, setView] = useState<'select' | 'pin'>('select');
   const [pinBuffer, setPinBuffer] = useState('');
   const [pinError, setPinError] = useState(false);
-  const [isLeaving, setIsLeaving] = useState(false);
 
-  const handleSuccessEnter = (role: Exclude<UserRole, null>) => {
+  const handleSuccessEnter = (role: UserRole) => {
     astroSound.playStartupChime();
-    setIsLeaving(true);
-    setTimeout(() => {
-      onEnter(role);
-    }, 520);
+    onEnterDesktop(role);
   };
 
   const handleDigit = (digit: string) => {
-    if (pinBuffer.length >= 4 || isLeaving) return;
-    astroSound.playKeyTap(620 + Number(digit) * 28);
+    if (pinBuffer.length >= 4) return;
+    astroSound.playKeyTap(640 + Number(digit) * 28);
     const next = pinBuffer + digit;
     setPinBuffer(next);
     setPinError(false);
 
     if (next.length === 4) {
       if (next === adminPin) {
-        setTimeout(() => handleSuccessEnter('admin'), 160);
+        setTimeout(() => {
+          setPinBuffer('');
+          handleSuccessEnter('admin');
+        }, 120);
       } else {
         astroSound.playErrorBuzz();
         setPinError(true);
         setTimeout(() => {
           setPinBuffer('');
-        }, 550);
+        }, 420);
       }
     }
   };
 
-  const handleBackspace = () => {
-    astroSound.playKeyTap(420);
-    setPinBuffer((prev) => prev.slice(0, -1));
-    setPinError(false);
-  };
-
   const handleClear = () => {
-    astroSound.playKeyTap(340);
+    astroSound.playKeyTap(440);
     setPinBuffer('');
     setPinError(false);
   };
 
-  useEffect(() => {
-    if (view !== 'pin') return;
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (/^[0-9]$/.test(e.key)) {
-        handleDigit(e.key);
-      } else if (e.key === 'Backspace') {
-        handleBackspace();
-      } else if (e.key === 'Escape') {
-        setView('select');
-        setPinBuffer('');
-        setPinError(false);
-      }
-    };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  });
+  const handleBackspace = () => {
+    astroSound.playKeyTap(500);
+    setPinBuffer((prev) => prev.slice(0, -1));
+    setPinError(false);
+  };
 
   return (
-    <div
-      className={`fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#060814]/75 backdrop-blur-3xl overflow-hidden transition-all duration-500 ${
-        isLeaving ? 'opacity-0 scale-105 pointer-events-none' : 'opacity-100 scale-100'
-      }`}
-    >
-      {/* Dynamic Subtle Lava Lamp Fluid Layers */}
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#050510]/90 backdrop-blur-2xl select-none overflow-hidden">
+      {/* Fluid Organic Lava Lamp Blobs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
         <div className="absolute top-[12%] left-[18%] w-[380px] h-[380px] rounded-full bg-pink-600/25 blur-[90px] animate-lava-1 mix-blend-screen" />
         <div className="absolute bottom-[16%] right-[15%] w-[420px] h-[420px] rounded-full bg-cyan-500/20 blur-[100px] animate-lava-2 mix-blend-screen" />
@@ -85,15 +68,14 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ osTitle, adminPin,
         <div className="absolute bottom-[30%] left-[28%] w-[290px] h-[290px] rounded-full bg-indigo-500/25 blur-[80px] animate-lava-4 mix-blend-screen" />
       </div>
 
-      <div className="relative z-10 w-full max-w-md glass-window border border-white/20 p-6 md:p-8 flex flex-col items-center text-center shadow-2xl backdrop-blur-xl">
-        {/* Saturn OS Logo */}
+      <div
+        className={`relative z-10 w-full max-w-md glass-window border border-white/20 p-6 md:p-8 flex flex-col items-center text-center shadow-2xl backdrop-blur-xl ${
+          pinError ? 'animate-shake' : ''
+        }`}
+      >
         <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-pink-500 via-purple-500 to-cyan-400 p-[2px] shadow-xl shadow-pink-500/25 mb-3">
           <div className="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
-            <svg className="w-8 h-8 text-cyan-300 drop-shadow-[0_0_8px_#00F0FF]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="5" />
-              <path d="M4.5 14.5C2.5 13.5 2.5 11 5 9.5C9.5 7 17 6 20.5 8C22.5 9 22 11.5 19.5 13" />
-              <path d="M7 16C9 17.5 14 18 17.5 16.5" />
-            </svg>
+            <AstroLogoSvg className="w-10 h-10 drop-shadow-[0_0_10px_rgba(0,240,255,0.4)]" />
           </div>
         </div>
 
@@ -107,7 +89,6 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ osTitle, adminPin,
         {view === 'select' ? (
           <div className="w-full space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 w-full">
-              {/* Admin Card */}
               <button
                 onClick={() => {
                   astroSound.playKeyTap(700);
@@ -135,7 +116,6 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ osTitle, adminPin,
                 </div>
               </button>
 
-              {/* Guest Card */}
               <button
                 onClick={() => handleSuccessEnter('guest')}
                 className="group relative p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/15 hover:border-cyan-400/60 transition-all duration-200 text-left flex flex-col justify-between overflow-hidden shadow-lg active:scale-[0.98]"
@@ -178,11 +158,10 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ osTitle, adminPin,
                 ← Back
               </button>
               <span className="text-xs font-mono font-bold text-pink-300">
-                Enter Admin PIN
+                Enter Admin PIN (Default: {adminPin})
               </span>
             </div>
 
-            {/* PIN Dots */}
             <div className="flex items-center justify-center gap-3 my-4">
               {[0, 1, 2, 3].map((idx) => {
                 const filled = pinBuffer.length > idx;
@@ -201,7 +180,6 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ osTitle, adminPin,
               })}
             </div>
 
-            {/* Keypad */}
             <div className="grid grid-cols-3 gap-2.5 w-full max-w-[240px] mt-2">
               {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((digit) => (
                 <button

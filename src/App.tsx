@@ -1,6 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
-  ASTRO_CITY_WIDGET_IMG,
   COSMOS_WIDGET_IMG,
   DAHYUN_GIF_URL,
   DEFAULT_ADMIN_CONFIG,
@@ -10,12 +9,9 @@ import {
   WINDOW_META_MAP,
   createDefaultWidgets,
 } from './constants/defaults';
-import { DesktopBounds, stepPhysicsBodies } from './engine/physics';
-import { astroSound } from './engine/sound';
 import {
   AdminConfig,
   CollisionImpactEvent,
-  DesktopIconConfig,
   MediaWidgetItem,
   PhysicsBody,
   PhysicsMode,
@@ -25,17 +21,19 @@ import {
   WindowId,
   WindowRuntimeState,
 } from './types/os';
+import { DesktopBounds, computeRectInertia, stepPhysicsBodies } from './engine/physics';
+import { astroSound } from './engine/sound';
 import { StarfieldCanvas } from './components/StarfieldCanvas';
 import { BootScreen } from './components/BootScreen';
-import { DesktopDrawCanvas } from './components/DesktopDrawCanvas';
 import { WelcomeScreen } from './components/WelcomeScreen';
+import { MobileStatusBar } from './components/MobileStatusBar';
+import { Taskbar } from './components/Taskbar';
+import { StartMenu } from './components/StartMenu';
+import { DesktopDrawCanvas } from './components/DesktopDrawCanvas';
 import { DesktopIconItem } from './components/DesktopIconItem';
 import { MediaWidgetItemView } from './components/MediaWidgetItemView';
 import { WindowFrame } from './components/WindowFrame';
-import { Taskbar } from './components/Taskbar';
-import { StartMenu } from './components/StartMenu';
 import { TimezoneModal } from './components/TimezoneModal';
-import { MobileStatusBar } from './components/MobileStatusBar';
 import { AdminPinModal } from './components/AdminPinModal';
 import { AstroVerseApp } from './components/apps/AstroVerseApp';
 import { PaintApp } from './components/apps/PaintApp';
@@ -46,14 +44,15 @@ import { MusicApp } from './components/apps/MusicApp';
 import { MediaFlowApp } from './components/apps/MediaFlowApp';
 import { PressmarkApp } from './components/apps/PressmarkApp';
 import { CardGramApp } from './components/apps/CardGramApp';
+import { InkraApp } from './components/apps/InkraApp';
 import { IconManagerApp } from './components/apps/IconManagerApp';
 import { YouTubeApp } from './components/apps/YouTubeApp';
 import { AdminPanelApp } from './components/apps/AdminPanelApp';
 import { globalMusic } from './engine/music';
 
-const STORAGE_CONFIG_KEY = 'astro_os_v3_config';
-const STORAGE_WIDGETS_KEY = 'astro_os_v3_widgets';
-const STORAGE_TIMEZONES_KEY = 'astro_os_v3_timezones';
+const STORAGE_CONFIG_KEY = 'astro_os_v7_config';
+const STORAGE_WIDGETS_KEY = 'astro_os_v6_widgets';
+const STORAGE_TIMEZONES_KEY = 'astro_os_v4_timezones';
 
 type ViewportTier = 'mobile' | 'tablet' | 'desktop';
 
@@ -89,102 +88,73 @@ function loadInitialConfig(): AdminConfig {
 function createResponsiveDefaultWidgets(vw: number, vh: number): MediaWidgetItem[] {
   const tier = getViewportTier(vw);
   if (tier === 'mobile') {
-    const size = Math.min(110, Math.floor((vw - 48) / 3));
-    const y = Math.max(330, vh - 190);
-    const gap = Math.max(8, Math.floor((vw - size * 3 - 24) / 2));
+    const size = Math.min(92, Math.floor((vw - 44) / 3.6));
+    const mainH = Math.max(460, vh - 84);
+    const y = Math.max(388, mainH - size - 14);
+    const centerX = Math.round(vw * 0.5);
     return [
-      {
-        id: 'media-widget-1',
-        url: COSMOS_WIDGET_IMG,
-        label: 'Cosmos.jpg',
-        width: size,
-        height: size,
-        defaultWidth: 176,
-        defaultHeight: 176,
-        x: 12,
-        y,
-        visible: true,
-        isGif: false,
-        fallbackScene: 'cosmos',
-      },
-      {
-        id: 'media-widget-2',
-        url: ASTRO_CITY_WIDGET_IMG,
-        label: 'AstroCity.png',
-        width: size,
-        height: size,
-        defaultWidth: 196,
-        defaultHeight: 148,
-        x: 12 + size + gap,
-        y,
-        visible: true,
-        isGif: false,
-        fallbackScene: 'city',
-      },
       {
         id: 'media-widget-3',
         url: DAHYUN_GIF_URL,
         label: 'Dahyun.gif',
         width: size,
         height: size,
-        defaultWidth: 164,
-        defaultHeight: 164,
-        x: 12 + (size + gap) * 2,
+        defaultWidth: size,
+        defaultHeight: size,
+        x: Math.max(12, centerX - size - 10),
         y,
         visible: true,
         isGif: true,
         fallbackScene: 'pulse',
       },
+      {
+        id: 'media-widget-1',
+        url: COSMOS_WIDGET_IMG,
+        label: 'Cosmos.jpg',
+        width: size,
+        height: size,
+        defaultWidth: size,
+        defaultHeight: size,
+        x: Math.min(vw - size - 12, centerX + 10),
+        y,
+        visible: true,
+        isGif: false,
+        fallbackScene: 'cosmos',
+      },
     ];
   }
-
   if (tier === 'tablet') {
     return [
+      {
+        id: 'media-widget-3',
+        url: DAHYUN_GIF_URL,
+        label: 'Dahyun.gif',
+        width: 132,
+        height: 152,
+        defaultWidth: 132,
+        defaultHeight: 152,
+        x: Math.max(240, vw - 332),
+        y: 28,
+        visible: true,
+        isGif: true,
+        fallbackScene: 'pulse',
+      },
       {
         id: 'media-widget-1',
         url: COSMOS_WIDGET_IMG,
         label: 'Cosmos.jpg',
         width: 156,
         height: 156,
-        defaultWidth: 176,
-        defaultHeight: 176,
-        x: Math.max(240, vw - 188),
+        defaultWidth: 156,
+        defaultHeight: 156,
+        x: Math.max(240, vw - 184),
         y: 28,
         visible: true,
         isGif: false,
         fallbackScene: 'cosmos',
       },
-      {
-        id: 'media-widget-2',
-        url: ASTRO_CITY_WIDGET_IMG,
-        label: 'AstroCity.png',
-        width: 184,
-        height: 138,
-        defaultWidth: 196,
-        defaultHeight: 148,
-        x: Math.max(240, vw - 220),
-        y: Math.max(220, vh - 245),
-        visible: true,
-        isGif: false,
-        fallbackScene: 'city',
-      },
-      {
-        id: 'media-widget-3',
-        url: DAHYUN_GIF_URL,
-        label: 'Dahyun.gif',
-        width: 150,
-        height: 150,
-        defaultWidth: 164,
-        defaultHeight: 164,
-        x: Math.round(vw * 0.44),
-        y: Math.round(vh * 0.36),
-        visible: true,
-        isGif: true,
-        fallbackScene: 'pulse',
-      },
     ];
   }
-
   return createDefaultWidgets(vw, vh);
 }
 
@@ -213,14 +183,15 @@ function createInitialWindows(): Record<WindowId, WindowRuntimeState> {
     const h = Math.min(meta.defaultHeight, Math.max(280, vh - 96));
     const x = Math.max(14, Math.round((vw - w) / 2) + (idx % 3) * 16 - 16);
     const y = Math.max(14, Math.round((vh - 56 - h) / 2) + (idx % 3) * 14 - 14);
-    
-    // theAstroBruh starts opened by default for seamless entry
     const isAstroVerse = meta.id === 'win-astroverse';
+    const startsMaximized =
+      meta.id === 'win-pressmark' || meta.id === 'win-cardgram' || meta.id === 'win-inkra';
+
     result[meta.id] = {
       id: meta.id,
       isOpen: isAstroVerse,
       isMinimized: false,
-      isMaximized: false,
+      isMaximized: startsMaximized,
       zIndex: isAstroVerse ? 50 : 30 + idx,
       x,
       y,
@@ -228,7 +199,6 @@ function createInitialWindows(): Record<WindowId, WindowRuntimeState> {
       height: h,
     };
   });
-
   return result;
 }
 
@@ -242,47 +212,42 @@ function computeGridIconPositions(
   const positions: Record<string, { x: number; y: number }> = {};
 
   if (tier === 'mobile') {
-    // Clean centered 3-column smartphone app launcher grid
-    const effectiveSize = Math.min(58, iconSize);
-    const cellW = Math.max(96, Math.floor((vw - 24) / 3));
-    const cellH = effectiveSize + 46;
+    const effectiveSize = Math.min(52, iconSize);
+    const cellW = Math.max(98, Math.floor((vw - 16) / 3));
+    const cellH = effectiveSize + 36;
     const cols = 3;
     const startX = Math.max(6, Math.round((vw - cellW * cols) / 2));
-    const startY = 14;
-
+    const startY = 10;
     ICON_ORDER.forEach((item, index) => {
       const col = index % cols;
       const row = Math.floor(index / cols);
       positions[item.id] = {
-        x: startX + col * cellW + Math.round((cellW - (effectiveSize + 28)) / 2),
-        y: startY + row * (cellH + 8),
+        x: startX + col * cellW + Math.round((cellW - Math.max(92, effectiveSize + 30)) / 2),
+        y: startY + row * (cellH + 4),
       };
     });
     return positions;
   }
 
   if (tier === 'tablet') {
-    // Clean 2-column vertical left layout tailored for iPad / Tablets
-    const cellW = Math.max(104, iconSize + 36);
-    const cellH = iconSize + 46;
-    const padTop = 20;
+    const cellW = Math.max(112, iconSize + 44);
+    const cellH = iconSize + 44;
+    const padTop = 18;
     const availH = Math.max(240, vh - 96);
     const rowsPerCol = Math.max(3, Math.floor(availH / (cellH + gap)));
-
     ICON_ORDER.forEach((item, index) => {
       const col = Math.floor(index / rowsPerCol);
       const row = index % rowsPerCol;
       positions[item.id] = {
-        x: 20 + col * (cellW + 14),
+        x: 18 + col * (cellW + 14),
         y: padTop + row * (cellH + gap),
       };
     });
     return positions;
   }
 
-  // Desktop 2-column layout matching reference screenshot (5 rows per column)
-  const cellW = Math.max(108, iconSize + 36);
-  const cellH = iconSize + 46;
+  const cellW = Math.max(114, iconSize + 44);
+  const cellH = iconSize + 44;
   const padTop = 18;
   const padLeft = 18;
   const rowsPerCol = 5;
@@ -290,9 +255,10 @@ function computeGridIconPositions(
   ICON_ORDER.forEach((item, index) => {
     const col = Math.floor(index / rowsPerCol);
     const row = index % rowsPerCol;
-    const x = padLeft + col * (cellW + 12);
-    const y = padTop + row * (cellH + gap);
-    positions[item.id] = { x, y };
+    positions[item.id] = {
+      x: padLeft + col * (cellW + 14),
+      y: padTop + row * (cellH + gap),
+    };
   });
   return positions;
 }
@@ -304,7 +270,7 @@ export default function App() {
   const [widgets, setWidgets] = useState<MediaWidgetItem[]>(loadInitialWidgets);
   const [windows, setWindows] = useState<Record<WindowId, WindowRuntimeState>>(createInitialWindows);
   const [activeWindowId, setActiveWindowId] = useState<WindowId | null>('win-astroverse');
-  const zCounterRef = useRef(40);
+  const zCounterRef = useRef(52);
 
   const [viewportTier, setViewportTier] = useState<ViewportTier>(() =>
     typeof window !== 'undefined' ? getViewportTier(window.innerWidth) : 'desktop'
@@ -318,6 +284,10 @@ export default function App() {
   const [timezoneModalOpen, setTimezoneModalOpen] = useState(false);
   const [adminPinModalOpen, setAdminPinModalOpen] = useState(false);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
+  const [musicInTray, setMusicInTray] = useState(false);
+
+  const [ctxMenu, setCtxMenu] = useState<{ open: boolean; widgetId: string; x: number; y: number } | null>(null);
+
   const [selectedTimezones, setSelectedTimezones] = useState<string[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_TIMEZONES_KEY);
@@ -328,31 +298,10 @@ export default function App() {
     } catch {
       // ignore
     }
-    return ['America/Lima', 'America/New_York', 'Europe/Madrid'];
+    return ['America/Lima', 'America/New_York'];
   });
 
-  const [ctxMenu, setCtxMenu] = useState<{
-    open: boolean;
-    widgetId: string;
-    x: number;
-    y: number;
-  } | null>(null);
-  const replaceWidgetImgRef = useRef<HTMLInputElement | null>(null);
-  const newWidgetInputRef = useRef<HTMLInputElement | null>(null);
-  const widgetToReplaceRef = useRef<string | null>(null);
-
-  const desktopRef = useRef<HTMLElement | null>(null);
-  const domMapRef = useRef<Map<string, HTMLElement>>(new Map());
-  const bodiesRef = useRef<Map<string, PhysicsBody>>(new Map());
-  const impactsRef = useRef<CollisionImpactEvent[]>([]);
-  const cursorRef = useRef({ x: 0, y: 0, active: false });
-  const physicsSettingsRef = useRef<PhysicsSettings>(config.physics);
-
-  const effectiveIconSize = isMobile
-    ? Math.min(58, config.desktop.iconSize)
-    : isTablet
-    ? Math.min(64, config.desktop.iconSize)
-    : config.desktop.iconSize;
+  const effectiveIconSize = isMobile ? Math.min(52, config.desktop.iconSize) : config.desktop.iconSize;
 
   const [iconPositions, setIconPositions] = useState<Record<string, { x: number; y: number }>>(() =>
     computeGridIconPositions(
@@ -362,6 +311,16 @@ export default function App() {
       typeof window !== 'undefined' ? window.innerHeight : 760
     )
   );
+
+  const desktopRef = useRef<HTMLDivElement | null>(null);
+  const domMapRef = useRef<Map<string, HTMLElement>>(new Map());
+  const bodiesRef = useRef<Map<string, PhysicsBody>>(new Map());
+  const cursorRef = useRef({ x: -999, y: -999, active: false });
+  const impactsRef = useRef<CollisionImpactEvent[]>([]);
+  const physicsSettingsRef = useRef(config.physics);
+  const newWidgetInputRef = useRef<HTMLInputElement | null>(null);
+  const replaceWidgetImgRef = useRef<HTMLInputElement | null>(null);
+  const widgetToReplaceRef = useRef<string | null>(null);
 
   const showToast = useCallback((msg: string) => {
     setToastMsg(msg);
@@ -400,7 +359,6 @@ export default function App() {
 
   useEffect(() => {
     const handleContextMenu = (e: MouseEvent) => {
-      // Prevent browser default context menu, inspect element, etc.
       e.preventDefault();
     };
     window.addEventListener('contextmenu', handleContextMenu);
@@ -411,13 +369,11 @@ export default function App() {
     localStorage.setItem(STORAGE_TIMEZONES_KEY, JSON.stringify(selectedTimezones));
   }, [selectedTimezones]);
 
-  // Reflow icons and clamp widgets gracefully when crossing Mobile / Tablet / Desktop breakpoints
   useEffect(() => {
     const onResize = () => {
       const vw = window.innerWidth;
       const vh = window.innerHeight;
       const nextTier = getViewportTier(vw);
-
       setViewportTier((prevTier) => {
         if (prevTier !== nextTier) {
           const nextIcons = computeGridIconPositions(
@@ -435,13 +391,13 @@ export default function App() {
               b.vx = 0;
               b.vy = 0;
               b.angle = 0;
+              b.angularVel = 0;
             }
           });
         }
         return nextTier;
       });
 
-      // Clamp widget bodies inside visible desktop bounds
       const maxRight = Math.max(240, vw - 16);
       const maxBottom = Math.max(240, vh - (nextTier === 'mobile' ? 115 : 70));
       setWidgets((prev) =>
@@ -469,6 +425,7 @@ export default function App() {
 
   const getBody = useCallback((id: string) => bodiesRef.current.get(id), []);
 
+  // Synchronize React items into rigid-body physics map
   useEffect(() => {
     const bodies = bodiesRef.current;
     const activeIds = new Set<string>();
@@ -478,13 +435,16 @@ export default function App() {
       if (cfg && !cfg.visible) return;
       activeIds.add(item.id);
       const pos = iconPositions[item.id] || { x: 20, y: 20 };
-      const w = Math.max(84, effectiveIconSize + 24);
+      const w = Math.max(92, effectiveIconSize + 30);
       const h = effectiveIconSize + 34;
+      const mass = w * h;
+      const inertia = computeRectInertia(mass, w, h);
       const existing = bodies.get(item.id);
       if (existing) {
         existing.width = w;
         existing.height = h;
-        existing.mass = w * h;
+        existing.mass = mass;
+        existing.inertia = inertia;
       } else {
         bodies.set(item.id, {
           id: item.id,
@@ -498,9 +458,13 @@ export default function App() {
           angle: 0,
           angularVel: 0,
           targetAngle: 0,
+          grabOffsetX: 0,
+          grabOffsetY: 0,
           isDragging: false,
+          isSleeping: false,
           scale: 1,
-          mass: w * h,
+          mass,
+          inertia,
         });
       }
     });
@@ -508,11 +472,14 @@ export default function App() {
     widgets.forEach((widget) => {
       if (!widget.visible) return;
       activeIds.add(widget.id);
+      const mass = widget.width * widget.height * 1.4;
+      const inertia = computeRectInertia(mass, widget.width, widget.height);
       const existing = bodies.get(widget.id);
       if (existing) {
         existing.width = widget.width;
         existing.height = widget.height;
-        existing.mass = widget.width * widget.height * 1.4;
+        existing.mass = mass;
+        existing.inertia = inertia;
       } else {
         bodies.set(widget.id, {
           id: widget.id,
@@ -526,9 +493,13 @@ export default function App() {
           angle: 0,
           angularVel: 0,
           targetAngle: 0,
+          grabOffsetX: 0,
+          grabOffsetY: 0,
           isDragging: false,
+          isSleeping: false,
           scale: 1,
-          mass: widget.width * widget.height * 1.4,
+          mass,
+          inertia,
         });
       }
     });
@@ -536,11 +507,14 @@ export default function App() {
     (Object.values(windows) as WindowRuntimeState[]).forEach((win) => {
       if (!win.isOpen || win.isMinimized || win.isMaximized || isMobile) return;
       activeIds.add(win.id);
+      const mass = win.width * win.height * 3.2;
+      const inertia = computeRectInertia(mass, win.width, win.height);
       const existing = bodies.get(win.id);
       if (existing) {
         existing.width = win.width;
         existing.height = win.height;
-        existing.mass = win.width * win.height * 3;
+        existing.mass = mass;
+        existing.inertia = inertia;
       } else {
         bodies.set(win.id, {
           id: win.id,
@@ -554,9 +528,13 @@ export default function App() {
           angle: 0,
           angularVel: 0,
           targetAngle: 0,
+          grabOffsetX: 0,
+          grabOffsetY: 0,
           isDragging: false,
+          isSleeping: false,
           scale: 1,
-          mass: win.width * win.height * 3,
+          mass,
+          inertia,
         });
       }
     });
@@ -566,6 +544,7 @@ export default function App() {
     });
   }, [effectiveIconSize, config.desktop.icons, iconPositions, widgets, windows, isMobile]);
 
+  // 60fps Rigid-Body Physics Loop
   useEffect(() => {
     const onPointerMoveGlobal = (e: PointerEvent) => {
       const desk = desktopRef.current;
@@ -585,7 +564,6 @@ export default function App() {
     const loop = (now: number) => {
       const dt = (now - lastTime) / 1000;
       lastTime = now;
-
       const desk = desktopRef.current;
       if (desk) {
         const bounds: DesktopBounds = {
@@ -611,7 +589,7 @@ export default function App() {
               x: imp.x + rect.left,
               y: imp.y + rect.top,
             });
-            astroSound.playImpact(imp.intensity * 1000);
+            astroSound.playImpact(imp.intensity * 1000, 1.0);
           }
         }
 
@@ -621,7 +599,6 @@ export default function App() {
           el.style.transform = `translate3d(${b.x.toFixed(1)}px, ${b.y.toFixed(1)}px, 0) rotate(${b.angle.toFixed(2)}deg) scale(${b.scale.toFixed(3)})`;
         });
       }
-
       rafId = requestAnimationFrame(loop);
     };
 
@@ -632,23 +609,34 @@ export default function App() {
     };
   }, []);
 
-  const handleDragStartBody = useCallback((id: string) => {
+  const handleDragStartBody = useCallback((id: string, grabOffsetX: number, grabOffsetY: number) => {
     const b = bodiesRef.current.get(id);
     if (b) {
       b.isDragging = true;
+      b.isSleeping = false;
       b.vx = 0;
       b.vy = 0;
+      b.grabOffsetX = grabOffsetX;
+      b.grabOffsetY = grabOffsetY;
     }
   }, []);
 
-  const handleDragMoveBody = useCallback((id: string, x: number, y: number, instVx: number) => {
-    const b = bodiesRef.current.get(id);
-    if (b) {
-      b.x = x;
-      b.y = y;
-      b.targetAngle = Math.max(-12, Math.min(12, instVx * 0.01));
-    }
-  }, []);
+  const handleDragMoveBody = useCallback(
+    (id: string, x: number, y: number, instVx: number, instVy: number) => {
+      const b = bodiesRef.current.get(id);
+      if (b) {
+        b.x = x;
+        b.y = y;
+        // Expose live drag velocity so colliding bodies get physically shoved aside!
+        b.vx = Math.max(-1800, Math.min(1800, instVx * 0.6));
+        b.vy = Math.max(-1800, Math.min(1800, instVy * 0.6));
+        // Realistic lever-arm pendulum target angle from drag acceleration & grab point
+        const torqueTilt = (instVx * 0.011) - (b.grabOffsetY * instVx * 0.00018);
+        b.targetAngle = Math.max(-22, Math.min(22, torqueTilt));
+      }
+    },
+    []
+  );
 
   const handleDragEndBody = useCallback((id: string, vx: number, vy: number) => {
     const b = bodiesRef.current.get(id);
@@ -656,11 +644,15 @@ export default function App() {
       b.isDragging = false;
       b.vx = vx;
       b.vy = vy;
+      // Impart realistic rotational spin from off-center grab lever arm on release
+      const releaseSpin = (b.grabOffsetX * vy - b.grabOffsetY * vx) * 0.00028;
+      b.angularVel += Math.max(-180, Math.min(180, releaseSpin));
+
       if (b.kind === 'window') {
         setWindows((prev) => {
           const w = prev[id as WindowId];
           if (!w) return prev;
-          return { ...prev, [id]: { ...w, x: b.x, y: b.y } };
+          return { ...prev, [id]: { ...w, x: Math.round(b.x), y: Math.round(b.y) } };
         });
       } else if (b.kind === 'widget') {
         setWidgets((prev) =>
@@ -670,153 +662,8 @@ export default function App() {
     }
   }, []);
 
-  const focusWindow = useCallback((id: WindowId) => {
-    zCounterRef.current += 1;
-    const nextZ = zCounterRef.current;
-    setActiveWindowId(id);
-    setWindows((prev) => ({
-      ...prev,
-      [id]: { ...prev[id], zIndex: nextZ, isMinimized: false },
-    }));
-  }, []);
-
-  const openWindow = useCallback(
-    (id: WindowId) => {
-      if (id === 'win-admin' && userRole !== 'admin') {
-        setAdminPinModalOpen(true);
-        return;
-      }
-      zCounterRef.current += 1;
-      const nextZ = zCounterRef.current;
-      setActiveWindowId(id);
-      setWindows((prev) => {
-        const cur = prev[id];
-        const cfg = config.windows[id];
-        const w = cfg ? Math.min(cfg.width, window.innerWidth - 28) : cur.width;
-        const h = cfg ? Math.min(cfg.height, window.innerHeight - 86) : cur.height;
-        const x = cur.isOpen ? cur.x : Math.max(14, Math.round((window.innerWidth - w) / 2));
-        const y = cur.isOpen ? cur.y : Math.max(12, Math.round((window.innerHeight - 58 - h) / 2));
-        const shouldMaximize = id === 'win-cardgram' ? true : cur.isMaximized;
-
-        // Sync or register physics body immediately to prevent snapping to (0,0) or corners
-        const body = bodiesRef.current.get(id);
-        if (body) {
-          body.x = x;
-          body.y = y;
-          body.vx = 0;
-          body.vy = 0;
-          body.angle = 0;
-          body.angularVel = 0;
-          body.width = w;
-          body.height = h;
-        } else {
-          bodiesRef.current.set(id, {
-            id,
-            kind: 'window',
-            x,
-            y,
-            width: w,
-            height: h,
-            vx: 0,
-            vy: 0,
-            angle: 0,
-            angularVel: 0,
-            targetAngle: 0,
-            isDragging: false,
-            scale: 1,
-            mass: w * h * 3,
-          });
-        }
-
-        return {
-          ...prev,
-          [id]: {
-            ...cur,
-            isOpen: true,
-            isMinimized: false,
-            isMaximized: shouldMaximize,
-            zIndex: nextZ,
-            width: w,
-            height: h,
-            x,
-            y,
-          },
-        };
-      });
-    },
-    [userRole, config.windows]
-  );
-
-  const minimizeWindow = useCallback((id: WindowId) => {
-    setWindows((prev) => ({
-      ...prev,
-      [id]: { ...prev[id], isMinimized: true },
-    }));
-    setActiveWindowId((cur) => (cur === id ? null : cur));
-  }, []);
-
-  const toggleMaximizeWindow = useCallback((id: WindowId) => {
-    setWindows((prev) => ({
-      ...prev,
-      [id]: { ...prev[id], isMaximized: !prev[id].isMaximized },
-    }));
-  }, []);
-
-  const [musicInTray, setMusicInTray] = useState(false);
-
-  const closeWindow = useCallback((id: WindowId) => {
-    if (id === 'win-music') {
-      // Ares-style minimize to system tray instead of closing
-      setMusicInTray(true);
-      setWindows((prev) => ({
-        ...prev,
-        [id]: { ...prev[id], isMinimized: true },
-      }));
-      setActiveWindowId((cur) => (cur === id ? null : cur));
-      showToast('Music minimized to system tray (Ares style)');
-      return;
-    }
-    setWindows((prev) => ({
-      ...prev,
-      [id]: { ...prev[id], isOpen: false, isMinimized: false },
-    }));
-    setActiveWindowId((cur) => (cur === id ? null : cur));
-  }, [showToast]);
-
-  const restoreMusicFromTray = useCallback(() => {
-    setMusicInTray(false);
-    focusWindow('win-music');
-  }, [focusWindow]);
-
-  const closeMusicPermanently = useCallback(() => {
-    setMusicInTray(false);
-    globalMusic.stopCompletely();
-    setWindows((prev) => ({
-      ...prev,
-      ['win-music']: { ...prev['win-music'], isOpen: false, isMinimized: false },
-    }));
-    setActiveWindowId((cur) => (cur === 'win-music' ? null : cur));
-    showToast('Music closed and stopped');
-  }, [showToast]);
-
-  const handleTaskbarWindowClick = useCallback(
-    (id: WindowId) => {
-      const w = windows[id];
-      if (!w) return;
-      if (w.isMinimized || activeWindowId !== id) {
-        focusWindow(id);
-      } else {
-        minimizeWindow(id);
-      }
-    },
-    [windows, activeWindowId, focusWindow, minimizeWindow]
-  );
-
-  const handleResizeWindow = useCallback((id: WindowId, width: number, height: number) => {
-    setWindows((prev) => ({
-      ...prev,
-      [id]: { ...prev[id], width, height },
-    }));
+  const handleBootComplete = useCallback(() => {
+    setIsBooting(false);
   }, []);
 
   const rearrangeIcons = useCallback(() => {
@@ -835,47 +682,197 @@ export default function App() {
         b.vx = 0;
         b.vy = 0;
         b.angle = 0;
+        b.angularVel = 0;
       }
     });
-    showToast('Íconos reordenados en cuadrícula');
+    astroSound.playKeyTap(740);
+    showToast('Íconos ordenados en cuadrícula');
   }, [config.desktop.iconSize, config.desktop.gridGap, showToast]);
 
+  const focusWindow = useCallback(
+    (id: WindowId) => {
+      if (activeWindowId === id && !windows[id]?.isMinimized) return;
+      zCounterRef.current += 1;
+      const z = zCounterRef.current;
+      setActiveWindowId(id);
+      setWindows((prev) => ({
+        ...prev,
+        [id]: { ...prev[id], isMinimized: false, zIndex: z },
+      }));
+    },
+    [activeWindowId, windows]
+  );
+
+  const openWindow = useCallback(
+    (id: WindowId) => {
+      setStartMenuOpen(false);
+      setCtxMenu(null);
+      if (id === 'win-admin' && userRole !== 'admin') {
+        setAdminPinModalOpen(true);
+        return;
+      }
+      if (id === 'win-music') {
+        setMusicInTray(false);
+      }
+      astroSound.playWindowPop(true);
+      zCounterRef.current += 1;
+      const z = zCounterRef.current;
+      setActiveWindowId(id);
+      setWindows((prev) => {
+        const cur = prev[id];
+        return {
+          ...prev,
+          [id]: {
+            ...cur,
+            isOpen: true,
+            isMinimized: false,
+            zIndex: z,
+          },
+        };
+      });
+    },
+    [userRole]
+  );
+
+  const minimizeWindow = useCallback((id: WindowId) => {
+    setWindows((prev) => ({
+      ...prev,
+      [id]: { ...prev[id], isMinimized: true },
+    }));
+    setActiveWindowId((curr) => (curr === id ? null : curr));
+  }, []);
+
+  const toggleMaximizeWindow = useCallback((id: WindowId) => {
+    setWindows((prev) => ({
+      ...prev,
+      [id]: { ...prev[id], isMaximized: !prev[id].isMaximized },
+    }));
+  }, []);
+
+  const closeWindow = useCallback((id: WindowId) => {
+    if (id === 'win-music' && globalMusic.isPlaying) {
+      setMusicInTray(true);
+    }
+    setWindows((prev) => ({
+      ...prev,
+      [id]: { ...prev[id], isOpen: false, isMinimized: false },
+    }));
+    setActiveWindowId((curr) => (curr === id ? null : curr));
+  }, []);
+
+  const restoreMusicFromTray = useCallback(() => {
+    setMusicInTray(false);
+    openWindow('win-music');
+  }, [openWindow]);
+
+  const closeMusicPermanently = useCallback(() => {
+    globalMusic.stopCompletely();
+    setMusicInTray(false);
+    setWindows((prev) => ({
+      ...prev,
+      'win-music': { ...prev['win-music'], isOpen: false, isMinimized: false },
+    }));
+    showToast('Music stopped & closed');
+  }, [showToast]);
+
+  const handleTaskbarWindowClick = useCallback(
+    (id: WindowId) => {
+      const win = windows[id];
+      if (!win.isOpen || win.isMinimized) {
+        openWindow(id);
+      } else if (activeWindowId === id) {
+        minimizeWindow(id);
+      } else {
+        focusWindow(id);
+      }
+    },
+    [windows, activeWindowId, openWindow, minimizeWindow, focusWindow]
+  );
+
+  const resizeWindow = useCallback((id: WindowId, width: number, height: number) => {
+    setWindows((prev) => ({
+      ...prev,
+      [id]: { ...prev[id], width, height },
+    }));
+  }, []);
+
   const triggerImpulseBurst = useCallback(() => {
-    astroSound.playImpact(950);
+    const cx = window.innerWidth * 0.5;
+    const cy = window.innerHeight * 0.48;
     bodiesRef.current.forEach((b) => {
       if (b.kind === 'window') return;
-      const angle = Math.random() * Math.PI * 2;
-      const speed = 420 + Math.random() * 580;
-      b.vx += Math.cos(angle) * speed;
-      b.vy += Math.sin(angle) * speed - (physicsSettingsRef.current.mode === 'earth' ? 420 : 0);
-      b.angularVel += (Math.random() - 0.5) * 40;
+      const bx = b.x + b.width * 0.5;
+      const by = b.y + b.height * 0.5;
+      const dx = bx - cx;
+      const dy = by - cy;
+      const dist = Math.max(40, Math.hypot(dx, dy));
+      const force = 780 + Math.random() * 480;
+      b.vx += (dx / dist) * force;
+      b.vy += (dy / dist) * force - 240;
+      b.angularVel += (Math.random() - 0.5) * 260;
+      b.isSleeping = false;
     });
-    showToast('¡Impulso cósmico aplicado!');
+    astroSound.playImpact(850, 0.9);
+    showToast('Impulso cósmico radial aplicado');
   }, [showToast]);
 
   const changePhysicsMode = useCallback(
     (mode: PhysicsMode) => {
-      setConfig((prev) => ({
-        ...prev,
-        physics: { ...prev.physics, mode },
-      }));
+      setConfig((prev) => ({ ...prev, physics: { ...prev.physics, mode } }));
       if (mode === 'zero-g') {
         bodiesRef.current.forEach((b) => {
           if (b.kind !== 'window') {
-            b.vx += (Math.random() - 0.5) * 90;
-            b.vy += (Math.random() - 0.5) * 90;
+            b.vx += (Math.random() - 0.5) * 180;
+            b.vy += (Math.random() - 0.5) * 180;
+            b.angularVel += (Math.random() - 0.5) * 40;
           }
         });
       }
-      const names: Record<PhysicsMode, string> = {
-        tactile: 'Inercia Táctil + Colisiones',
-        earth: 'Gravedad Terrestre (9.8 m/s²)',
-        'zero-g': 'Gravedad Zero-G Orbital',
-        static: 'Modo Clásico Fijo',
-      };
-      showToast(`Física: ${names[mode]}`);
+      astroSound.playKeyTap(680);
+      showToast(`Física: ${mode}`);
     },
     [showToast]
+  );
+
+  const toggleWindowCollisions = useCallback(() => {
+    setConfig((prev) => {
+      const next = !prev.physics.windowCollisions;
+      showToast(next ? 'Colisiones con ventanas activadas' : 'Colisiones con ventanas desactivadas');
+      return {
+        ...prev,
+        physics: { ...prev.physics, windowCollisions: next },
+      };
+    });
+  }, [showToast]);
+
+  const updateEffects = useCallback((patch: Partial<ThemeEffectsConfig>) => {
+    setConfig((prev) => ({
+      ...prev,
+      effects: { ...prev.effects, ...patch },
+    }));
+  }, []);
+
+  const updatePhysics = useCallback((patch: Partial<PhysicsSettings>) => {
+    setConfig((prev) => ({
+      ...prev,
+      physics: { ...prev.physics, ...patch },
+    }));
+  }, []);
+
+  const applyThemePreset = useCallback(
+    (presetId: string) => {
+      const p = THEME_PRESETS.find((t) => t.id === presetId);
+      if (!p) return;
+      updateEffects({
+        bgTop: p.top,
+        bgMiddle: p.mid,
+        bgBottom: p.bot,
+        primaryAccent: p.primary,
+        secondaryAccent: p.secondary,
+      });
+      showToast(`Tema aplicado: ${p.name}`);
+    },
+    [updateEffects, showToast]
   );
 
   const spawnWidget = useCallback(
@@ -887,9 +884,15 @@ export default function App() {
     }) => {
       const vw = window.innerWidth;
       const vh = window.innerHeight;
-      const id = `media-widget-${Date.now()}-${Math.floor(Math.random() * 999)}`;
-      const size = isMobile ? 124 : 172;
-      const newWidget: MediaWidgetItem = {
+      const size = isMobile ? 84 : 176;
+      const x = isMobile
+        ? Math.round(Math.max(12, Math.min(vw - size - 12, vw * 0.5 - size * 0.5)))
+        : Math.round(Math.max(24, Math.min(vw - size - 24, vw * 0.55 + (Math.random() - 0.5) * 140)));
+      const y = isMobile
+        ? Math.max(388, vh - 84 - size - 16)
+        : Math.round(Math.max(24, Math.min(vh - size - 80, vh * 0.28 + (Math.random() - 0.5) * 120)));
+      const id = `widget-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+      const item: MediaWidgetItem = {
         id,
         url: opts.url,
         label: opts.label,
@@ -897,32 +900,34 @@ export default function App() {
         height: size,
         defaultWidth: size,
         defaultHeight: size,
-        x: Math.round(Math.max(16, vw * 0.45 + (Math.random() - 0.5) * 100 - size / 2)),
-        y: Math.round(Math.max(24, vh * 0.35 + (Math.random() - 0.5) * 90 - size / 2)),
+        x,
+        y,
         visible: true,
-        isGif: opts.isGif || opts.url.toLowerCase().includes('.gif'),
+        isGif: opts.isGif,
         fallbackScene: opts.fallbackScene || 'pulse',
       };
-      setWidgets((prev) => [...prev, newWidget]);
-      showToast(`Widget "${opts.label}" añadido al escritorio`);
+      setWidgets((prev) => [...prev, item]);
+      setSelectedWidgetId(id);
+      astroSound.playWindowPop(true);
     },
-    [isMobile, showToast]
+    [isMobile]
   );
 
   const handleNewWidgetFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    files.forEach((file) => {
+    files.forEach((f) => {
       const reader = new FileReader();
       reader.onload = () => {
         if (typeof reader.result === 'string') {
           spawnWidget({
             url: reader.result,
-            label: file.name,
-            isGif: file.type === 'image/gif' || file.name.toLowerCase().endsWith('.gif'),
+            label: f.name,
+            isGif: f.type === 'image/gif',
+            fallbackScene: 'pulse',
           });
         }
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(f);
     });
     e.target.value = '';
   };
@@ -937,12 +942,7 @@ export default function App() {
         setWidgets((prev) =>
           prev.map((w) =>
             w.id === targetId
-              ? {
-                  ...w,
-                  url: reader.result as string,
-                  label: file.name,
-                  isGif: file.type === 'image/gif' || file.name.toLowerCase().endsWith('.gif'),
-                }
+              ? { ...w, url: reader.result as string, label: file.name, isGif: file.type === 'image/gif' }
               : w
           )
         );
@@ -953,110 +953,66 @@ export default function App() {
     e.target.value = '';
   };
 
-  const applyThemePreset = useCallback(
-    (presetId: string) => {
-      const found = THEME_PRESETS.find((p) => p.id === presetId);
-      if (!found) return;
-      setConfig((prev) => ({
-        ...prev,
-        effects: {
-          ...prev.effects,
-          bgTop: found.top,
-          bgMiddle: found.mid,
-          bgBottom: found.bot,
-          primaryAccent: found.primary,
-          secondaryAccent: found.secondary,
-        },
-      }));
-      showToast(`Tema "${found.name}" aplicado`);
-    },
-    [showToast]
-  );
-
-  const desktopIcons: DesktopIconConfig[] = useMemo(() => {
-    return ICON_ORDER.map((item) => {
-      const cfg = config.desktop.icons[item.id];
-      return {
-        id: item.id,
-        winId: item.winId,
-        name: cfg?.name || item.defaultName,
-        visible: cfg ? cfg.visible : true,
-        customImage: cfg?.customImage,
-      };
-    });
-  }, [config.desktop.icons]);
-
-  const getWindowTitle = (id: WindowId) =>
-    config.windows[id]?.title || WINDOW_META_MAP[id].title;
+  const iconList = ICON_ORDER.map((item) => {
+    const cfg = config.desktop.icons[item.id] || { name: item.defaultName, visible: true };
+    return {
+      id: item.id,
+      winId: item.winId,
+      name: cfg.name,
+      visible: cfg.visible,
+      customImage: cfg.customImage,
+    };
+  });
 
   return (
     <div
       onClick={() => {
         if (startMenuOpen) setStartMenuOpen(false);
+        if (selectedWidgetId) setSelectedWidgetId(null);
         if (ctxMenu) setCtxMenu(null);
       }}
-      className="astro-wallpaper relative w-full h-full flex flex-col overflow-hidden"
+      className="relative w-screen h-screen overflow-hidden astro-wallpaper flex flex-col select-none"
     >
-      <StarfieldCanvas
-        starCount={config.effects.starCount}
-        starSpeed={config.effects.starSpeed}
-        impactsRef={impactsRef}
-      />
-
-      <div className="astro-vignette fixed inset-0 z-0" />
-
-      {isBooting && (
-        <BootScreen onComplete={() => setIsBooting(false)} />
-      )}
-
-      {!isBooting && userRole === null && (
-        <WelcomeScreen
-          osTitle={config.security.osTitle}
-          adminPin={config.security.adminPin}
-          onEnter={(role) => {
-            setUserRole(role);
-            if (role === 'guest') {
-              openWindow('win-astroverse');
-            }
-            showToast(
-              role === 'admin'
-                ? 'Administrator session active'
-                : 'Welcome to the.astro.os'
-            );
-          }}
-        />
-      )}
-
-      {isMobile && (
-        <MobileStatusBar
-          osTitle={config.security.osTitle}
-          primaryTimezone={selectedTimezones[0] || 'America/Lima'}
-          physicsMode={config.physics.mode}
-          soundEnabled={config.physics.soundEnabled}
-          onToggleSound={() =>
-            setConfig((p) => ({
-              ...p,
-              physics: { ...p.physics, soundEnabled: !p.physics.soundEnabled },
-            }))
-          }
-          onOpenTimezoneModal={() => setTimezoneModalOpen(true)}
-          onRearrangeIcons={rearrangeIcons}
-          onOpenWindow={openWindow}
-          onChangePhysicsMode={changePhysicsMode}
-        />
-      )}
+      <StarfieldCanvas effects={config.effects} impactsRef={impactsRef} />
+      <div className="fixed inset-0 astro-vignette z-[1]" />
 
       <DesktopDrawCanvas
         active={desktopDrawActive}
         onExit={() => setDesktopDrawActive(false)}
       />
 
+      {isBooting && <BootScreen onComplete={handleBootComplete} />}
+
+      {!isBooting && userRole === null && (
+        <WelcomeScreen
+          osTitle={config.security.osTitle}
+          adminPin={config.security.adminPin}
+          onEnterDesktop={(role) => setUserRole(role)}
+        />
+      )}
+
+      {isMobile && (
+        <MobileStatusBar
+          osTitle={config.security.osTitle}
+          physicsMode={config.physics.mode}
+          soundEnabled={config.physics.soundEnabled}
+          onChangePhysicsMode={changePhysicsMode}
+          onRearrangeIcons={rearrangeIcons}
+          onOpenWindow={openWindow}
+          onToggleSound={() =>
+            setConfig((p) => ({
+              ...p,
+              physics: { ...p.physics, soundEnabled: !p.physics.soundEnabled },
+            }))
+          }
+        />
+      )}
+
       <main
         ref={desktopRef}
-        onPointerDown={() => setSelectedWidgetId(null)}
-        className="relative flex-1 w-full min-h-0 overflow-hidden z-10"
+        className="relative flex-1 min-h-0 overflow-hidden z-10"
       >
-        {desktopIcons.map((icon) => {
+        {iconList.map((icon) => {
           const pos = iconPositions[icon.id] || { x: 20, y: 20 };
           return (
             <DesktopIconItem
@@ -1085,17 +1041,17 @@ export default function App() {
             registerElement={registerElement}
             getBody={getBody}
             onSelect={(id) => setSelectedWidgetId(id)}
-            onContextMenu={(id, clientX, clientY) =>
+            onContextMenu={(id, clientX, clientY) => {
               setCtxMenu({
                 open: true,
                 widgetId: id,
-                x: Math.min(window.innerWidth - 190, clientX),
-                y: Math.min(window.innerHeight - 170, clientY),
-              })
-            }
-            onResize={(id, width, height) =>
-              setWidgets((prev) => prev.map((w) => (w.id === id ? { ...w, width, height } : w)))
-            }
+                x: Math.min(clientX, window.innerWidth - 220),
+                y: Math.min(clientY, window.innerHeight - 230),
+              });
+            }}
+            onResize={(id, width, height) => {
+              setWidgets((prev) => prev.map((w) => (w.id === id ? { ...w, width, height } : w)));
+            }}
             onDragStartBody={handleDragStartBody}
             onDragMoveBody={handleDragMoveBody}
             onDragEndBody={handleDragEndBody}
@@ -1104,13 +1060,16 @@ export default function App() {
 
         {WINDOW_META_LIST.map((meta) => {
           const win = windows[meta.id];
+          if (!win || !win.isOpen || win.isMinimized) return null;
+          const title = config.windows[win.id]?.title || meta.title;
           return (
             <WindowFrame
-              key={meta.id}
+              key={win.id}
               win={win}
-              title={getWindowTitle(meta.id)}
+              title={title}
+              mobileTitle={meta.shortTitle}
               accentColor={meta.accentColor}
-              isActive={activeWindowId === meta.id}
+              isActive={activeWindowId === win.id}
               isMobile={isMobile}
               isTablet={isTablet}
               resizable={meta.resizable}
@@ -1120,20 +1079,23 @@ export default function App() {
               onMinimize={minimizeWindow}
               onToggleMaximize={toggleMaximizeWindow}
               onClose={closeWindow}
-              onResize={handleResizeWindow}
+              onResize={resizeWindow}
               onDragStartBody={handleDragStartBody}
               onDragMoveBody={handleDragMoveBody}
               onDragEndBody={handleDragEndBody}
             >
-              {meta.id === 'win-astroverse' && <AstroVerseApp onOpenWindow={openWindow} />}
-              {meta.id === 'win-draw' && (
+              {win.id === 'win-astroverse' && <AstroVerseApp onOpenWindow={openWindow} />}
+              {win.id === 'win-draw' && (
                 <PaintApp
-                  onPinToDesktop={(url, label) => spawnWidget({ url, label, isGif: false })}
+                  onPinToDesktop={(dataUrl, label) => {
+                    spawnWidget({ url: dataUrl, label, isGif: false, fallbackScene: 'prism' });
+                    showToast('Pintura anclada al escritorio');
+                  }}
                   onToast={showToast}
                 />
               )}
-              {meta.id === 'win-notes' && <NotesApp />}
-              {meta.id === 'win-terminal' && (
+              {win.id === 'win-notes' && <NotesApp />}
+              {win.id === 'win-terminal' && (
                 <TerminalApp
                   userRole={userRole}
                   physicsMode={config.physics.mode}
@@ -1144,30 +1106,27 @@ export default function App() {
                   onApplyThemePreset={applyThemePreset}
                 />
               )}
-              {meta.id === 'win-themes' && (
+              {win.id === 'win-themes' && (
                 <ThemesApp
                   effects={config.effects}
                   physics={config.physics}
-                  onUpdateEffects={(patch: Partial<ThemeEffectsConfig>) =>
-                    setConfig((p) => ({ ...p, effects: { ...p.effects, ...patch } }))
-                  }
+                  onUpdateEffects={updateEffects}
                   onApplyPreset={applyThemePreset}
-                  onUpdatePhysics={(patch: Partial<PhysicsSettings>) =>
-                    setConfig((p) => ({ ...p, physics: { ...p.physics, ...patch } }))
-                  }
+                  onUpdatePhysics={updatePhysics}
                 />
               )}
-              {meta.id === 'win-music' && <MusicApp />}
-              {meta.id === 'win-mediaflow' && (
+              {win.id === 'win-music' && <MusicApp />}
+              {win.id === 'win-mediaflow' && (
                 <MediaFlowApp onSpawnWidget={spawnWidget} onToast={showToast} />
               )}
-              {meta.id === 'win-pressmark' && <PressmarkApp />}
-              {meta.id === 'win-cardgram' && <CardGramApp />}
-              {meta.id === 'win-youtube' && <YouTubeApp />}
-              {meta.id === 'win-icon-manager' && (
+              {win.id === 'win-pressmark' && <PressmarkApp />}
+              {win.id === 'win-cardgram' && <CardGramApp />}
+              {win.id === 'win-inkra' && <InkraApp />}
+              {win.id === 'win-youtube' && <YouTubeApp />}
+              {win.id === 'win-icon-manager' && (
                 <IconManagerApp
-                  icons={desktopIcons}
-                  onSetCustomImage={(iconId, customImage) =>
+                  icons={iconList}
+                  onSetCustomImage={(iconId, dataUrl) => {
                     setConfig((p) => ({
                       ...p,
                       desktop: {
@@ -1176,12 +1135,13 @@ export default function App() {
                           ...p.desktop.icons,
                           [iconId]: {
                             ...(p.desktop.icons[iconId] || { name: iconId, visible: true }),
-                            customImage,
+                            customImage: dataUrl,
                           },
                         },
                       },
-                    }))
-                  }
+                    }));
+                    showToast('Ícono actualizado');
+                  }}
                   onResetAll={() => {
                     setConfig((p) => {
                       const nextIcons = { ...p.desktop.icons };
@@ -1190,30 +1150,24 @@ export default function App() {
                       });
                       return { ...p, desktop: { ...p.desktop, icons: nextIcons } };
                     });
-                    showToast('Íconos restaurados a su diseño original');
+                    showToast('Íconos restaurados a diseño original');
                   }}
                 />
               )}
-              {meta.id === 'win-admin' && (
+              {win.id === 'win-admin' && (
                 <AdminPanelApp
                   config={config}
                   widgets={widgets}
-                  onUpdateConfig={setConfig}
-                  onUpdateEffects={(patch) =>
-                    setConfig((p) => ({ ...p, effects: { ...p.effects, ...patch } }))
-                  }
+                  onUpdateConfig={(updater) => setConfig(updater)}
+                  onUpdateEffects={updateEffects}
                   onApplyThemePreset={applyThemePreset}
-                  onUpdatePhysics={(patch) =>
-                    setConfig((p) => ({ ...p, physics: { ...p.physics, ...patch } }))
-                  }
+                  onUpdatePhysics={updatePhysics}
                   onImpulseBurst={triggerImpulseBurst}
                   onRearrangeIcons={rearrangeIcons}
                   onUpdateWidget={(id, patch) =>
                     setWidgets((prev) => prev.map((w) => (w.id === id ? { ...w, ...patch } : w)))
                   }
-                  onDeleteWidget={(id) =>
-                    setWidgets((prev) => prev.filter((w) => w.id !== id))
-                  }
+                  onDeleteWidget={(id) => setWidgets((prev) => prev.filter((w) => w.id !== id))}
                   onSpawnWidget={spawnWidget}
                   onResetWidgets={() => {
                     setWidgets(createResponsiveDefaultWidgets(window.innerWidth, window.innerHeight));
@@ -1244,6 +1198,7 @@ export default function App() {
         startMenuOpen={startMenuOpen}
         desktopDrawActive={desktopDrawActive}
         physicsMode={config.physics.mode}
+        windowCollisions={config.physics.windowCollisions}
         soundEnabled={config.physics.soundEnabled}
         selectedTimezones={selectedTimezones}
         isMobile={isMobile}
@@ -1254,6 +1209,7 @@ export default function App() {
         onOpenWindow={openWindow}
         onTaskbarWindowClick={handleTaskbarWindowClick}
         onChangePhysicsMode={changePhysicsMode}
+        onToggleWindowCollisions={toggleWindowCollisions}
         onImpulseBurst={triggerImpulseBurst}
         onToggleSound={() =>
           setConfig((p) => ({
@@ -1292,12 +1248,10 @@ export default function App() {
                 const currentBody = bodiesRef.current.get(src.id);
                 const baseX = currentBody ? currentBody.x : src.x;
                 const baseY = currentBody ? currentBody.y : src.y;
-
                 const newId = `widget-clone-${Date.now()}`;
                 const offset = 36;
                 const newX = Math.max(16, Math.min(window.innerWidth - src.width - 24, baseX + offset));
                 const newY = Math.max(16, Math.min(window.innerHeight - src.height - 76, baseY + offset));
-
                 const cloned: MediaWidgetItem = {
                   ...src,
                   id: newId,
@@ -1306,7 +1260,7 @@ export default function App() {
                   y: Math.round(newY),
                 };
 
-                // Initialize physics body immediately at exact spawn location
+                const mass = src.width * src.height * 1.4;
                 bodiesRef.current.set(newId, {
                   id: newId,
                   kind: 'widget',
@@ -1316,12 +1270,16 @@ export default function App() {
                   height: src.height,
                   vx: (Math.random() - 0.5) * 450,
                   vy: -280,
-                  angle: (Math.random() - 0.5) * 12,
-                  angularVel: (Math.random() - 0.5) * 18,
+                  angle: (Math.random() - 0.5) * 14,
+                  angularVel: (Math.random() - 0.5) * 120,
                   targetAngle: 0,
+                  grabOffsetX: 0,
+                  grabOffsetY: 0,
                   isDragging: false,
+                  isSleeping: false,
                   scale: 1,
-                  mass: src.width * src.height * 1.4,
+                  mass,
+                  inertia: computeRectInertia(mass, src.width, src.height),
                 });
 
                 setWidgets((prev) => [...prev, cloned]);
@@ -1332,7 +1290,7 @@ export default function App() {
             }}
             className="w-full px-3 py-2 rounded-lg hover:bg-cyan-500/20 text-left text-xs font-mono text-cyan-300 font-bold transition-colors flex items-center justify-between"
           >
-            <span>✨ Duplicate / Clone</span>
+            <span>Duplicate / Clone</span>
             <span className="text-[10px] text-cyan-400">Clone</span>
           </button>
           <div className="h-px bg-white/10 my-0.5" />
@@ -1367,13 +1325,14 @@ export default function App() {
               if (b) {
                 b.vx += (Math.random() - 0.5) * 900;
                 b.vy -= 550;
-                b.angularVel += (Math.random() - 0.5) * 45;
+                b.angularVel += (Math.random() - 0.5) * 240;
+                b.isSleeping = false;
               }
               setCtxMenu(null);
             }}
             className="w-full px-3 py-2 rounded-lg hover:bg-white/10 text-left text-xs font-mono text-pink-300 transition-colors"
           >
-            ⚡ Throw Widget
+            Throw Widget
           </button>
           <div className="h-px bg-white/10 my-1" />
           <button
@@ -1438,7 +1397,6 @@ export default function App() {
 
       {toastMsg && (
         <div className="fixed bottom-16 right-5 z-50 bg-slate-950/90 border border-pink-400/45 px-4 py-2.5 rounded-xl shadow-2xl backdrop-blur-md flex items-center gap-2.5">
-          <span className="w-2 h-2 rounded-full bg-pink-400 shrink-0" />
           <span className="text-xs font-mono text-slate-100">{toastMsg}</span>
         </div>
       )}

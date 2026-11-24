@@ -3,49 +3,46 @@ class AstroSoundEngine {
   private enabled = true;
   private lastImpactAt = 0;
 
-  public setEnabled(val: boolean) {
-    this.enabled = val;
-  }
-
-  public isEnabled() {
-    return this.enabled;
-  }
-
   private getContext(): AudioContext | null {
     if (!this.enabled || typeof window === 'undefined') return null;
     if (!this.ctx) {
-      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      if (AudioCtx) {
-        this.ctx = new AudioCtx();
-      }
+      const AudioCtx =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      if (!AudioCtx) return null;
+      this.ctx = new AudioCtx();
     }
-    if (this.ctx && this.ctx.state === 'suspended') {
+    if (this.ctx.state === 'suspended') {
       this.ctx.resume().catch(() => {});
     }
     return this.ctx;
   }
 
+  public setEnabled(val: boolean) {
+    this.enabled = val;
+  }
+
   public playStartupChime() {
     const ctx = this.getContext();
     if (!ctx) return;
+    const notes = [392.0, 493.88, 587.33, 783.99];
     const now = ctx.currentTime;
-    const freqs = [261.63, 329.63, 392.0, 523.25, 659.25];
-    freqs.forEach((freq, i) => {
+    notes.forEach((freq, idx) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, now + i * 0.06);
-      gain.gain.setValueAtTime(0.0001, now + i * 0.06);
-      gain.gain.exponentialRampToValueAtTime(0.045, now + i * 0.06 + 0.03);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + i * 0.06 + 0.55);
+      osc.frequency.setValueAtTime(freq, now + idx * 0.085);
+      gain.gain.setValueAtTime(0.0001, now + idx * 0.085);
+      gain.gain.exponentialRampToValueAtTime(0.06, now + idx * 0.085 + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.085 + 0.45);
       osc.connect(gain);
       gain.connect(ctx.destination);
-      osc.start(now + i * 0.06);
-      osc.stop(now + i * 0.06 + 0.6);
+      osc.start(now + idx * 0.085);
+      osc.stop(now + idx * 0.085 + 0.48);
     });
   }
 
-  public playKeyTap(pitch = 680) {
+  public playKeyTap(pitch = 660) {
     const ctx = this.getContext();
     if (!ctx) return;
     const now = ctx.currentTime;
@@ -79,30 +76,27 @@ class AstroSoundEngine {
     osc.stop(now + 0.25);
   }
 
-  public playImpact(speedPxPerSec: number) {
+  public playImpact(speedPxPerSec: number, massScale = 1) {
     const nowMs = performance.now();
-    if (nowMs - this.lastImpactAt < 45) return;
-    const intensity = Math.min(1, Math.max(0, (speedPxPerSec - 90) / 1100));
+    if (nowMs - this.lastImpactAt < 42) return;
+    const intensity = Math.min(1, Math.max(0, (speedPxPerSec - 85) / 1050));
     if (intensity <= 0.04) return;
     const ctx = this.getContext();
     if (!ctx) return;
     this.lastImpactAt = nowMs;
-
     const now = ctx.currentTime;
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.type = 'sine';
-    const baseFreq = 95 + intensity * 120;
+    const baseFreq = Math.max(55, (115 + intensity * 125) / Math.max(0.7, Math.min(1.8, massScale)));
     osc.frequency.setValueAtTime(baseFreq, now);
-    osc.frequency.exponentialRampToValueAtTime(42, now + 0.09);
-
-    gain.gain.setValueAtTime(0.015 + intensity * 0.05, now);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.1);
-
+    osc.frequency.exponentialRampToValueAtTime(38, now + 0.095);
+    gain.gain.setValueAtTime(0.015 + intensity * 0.055, now);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.11);
     osc.connect(gain);
     gain.connect(ctx.destination);
     osc.start(now);
-    osc.stop(now + 0.11);
+    osc.stop(now + 0.12);
   }
 
   public playWindowPop(opening = true) {

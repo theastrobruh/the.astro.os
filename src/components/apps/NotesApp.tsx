@@ -23,7 +23,6 @@ const GLOSSARY_STORAGE_KEY = 'astro_glossary';
 export const NotesApp: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'editor' | 'todo' | 'glossary'>('editor');
 
-  // Multi-Note Documents
   const [docs, setDocs] = useState<NoteDoc[]>(() => {
     try {
       const saved = localStorage.getItem(NOTES_STORAGE_KEY);
@@ -34,19 +33,17 @@ export const NotesApp: React.FC = () => {
     } catch {
       // ignore
     }
-    const legacyTitle = localStorage.getItem('astro_note_title') || 'Bienvenido a Astro.Notes.md';
-    const legacyContent =
-      localStorage.getItem('astro_note_content') ||
-      '# Astro.Notes\n\nEscribe ideas, listas de verificación o apuntes rápidos.\n\n- Usa la barra superior para insertar formato Markdown\n- Cambia entre vista de Edición y Vista Previa\n- Crea múltiples notas desde el panel lateral';
     return [
       {
         id: 'note-1',
-        title: legacyTitle,
-        content: legacyContent,
+        title: 'Bienvenido a Astro.Notes.md',
+        content:
+          '# Astro.Notes\n\nEscribe ideas, listas de verificación o apuntes rápidos.\n\n- Usa la barra superior para insertar formato Markdown\n- Cambia entre vista de Edición y Vista Previa\n- Crea múltiples notas desde el panel lateral',
         updatedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       },
     ];
   });
+
   const [activeDocId, setActiveDocId] = useState<string>(() => docs[0]?.id || 'note-1');
   const [previewMode, setPreviewMode] = useState(false);
   const [copiedNotice, setCopiedNotice] = useState(false);
@@ -129,18 +126,20 @@ export const NotesApp: React.FC = () => {
   const [todos, setTodos] = useState<EnhancedTodoItem[]>(() => {
     try {
       const saved = localStorage.getItem(TODOS_STORAGE_KEY);
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) return parsed;
+      }
     } catch {
       // ignore
     }
     return [
-      { id: 't-1', text: 'Probar modo Gravedad Terrestre en el escritorio', done: false, priority: 'alta' },
-      { id: 't-2', text: 'Lanzar un widget GIF contra los íconos', done: false, priority: 'media' },
-      { id: 't-3', text: 'Dibujar en el lienzo blanco de Pintura Studio', done: false, priority: 'baja' },
+      { id: 't-1', text: 'Probar las físicas SAT OBB en modo Gravedad', done: false, priority: 'alta' },
+      { id: 't-2', text: 'Anclar un widget GIF en MediaFlow Studio', done: false, priority: 'media' },
     ];
   });
   const [todoInput, setTodoInput] = useState('');
-  const [todoPriority, setTodoPriority] = useState<EnhancedTodoItem['priority']>('media');
+  const [todoPriority, setTodoPriority] = useState<'alta' | 'media' | 'baja'>('media');
   const [todoFilter, setTodoFilter] = useState<'all' | 'pending' | 'done'>('all');
 
   useEffect(() => {
@@ -148,38 +147,40 @@ export const NotesApp: React.FC = () => {
   }, [todos]);
 
   const addTodo = () => {
-    const trimmed = todoInput.trim();
-    if (!trimmed) return;
+    if (!todoInput.trim()) return;
     setTodos((prev) => [
-      { id: `t-${Date.now()}`, text: trimmed, done: false, priority: todoPriority },
+      { id: `t-${Date.now()}`, text: todoInput.trim(), done: false, priority: todoPriority },
       ...prev,
     ]);
     setTodoInput('');
   };
 
-  const filteredTodos = todos.filter((t) => {
-    if (todoFilter === 'pending') return !t.done;
-    if (todoFilter === 'done') return t.done;
-    return true;
-  });
+  const filteredTodos = useMemo(() => {
+    if (todoFilter === 'pending') return todos.filter((t) => !t.done);
+    if (todoFilter === 'done') return todos.filter((t) => t.done);
+    return todos;
+  }, [todos, todoFilter]);
 
   const doneCount = todos.filter((t) => t.done).length;
-  const todoProgress = todos.length > 0 ? Math.round((doneCount / todos.length) * 100) : 0;
 
   // Glossary State
   const [glossary, setGlossary] = useState<GlossaryItem[]>(() => {
     try {
       const saved = localStorage.getItem(GLOSSARY_STORAGE_KEY);
-      return saved ? JSON.parse(saved) : DEFAULT_GLOSSARY;
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
     } catch {
-      return DEFAULT_GLOSSARY;
+      // ignore
     }
+    return DEFAULT_GLOSSARY;
   });
   const [glossarySearch, setGlossarySearch] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('Todas');
+  const [selectedCategory, setSelectedCategory] = useState('Todas');
   const [showAddGlossary, setShowAddGlossary] = useState(false);
   const [newTerm, setNewTerm] = useState('');
-  const [newCategory, setNewCategory] = useState('');
+  const [newCategory, setNewCategory] = useState('Física 2D');
   const [newDef, setNewDef] = useState('');
 
   useEffect(() => {
@@ -187,20 +188,19 @@ export const NotesApp: React.FC = () => {
   }, [glossary]);
 
   const categories = useMemo(() => {
-    const set = new Set<string>(['Todas']);
-    glossary.forEach((g) => set.add(g.category));
-    return Array.from(set);
+    const set = new Set(glossary.map((g) => g.category));
+    return ['Todas', ...Array.from(set)];
   }, [glossary]);
 
-  const filteredGlossary = glossary.filter((item) => {
-    const matchesCat = selectedCategory === 'Todas' || item.category === selectedCategory;
-    const q = glossarySearch.toLowerCase();
-    const matchesText =
-      item.term.toLowerCase().includes(q) ||
-      item.category.toLowerCase().includes(q) ||
-      item.definition.toLowerCase().includes(q);
-    return matchesCat && matchesText;
-  });
+  const filteredGlossary = useMemo(() => {
+    return glossary.filter((g) => {
+      const catOk = selectedCategory === 'Todas' || g.category === selectedCategory;
+      const q = glossarySearch.trim().toLowerCase();
+      const qOk =
+        !q || g.term.toLowerCase().includes(q) || g.definition.toLowerCase().includes(q);
+      return catOk && qOk;
+    });
+  }, [glossary, selectedCategory, glossarySearch]);
 
   const saveGlossaryTerm = () => {
     if (!newTerm.trim() || !newDef.trim()) return;
@@ -214,210 +214,150 @@ export const NotesApp: React.FC = () => {
       ...prev,
     ]);
     setNewTerm('');
-    setNewCategory('');
     setNewDef('');
     setShowAddGlossary(false);
   };
 
   return (
     <div className="flex-1 flex flex-col min-h-0">
-      {/* App Tabs */}
-      <div className="bg-black/45 border-b border-white/10 px-4 pt-2 flex items-center gap-2 overflow-x-auto shrink-0">
-        {[
-          { id: 'editor', label: `Editor (${docs.length})` },
-          { id: 'todo', label: `To-Do (${todos.filter((t) => !t.done).length})` },
-          { id: 'glossary', label: 'Glosario' },
-        ].map((t) => (
-          <button
-            key={t.id}
-            onClick={() => setActiveTab(t.id as typeof activeTab)}
-            className={`px-4 py-2 text-xs font-mono font-bold rounded-t-xl border-t border-x transition-colors whitespace-nowrap ${
-              activeTab === t.id
-                ? 'bg-indigo-600 text-white border-white/20'
-                : 'bg-white/5 hover:bg-white/10 text-slate-400 border-transparent'
-            }`}
-          >
-            {t.label}
-          </button>
-        ))}
+      {/* Top Tabs */}
+      <div className="px-4 pt-2.5 bg-black/45 border-b border-white/10 flex items-center justify-between gap-2 shrink-0">
+        <div className="flex items-center gap-1.5">
+          {[
+            { id: 'editor', label: 'Notas' },
+            { id: 'todo', label: `To-Do (${todos.length - doneCount})` },
+            { id: 'glossary', label: 'Glosario' },
+          ].map((t) => (
+            <button
+              key={t.id}
+              onClick={() => setActiveTab(t.id as typeof activeTab)}
+              className={`px-3.5 py-2 rounded-t-xl font-mono text-xs font-bold border-t border-x transition-colors ${
+                activeTab === t.id
+                  ? 'bg-indigo-500/25 border-indigo-400/50 text-indigo-200'
+                  : 'bg-white/5 border-transparent text-slate-400 hover:text-white'
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+        {activeTab === 'editor' && (
+          <span className="text-[11px] font-mono text-slate-400 hidden sm:inline tabular-nums">
+            {wordCount} palabras
+          </span>
+        )}
       </div>
 
       {/* EDITOR TAB */}
       {activeTab === 'editor' && activeDoc && (
-        <div className="flex-1 flex flex-col md:flex-row min-h-0">
-          {/* Note List Sidebar (horizontal strip on mobile, sidebar on tablet/desktop) */}
-          <aside className="md:w-52 bg-black/35 border-b md:border-b-0 md:border-r border-white/10 p-2.5 flex md:flex-col gap-2 overflow-x-auto md:overflow-y-auto shrink-0">
+        <div className="flex-1 flex flex-col md:flex-row min-h-0 overflow-hidden">
+          <aside className="w-full md:w-48 bg-black/35 border-b md:border-b-0 md:border-r border-white/10 p-2.5 flex md:flex-col gap-1.5 overflow-x-auto md:overflow-y-auto shrink-0">
             <button
               onClick={createNewDoc}
-              className="px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-mono text-xs font-bold whitespace-nowrap shrink-0 transition-colors"
+              className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-mono text-xs font-bold whitespace-nowrap shrink-0"
             >
               + Nueva Nota
             </button>
-            <div className="flex md:flex-col gap-1.5">
-              {docs.map((doc) => {
-                const isActive = doc.id === activeDoc.id;
-                return (
-                  <div
-                    key={doc.id}
-                    className={`group flex items-center justify-between gap-2 px-2.5 py-2 rounded-xl border transition-colors shrink-0 min-w-[140px] md:min-w-0 ${
-                      isActive
-                        ? 'bg-indigo-500/25 border-indigo-400/50 text-white'
-                        : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10'
-                    }`}
+            {docs.map((d) => (
+              <div
+                key={d.id}
+                onClick={() => setActiveDocId(d.id)}
+                className={`group px-2.5 py-2 rounded-xl border cursor-pointer flex items-center justify-between gap-2 shrink-0 transition-colors ${
+                  d.id === activeDoc.id
+                    ? 'bg-indigo-500/25 border-indigo-400/50 text-white'
+                    : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10'
+                }`}
+              >
+                <div className="min-w-0">
+                  <div className="text-xs font-mono font-semibold truncate">{d.title}</div>
+                  <div className="text-[10px] font-mono text-slate-400">{d.updatedAt}</div>
+                </div>
+                {docs.length > 1 && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deleteDoc(d.id);
+                    }}
+                    className="opacity-60 hover:opacity-100 text-[11px] font-mono text-rose-300 px-1"
                   >
-                    <button
-                      onClick={() => setActiveDocId(doc.id)}
-                      className="text-left min-w-0 flex-1"
-                    >
-                      <div className="text-xs font-mono font-semibold truncate">{doc.title}</div>
-                      <div className="text-[10px] text-slate-400">{doc.updatedAt}</div>
-                    </button>
-                    {docs.length > 1 && (
-                      <button
-                        onClick={() => deleteDoc(doc.id)}
-                        title="Eliminar nota"
-                        className="text-[11px] text-slate-400 hover:text-rose-400 px-1"
-                      >
-                        ✕
-                      </button>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+                    ✕
+                  </button>
+                )}
+              </div>
+            ))}
           </aside>
 
-          {/* Main Note Workspace */}
-          <div className="flex-1 flex flex-col p-4 gap-3 min-h-0">
-            <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex-1 flex flex-col p-3.5 gap-2.5 min-h-0">
+            <div className="flex flex-wrap items-center gap-2">
               <input
                 type="text"
                 value={activeDoc.title}
                 onChange={(e) => updateActiveDoc({ title: e.target.value })}
-                className="bg-transparent border-b border-white/20 outline-none text-sm font-mono font-bold text-indigo-300 px-1 py-1 focus:border-indigo-400 flex-1 min-w-[160px]"
+                className="flex-1 min-w-[140px] bg-white/5 border border-white/15 rounded-xl px-3 py-1.5 text-xs font-mono font-bold text-white focus:outline-none focus:border-indigo-400"
               />
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1">
                 <button
-                  onClick={() => setPreviewMode((v) => !v)}
-                  className={`px-3 py-1.5 rounded-lg font-mono text-xs border transition-colors ${
+                  onClick={() => insertSnippet('# ')}
+                  className="px-2 py-1 rounded-lg bg-white/5 hover:bg-white/15 text-[11px] font-mono text-slate-200 border border-white/10"
+                >
+                  H1
+                </button>
+                <button
+                  onClick={() => insertSnippet('**', '**')}
+                  className="px-2 py-1 rounded-lg bg-white/5 hover:bg-white/15 text-[11px] font-mono text-slate-200 border border-white/10 font-bold"
+                >
+                  B
+                </button>
+                <button
+                  onClick={() => insertSnippet('- ')}
+                  className="px-2 py-1 rounded-lg bg-white/5 hover:bg-white/15 text-[11px] font-mono text-slate-200 border border-white/10"
+                >
+                  • Lista
+                </button>
+                <button
+                  onClick={() => setPreviewMode((p) => !p)}
+                  className={`px-2.5 py-1 rounded-lg text-[11px] font-mono border ${
                     previewMode
                       ? 'bg-cyan-500/25 border-cyan-400 text-cyan-200'
-                      : 'bg-white/5 border-white/15 text-slate-300 hover:bg-white/10'
+                      : 'bg-white/5 border-white/10 text-slate-300'
                   }`}
                 >
                   {previewMode ? 'Editar' : 'Vista Previa'}
                 </button>
                 <button
                   onClick={copyNote}
-                  className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 border border-white/15 text-slate-200 font-mono text-xs transition-colors"
+                  className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/15 border border-white/10 text-[11px] font-mono text-slate-200"
                 >
-                  {copiedNotice ? 'Copiado ✓' : 'Copiar'}
+                  {copiedNotice ? 'Copiado' : 'Copiar'}
                 </button>
                 <button
                   onClick={downloadNote}
-                  className="px-3 py-1.5 rounded-lg bg-indigo-500/25 hover:bg-indigo-500/40 border border-indigo-400/35 text-indigo-200 font-mono text-xs transition-colors"
+                  className="px-2.5 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/35 border border-emerald-400/35 text-[11px] font-mono text-emerald-200"
                 >
-                  Exportar
+                  .MD
                 </button>
               </div>
             </div>
 
-            {/* Formatting Toolbar */}
-            {!previewMode && (
-              <div className="flex flex-wrap items-center gap-1 bg-white/5 p-1.5 rounded-xl border border-white/10">
-                <button
-                  onClick={() => insertSnippet('# ')}
-                  className="px-2.5 py-1 rounded-lg hover:bg-white/10 font-mono text-xs text-slate-200"
-                >
-                  H1
-                </button>
-                <button
-                  onClick={() => insertSnippet('**', '**')}
-                  className="px-2.5 py-1 rounded-lg hover:bg-white/10 font-mono text-xs font-bold text-slate-200"
-                >
-                  B
-                </button>
-                <button
-                  onClick={() => insertSnippet('*', '*')}
-                  className="px-2.5 py-1 rounded-lg hover:bg-white/10 font-mono text-xs italic text-slate-200"
-                >
-                  I
-                </button>
-                <button
-                  onClick={() => insertSnippet('- ')}
-                  className="px-2.5 py-1 rounded-lg hover:bg-white/10 font-mono text-xs text-slate-200"
-                >
-                  • Lista
-                </button>
-                <button
-                  onClick={() => insertSnippet('- [ ] ')}
-                  className="px-2.5 py-1 rounded-lg hover:bg-white/10 font-mono text-xs text-slate-200"
-                >
-                  ☐ Check
-                </button>
-                <button
-                  onClick={() => insertSnippet('`', '`')}
-                  className="px-2.5 py-1 rounded-lg hover:bg-white/10 font-mono text-xs text-slate-200"
-                >
-                  {'</>'}
-                </button>
-                <button
-                  onClick={() =>
-                    insertSnippet(`[${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}] `)
-                  }
-                  className="px-2.5 py-1 rounded-lg hover:bg-white/10 font-mono text-xs text-cyan-300 ml-auto"
-                >
-                  + Hora
-                </button>
-              </div>
-            )}
-
             {previewMode ? (
-              <div className="flex-1 overflow-y-auto bg-black/40 border border-white/10 rounded-xl p-4 space-y-2 text-sm text-slate-200 leading-relaxed">
+              <div className="flex-1 overflow-y-auto bg-black/35 border border-white/10 rounded-xl p-4 space-y-2 text-xs text-slate-200 leading-relaxed">
                 {activeDoc.content.split('\n').map((line, i) => {
                   if (line.startsWith('# ')) {
                     return (
-                      <h2 key={i} className="text-lg font-display font-bold text-indigo-300 pt-1">
-                        {line.slice(2)}
-                      </h2>
-                    );
-                  }
-                  if (line.startsWith('## ')) {
-                    return (
                       <h3 key={i} className="text-base font-display font-bold text-cyan-300 pt-1">
-                        {line.slice(3)}
+                        {line.slice(2)}
                       </h3>
-                    );
-                  }
-                  if (line.startsWith('- [ ] ')) {
-                    return (
-                      <div key={i} className="flex items-center gap-2 text-xs font-mono text-slate-300">
-                        <span>☐</span>
-                        <span>{line.slice(6)}</span>
-                      </div>
-                    );
-                  }
-                  if (line.startsWith('- [x] ')) {
-                    return (
-                      <div key={i} className="flex items-center gap-2 text-xs font-mono text-emerald-300 line-through">
-                        <span>☑</span>
-                        <span>{line.slice(6)}</span>
-                      </div>
                     );
                   }
                   if (line.startsWith('- ')) {
                     return (
-                      <div key={i} className="flex items-start gap-2 text-xs text-slate-200 pl-2">
+                      <div key={i} className="flex gap-2 pl-2">
                         <span className="text-pink-400">•</span>
                         <span>{line.slice(2)}</span>
                       </div>
                     );
                   }
-                  return (
-                    <p key={i} className="text-xs text-slate-300 min-h-[1em]">
-                      {line}
-                    </p>
-                  );
+                  return <p key={i}>{line || '\u00A0'}</p>;
                 })}
               </div>
             ) : (
@@ -425,18 +365,10 @@ export const NotesApp: React.FC = () => {
                 ref={textareaRef}
                 value={activeDoc.content}
                 onChange={(e) => updateActiveDoc({ content: e.target.value })}
-                placeholder="Escribe aquí tus notas, ideas, apuntes o borradores..."
-                className="flex-1 w-full bg-black/40 border border-white/10 rounded-xl p-4 text-xs sm:text-sm font-mono text-slate-100 focus:outline-none focus:border-indigo-500/60 resize-none leading-relaxed"
+                placeholder="Empieza a escribir tus apuntes aquí..."
+                className="flex-1 w-full bg-black/35 border border-white/15 rounded-xl p-3.5 text-xs font-mono text-slate-100 leading-relaxed resize-none focus:outline-none focus:border-indigo-400"
               />
             )}
-
-            {/* Footer Metrics */}
-            <div className="flex items-center justify-between text-[11px] font-mono text-slate-400">
-              <span>
-                {wordCount} palabras · {activeDoc.content.length} caracteres
-              </span>
-              <span>Guardado automático ({activeDoc.updatedAt})</span>
-            </div>
           </div>
         </div>
       )}
@@ -444,36 +376,20 @@ export const NotesApp: React.FC = () => {
       {/* TO-DO TAB */}
       {activeTab === 'todo' && (
         <div className="p-5 flex-1 overflow-y-auto space-y-4">
-          {/* Progress Bar */}
-          <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 space-y-2">
-            <div className="flex items-center justify-between text-xs font-mono">
-              <span className="text-slate-300">Progreso de tareas</span>
-              <span className="text-emerald-300 font-bold">
-                {doneCount}/{todos.length} ({todoProgress}%)
-              </span>
-            </div>
-            <div className="w-full h-2 rounded-full bg-black/50 overflow-hidden">
-              <div
-                className="h-full bg-gradient-to-r from-indigo-500 via-pink-500 to-cyan-400 transition-all duration-300"
-                style={{ width: `${todoProgress}%` }}
-              />
-            </div>
-          </div>
-
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <input
               type="text"
               value={todoInput}
               onChange={(e) => setTodoInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && addTodo()}
-              placeholder="Añadir nueva tarea..."
-              className="flex-1 bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-indigo-400"
+              placeholder="Nueva tarea o recordatorio..."
+              className="flex-1 bg-white/5 border border-white/15 rounded-xl px-3 py-2 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-indigo-400"
             />
-            <div className="flex items-center gap-2">
+            <div className="flex gap-2">
               <select
                 value={todoPriority}
-                onChange={(e) => setTodoPriority(e.target.value as EnhancedTodoItem['priority'])}
-                className="bg-slate-900 border border-white/15 rounded-xl px-3 py-2.5 text-xs font-mono text-slate-200"
+                onChange={(e) => setTodoPriority(e.target.value as 'alta' | 'media' | 'baja')}
+                className="bg-slate-900 border border-white/15 rounded-xl px-3 py-2 text-xs font-mono text-slate-200"
               >
                 <option value="alta">Alta</option>
                 <option value="media">Media</option>

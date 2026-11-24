@@ -112,7 +112,6 @@ export const PaintApp: React.FC<PaintAppProps> = ({ onPinToDesktop, onToast }) =
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-
     const x0 = Math.floor(startX);
     const y0 = Math.floor(startY);
     if (x0 < 0 || y0 < 0 || x0 >= canvas.width || y0 >= canvas.height) return;
@@ -121,7 +120,6 @@ export const PaintApp: React.FC<PaintAppProps> = ({ onPinToDesktop, onToast }) =
     const data = imgData.data;
     const w = canvas.width;
     const h = canvas.height;
-
     const idx0 = (y0 * w + x0) * 4;
     const targetR = data[idx0];
     const targetG = data[idx0 + 1];
@@ -152,7 +150,6 @@ export const PaintApp: React.FC<PaintAppProps> = ({ onPinToDesktop, onToast }) =
       if (visited[pIdx]) continue;
       const dIdx = pIdx * 4;
       if (!match(dIdx)) continue;
-
       visited[pIdx] = 1;
       data[dIdx] = fillR;
       data[dIdx + 1] = fillG;
@@ -174,7 +171,6 @@ export const PaintApp: React.FC<PaintAppProps> = ({ onPinToDesktop, onToast }) =
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-
     const pos = getCoords(e);
 
     if (tool === 'picker') {
@@ -216,7 +212,6 @@ export const PaintApp: React.FC<PaintAppProps> = ({ onPinToDesktop, onToast }) =
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-
     const pos = getCoords(e);
 
     if (tool === 'brush' || tool === 'marker' || tool === 'eraser') {
@@ -254,7 +249,6 @@ export const PaintApp: React.FC<PaintAppProps> = ({ onPinToDesktop, onToast }) =
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
       const { x: sx, y: sy } = startPosRef.current;
-
       ctx.beginPath();
       if (tool === 'line') {
         ctx.moveTo(sx, sy);
@@ -283,124 +277,109 @@ export const PaintApp: React.FC<PaintAppProps> = ({ onPinToDesktop, onToast }) =
 
   const handleUndo = () => {
     const canvas = canvasRef.current;
-    if (!canvas || historyRef.current.length <= 1) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const popped = historyRef.current.pop();
-    if (popped) redoRef.current.push(popped);
-    const prev = historyRef.current[historyRef.current.length - 1];
-    if (prev) ctx.putImageData(prev, 0, 0);
+    const ctx = canvas?.getContext('2d');
+    if (!canvas || !ctx || historyRef.current.length <= 1) return;
+    const popped = historyRef.current.pop()!;
+    redoRef.current.push(popped);
+    ctx.putImageData(historyRef.current[historyRef.current.length - 1], 0, 0);
   };
 
   const handleRedo = () => {
     const canvas = canvasRef.current;
-    if (!canvas || redoRef.current.length === 0) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const next = redoRef.current.pop();
-    if (next) {
-      historyRef.current.push(next);
-      ctx.putImageData(next, 0, 0);
-    }
+    const ctx = canvas?.getContext('2d');
+    if (!canvas || !ctx || redoRef.current.length === 0) return;
+    const next = redoRef.current.pop()!;
+    historyRef.current.push(next);
+    ctx.putImageData(next, 0, 0);
   };
 
   const handleClear = (targetBg = bgColor) => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    const ctx = canvas?.getContext('2d');
+    if (!canvas || !ctx) return;
     ctx.fillStyle = targetBg;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     pushHistory(ctx, canvas);
   };
 
-  const toggleBackground = () => {
-    const next = bgColor === '#FFFFFF' ? '#0F172A' : '#FFFFFF';
-    setBgColor(next);
-    if (next === '#0F172A' && color === '#0F172A') setColor('#00F0FF');
-    if (next === '#FFFFFF' && color === '#FFFFFF') setColor('#0F172A');
-    handleClear(next);
-    onToast(next === '#FFFFFF' ? 'Lienzo blanco activado' : 'Lienzo oscuro activado');
-  };
-
   const handleDownload = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const link = document.createElement('a');
-    link.download = `astro_paint_${Date.now()}.png`;
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-    onToast('Dibujo exportado como PNG');
+    const a = document.createElement('a');
+    a.download = `astro_paint_${Date.now()}.png`;
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+    onToast('Imagen PNG descargada');
   };
 
-  const tools: Array<{ id: PaintTool; label: string; icon: string }> = [
-    { id: 'brush', label: 'Pincel', icon: '🖌️' },
-    { id: 'marker', label: 'Marcador', icon: '🖍️' },
-    { id: 'line', label: 'Línea', icon: '╱' },
-    { id: 'rect', label: 'Rect', icon: '▭' },
-    { id: 'circle', label: 'Círculo', icon: '◯' },
-    { id: 'fill', label: 'Relleno', icon: '🪣' },
-    { id: 'picker', label: 'Gotero', icon: '💧' },
-    { id: 'eraser', label: 'Borrador', icon: '⌫' },
+  const toolsList: Array<{ id: PaintTool; label: string }> = [
+    { id: 'brush', label: 'Pincel' },
+    { id: 'marker', label: 'Marcador' },
+    { id: 'line', label: 'Línea' },
+    { id: 'rect', label: 'Rect' },
+    { id: 'circle', label: 'Círculo' },
+    { id: 'fill', label: 'Relleno' },
+    { id: 'picker', label: 'Gotero' },
+    { id: 'eraser', label: 'Borrador' },
   ];
 
   return (
     <div className="flex-1 flex flex-col min-h-0">
-      {/* Top Toolbar */}
-      <div className="p-2.5 bg-slate-950/70 border-b border-white/10 space-y-2 shrink-0">
-        <div className="flex flex-wrap items-center gap-1.5">
-          <div className="flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/10 overflow-x-auto max-w-full">
-            {tools.map((t) => (
+      <div className="p-2.5 bg-black/50 border-b border-white/10 space-y-2 shrink-0">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex flex-wrap items-center gap-1">
+            {toolsList.map((t) => (
               <button
                 key={t.id}
                 onClick={() => setTool(t.id)}
-                title={t.label}
-                className={`px-2.5 py-1.5 rounded-lg text-xs font-mono flex items-center gap-1 whitespace-nowrap transition-colors ${
+                className={`px-2.5 py-1 rounded-lg font-mono text-[11px] border transition-colors ${
                   tool === t.id
-                    ? 'bg-yellow-400 text-slate-950 font-bold shadow'
-                    : 'text-slate-300 hover:bg-white/10'
+                    ? 'bg-amber-400/25 border-amber-400 text-amber-200 font-bold'
+                    : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/15'
                 }`}
               >
-                <span>{t.icon}</span>
-                <span className="hidden sm:inline">{t.label}</span>
+                {t.label}
               </button>
             ))}
           </div>
 
-          <div className="flex items-center gap-1.5 ml-auto">
+          <div className="flex items-center gap-1.5">
             <button
               onClick={handleUndo}
+              className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-mono text-slate-200"
               title="Deshacer"
-              className="px-2.5 py-1.5 bg-white/10 hover:bg-white/20 text-slate-200 font-mono text-xs rounded-lg transition-colors"
             >
               ↶
             </button>
             <button
               onClick={handleRedo}
+              className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-mono text-slate-200"
               title="Rehacer"
-              className="px-2.5 py-1.5 bg-white/10 hover:bg-white/20 text-slate-200 font-mono text-xs rounded-lg transition-colors"
             >
               ↷
             </button>
             <button
-              onClick={toggleBackground}
-              title="Alternar fondo blanco / oscuro"
-              className="px-2.5 py-1.5 bg-white/10 hover:bg-white/20 text-slate-200 font-mono text-xs rounded-lg transition-colors whitespace-nowrap"
+              onClick={() => {
+                const nextBg = bgColor === '#FFFFFF' ? '#0F172A' : '#FFFFFF';
+                setBgColor(nextBg);
+                setColor(nextBg === '#FFFFFF' ? '#0F172A' : '#FFFFFF');
+                handleClear(nextBg);
+              }}
+              className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-[11px] font-mono text-cyan-200"
             >
-              {bgColor === '#FFFFFF' ? '☀️ Blanco' : '🌙 Oscuro'}
+              Fondo: {bgColor === '#FFFFFF' ? 'Claro' : 'Oscuro'}
             </button>
             <button
-              onClick={() => handleClear(bgColor)}
-              className="px-2.5 py-1.5 bg-rose-500/20 hover:bg-rose-500/35 text-rose-200 border border-rose-500/30 font-mono text-xs rounded-lg transition-colors"
+              onClick={() => handleClear()}
+              className="px-2.5 py-1 rounded-lg bg-rose-500/20 hover:bg-rose-500/35 border border-rose-500/35 text-[11px] font-mono text-rose-200"
             >
               Limpiar
             </button>
           </div>
         </div>
 
-        {/* Colors, Brush Size, Opacity & Export */}
-        <div className="flex flex-wrap items-center gap-2.5">
-          <div className="flex items-center gap-1.5 bg-white/5 px-2.5 py-1.5 rounded-xl border border-white/10">
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-1.5">
             {SWATCHES.map((s) => (
               <button
                 key={s}
@@ -477,7 +456,6 @@ export const PaintApp: React.FC<PaintAppProps> = ({ onPinToDesktop, onToast }) =
         </div>
       </div>
 
-      {/* Canvas Stage */}
       <div
         ref={containerRef}
         className="flex-1 bg-slate-900/70 p-2 flex items-center justify-center min-h-0 overflow-hidden"

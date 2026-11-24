@@ -1,42 +1,29 @@
 import React, { useState } from 'react';
 
 const FEATURED_VIDEOS = [
-  { id: 'jfKfPfyJRdk', title: 'lofi hip hop radio 📚 - beats to relax/study to', channel: 'Lofi Girl', tag: 'Lofi' },
-  { id: '4xDzrJKXOOY', title: 'synthwave radio 🌌 - chill synth / retro beats', channel: 'Lofi Girl', tag: 'Synth' },
-  { id: '5qap5aO4i9A', title: 'lofi hip hop radio 💤 - beats to sleep/chill to', channel: 'Lofi Girl', tag: 'Chill' },
-  { id: 'TURbeWK2wwg', title: 'Space Ambient Music • Interstellar Journey (60 FPS)', channel: 'Cosmic Sounds', tag: 'Space' },
-  { id: 'kJQP7kiw5Fk', title: 'Luis Fonsi - Despacito ft. Daddy Yankee', channel: 'Luis Fonsi', tag: 'Music' },
-  { id: 'fJ9rUzIMcZQ', title: 'Queen – Bohemian Rhapsody (Official Video)', channel: 'Queen Official', tag: 'Classic' },
-  { id: 'dQw4w9WgXcQ', title: 'Rick Astley - Never Gonna Give You Up (Official Music Video)', channel: 'Rick Astley', tag: 'Meme' },
+  { id: '4xDzrJKXOOY', title: 'synthwave radio - chill synth / retro beats', channel: 'Lofi Girl', tag: 'Synth' },
+  { id: 'jfKfPfyJRdk', title: 'lofi hip hop radio - beats to relax/study to', channel: 'Lofi Girl', tag: 'Lofi' },
+  { id: '5qap5aO4i9A', title: 'lofi hip hop radio - beats to study/relax to', channel: 'ChilledCow', tag: 'Lofi' },
+  { id: 'DWcJFNfaw9c', title: 'Space Ambient Music LIVE 24/7', channel: 'Space Ambient', tag: 'Space' },
   { id: '36YnV9STBqc', title: 'Aesthetic Lofi Chill Beats for Coding / Studying', channel: 'Chillhop', tag: 'Coding' },
+  { id: 'fJ9rUzIMcZQ', title: 'Queen - Bohemian Rhapsody (Official Video)', channel: 'Queen Official', tag: 'Music' },
 ];
 
 export const YouTubeApp: React.FC = () => {
   const [currentVideoId, setCurrentVideoId] = useState('4xDzrJKXOOY');
   const [searchInput, setSearchInput] = useState('');
-  const [searchMode, setSearchMode] = useState<'embed' | 'list'>('embed');
   const [filterTag, setFilterTag] = useState<string>('All');
 
   const extractVideoId = (str: string): string | null => {
     const trimmed = str.trim();
     if (!trimmed) return null;
-
-    // Handle youtu.be/<id>
     const beMatch = trimmed.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/);
     if (beMatch && beMatch[1]) return beMatch[1];
-
-    // Handle youtube.com/watch?v=<id> or embed/<id>
     const ytMatch = trimmed.match(/[?&]v=([a-zA-Z0-9_-]{11})/);
     if (ytMatch && ytMatch[1]) return ytMatch[1];
-
     const embedMatch = trimmed.match(/\/embed\/([a-zA-Z0-9_-]{11})/);
     if (embedMatch && embedMatch[1]) return embedMatch[1];
-
-    // Direct 11-char ID
-    if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) {
-      return trimmed;
-    }
-
+    if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) return trimmed;
     return null;
   };
 
@@ -44,16 +31,11 @@ export const YouTubeApp: React.FC = () => {
     e.preventDefault();
     const query = searchInput.trim();
     if (!query) return;
-
-    // 1. Direct URL or Video ID
     const extractedId = extractVideoId(query);
     if (extractedId) {
       setCurrentVideoId(extractedId);
-      setSearchMode('embed');
       return;
     }
-
-    // 2. Keyword match against featured list
     const found = FEATURED_VIDEOS.find(
       (v) =>
         v.title.toLowerCase().includes(query.toLowerCase()) ||
@@ -62,13 +44,7 @@ export const YouTubeApp: React.FC = () => {
     );
     if (found) {
       setCurrentVideoId(found.id);
-      setSearchMode('embed');
-      return;
     }
-
-    // 3. Fallback: switch to search query mode inside embed player
-    // If not direct ID, YouTube allows embed video search or we load first matched
-    setSearchMode('embed');
   };
 
   const filteredVideos = FEATURED_VIDEOS.filter((v) => {
@@ -82,7 +58,6 @@ export const YouTubeApp: React.FC = () => {
 
   return (
     <div className="flex-1 flex flex-col h-full bg-[#080812] text-white overflow-hidden">
-      {/* Top Search & Nav */}
       <div className="p-3 bg-black/50 border-b border-white/10 flex items-center justify-between gap-3 shrink-0">
         <form onSubmit={handleSearchSubmit} className="flex-1 flex items-center gap-2">
           <div className="relative flex-1">
@@ -98,7 +73,7 @@ export const YouTubeApp: React.FC = () => {
               type="text"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              placeholder="Paste YouTube link, video ID, or search song title..."
+              placeholder="Paste YouTube link, video ID, or filter playlist..."
               className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-white/5 border border-white/15 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-red-500/60"
             />
           </div>
@@ -128,9 +103,7 @@ export const YouTubeApp: React.FC = () => {
         </a>
       </div>
 
-      {/* Main Container */}
       <div className="flex-1 min-h-0 flex flex-col md:flex-row overflow-hidden">
-        {/* Main Video Screen */}
         <div className="flex-1 bg-black flex flex-col items-center justify-center min-h-[240px] relative">
           <iframe
             key={currentVideoId}
@@ -142,9 +115,7 @@ export const YouTubeApp: React.FC = () => {
           />
         </div>
 
-        {/* Video Explorer Sidebar */}
         <div className="w-full md:w-72 bg-black/60 border-t md:border-t-0 md:border-l border-white/10 flex flex-col shrink-0">
-          {/* Tag Filter Pills */}
           <div className="p-2 border-b border-white/10 flex items-center gap-1 overflow-x-auto shrink-0">
             {tags.map((t) => (
               <button
@@ -161,7 +132,6 @@ export const YouTubeApp: React.FC = () => {
             ))}
           </div>
 
-          {/* Video List */}
           <div className="flex-1 overflow-y-auto p-2 space-y-1.5">
             {filteredVideos.map((v) => (
               <button
@@ -177,6 +147,7 @@ export const YouTubeApp: React.FC = () => {
                   <img
                     src={`https://img.youtube.com/vi/${v.id}/mqdefault.jpg`}
                     alt={v.title}
+                    referrerPolicy="no-referrer"
                     className="w-full h-full object-cover"
                   />
                   {currentVideoId === v.id && (

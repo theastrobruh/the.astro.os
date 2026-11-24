@@ -4,8 +4,6 @@ import { globalMusic } from '../../engine/music';
 
 export const MusicApp: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-
-  // Safe React state tracking global music store
   const [, setTick] = useState(0);
 
   useEffect(() => {
@@ -20,7 +18,6 @@ export const MusicApp: React.FC = () => {
   const currentTitle = globalMusic.getCurrentTitle();
   const currentSub = globalMusic.getCurrentSub();
 
-  // Visualizer loop
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -77,7 +74,6 @@ export const MusicApp: React.FC = () => {
 
   return (
     <div className="p-4 flex-1 flex flex-col justify-between overflow-y-auto space-y-3">
-      {/* Now Playing Header & Compact Visualizer */}
       <div className="p-3 rounded-2xl bg-black/45 border border-white/15 space-y-2.5">
         <div className="flex items-center gap-3">
           <img
@@ -118,7 +114,6 @@ export const MusicApp: React.FC = () => {
         <canvas ref={canvasRef} width={480} height={44} className="w-full h-11 rounded-xl bg-slate-950/70" />
       </div>
 
-      {/* Controls Bar */}
       <div className="bg-black/45 p-3 rounded-2xl border border-white/10 space-y-2">
         <div className="flex items-center gap-2 text-[11px] font-mono text-slate-400">
           <span className="w-9">{formatTime(currentTime)}</span>
@@ -189,7 +184,6 @@ export const MusicApp: React.FC = () => {
         </div>
       </div>
 
-      {/* Radio Presets Grid */}
       <div className="space-y-1.5">
         <h4 className="text-[11px] font-mono font-bold text-slate-400">Live Cosmic Stations</h4>
         <div className="grid grid-cols-2 gap-1.5">

@@ -11,8 +11,8 @@ interface MediaWidgetItemViewProps {
   onSelect: (id: string) => void;
   onContextMenu: (id: string, clientX: number, clientY: number) => void;
   onResize: (id: string, width: number, height: number) => void;
-  onDragStartBody: (id: string) => void;
-  onDragMoveBody: (id: string, x: number, y: number, vx: number) => void;
+  onDragStartBody: (id: string, grabOffsetX: number, grabOffsetY: number) => void;
+  onDragMoveBody: (id: string, x: number, y: number, instVx: number, instVy: number) => void;
   onDragEndBody: (id: string, vx: number, vy: number) => void;
 }
 
@@ -31,11 +31,15 @@ export const MediaWidgetItemView: React.FC<MediaWidgetItemViewProps> = ({
   const trackerRef = useRef(new PointerVelocityTracker());
   const dragRef = useRef({
     active: false,
+    moved: false,
+    pointerId: -1,
     startClientX: 0,
     startClientY: 0,
     startBodyX: 0,
     startBodyY: 0,
     lastClientX: 0,
+    lastClientY: 0,
+    lastTime: 0,
   });
 
   if (!widget.visible) return null;
@@ -43,43 +47,74 @@ export const MediaWidgetItemView: React.FC<MediaWidgetItemViewProps> = ({
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (e.button === 2) return;
     if ((e.target as HTMLElement).dataset.resizeHandle === 'true') return;
-
-    e.preventDefault();
     e.stopPropagation();
     onSelect(widget.id);
-    e.currentTarget.setPointerCapture(e.pointerId);
 
     const body = getBody(widget.id);
     const sx = body ? body.x : widget.x;
     const sy = body ? body.y : widget.y;
 
+    const rect = e.currentTarget.getBoundingClientRect();
+    const grabOffsetX = e.clientX - (rect.left + rect.width * 0.5);
+    const grabOffsetY = e.clientY - (rect.top + rect.height * 0.5);
+
     dragRef.current = {
       active: true,
+      moved: false,
+      pointerId: e.pointerId,
       startClientX: e.clientX,
       startClientY: e.clientY,
       startBodyX: sx,
       startBodyY: sy,
       lastClientX: e.clientX,
+      lastClientY: e.clientY,
+      lastTime: performance.now(),
     };
     trackerRef.current.reset(e.clientX, e.clientY);
-    onDragStartBody(widget.id);
+    onDragStartBody(widget.id, grabOffsetX, grabOffsetY);
   };
 
   const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!dragRef.current.active) return;
+    if (!dragRef.current.active || e.pointerId !== dragRef.current.pointerId) return;
+    const now = performance.now();
+    const dt = Math.max(0.004, (now - dragRef.current.lastTime) / 1000);
     const dx = e.clientX - dragRef.current.startClientX;
     const dy = e.clientY - dragRef.current.startClientY;
-    const instVx = (e.clientX - dragRef.current.lastClientX) * 60;
+
+    if (!dragRef.current.moved && Math.hypot(dx, dy) > 4) {
+      dragRef.current.moved = true;
+      try {
+        e.currentTarget.setPointerCapture(e.pointerId);
+      } catch {
+        // ignore
+      }
+    }
+
+    const instVx = (e.clientX - dragRef.current.lastClientX) / dt;
+    const instVy = (e.clientY - dragRef.current.lastClientY) / dt;
+
     dragRef.current.lastClientX = e.clientX;
+    dragRef.current.lastClientY = e.clientY;
+    dragRef.current.lastTime = now;
     trackerRef.current.push(e.clientX, e.clientY);
-    onDragMoveBody(widget.id, dragRef.current.startBodyX + dx, dragRef.current.startBodyY + dy, instVx);
+
+    onDragMoveBody(
+      widget.id,
+      dragRef.current.startBodyX + dx,
+      dragRef.current.startBodyY + dy,
+      instVx,
+      instVy
+    );
   };
 
   const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!dragRef.current.active) return;
+    if (!dragRef.current.active || e.pointerId !== dragRef.current.pointerId) return;
     dragRef.current.active = false;
+    dragRef.current.pointerId = -1;
     try {
-      e.currentTarget.releasePointerCapture(e.pointerId);
+      if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+        e.currentTarget.releasePointerCapture(e.pointerId);
+      }
     } catch {
       // ignore
     }
@@ -99,7 +134,7 @@ export const MediaWidgetItemView: React.FC<MediaWidgetItemViewProps> = ({
     const aspect = startW / Math.max(1, startH);
 
     const onMove = (ev: PointerEvent) => {
-      let nextW = Math.max(84, Math.min(460, startW + (ev.clientX - startX)));
+      const nextW = Math.max(84, Math.min(460, startW + (ev.clientX - startX)));
       let nextH = Math.max(84, Math.min(460, startH + (ev.clientY - startY)));
       if (ev.shiftKey) {
         nextH = Math.round(nextW / aspect);
@@ -152,15 +187,16 @@ export const MediaWidgetItemView: React.FC<MediaWidgetItemViewProps> = ({
           label={widget.label}
           fallbackScene={widget.fallbackScene}
         />
-        <div className="absolute bottom-1.5 left-2 right-2 flex items-center justify-between gap-1">
-          <span className="text-[10px] font-mono text-cyan-200 bg-black/70 px-1.5 py-0.5 rounded truncate">
+        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.04] to-white/[0.12] opacity-60 pointer-events-none" />
+        {(widget.isGif || widget.url.toLowerCase().includes('.gif')) && (
+          <span className="absolute top-1.5 right-1.5 text-[8px] sm:text-[9px] font-mono font-bold text-pink-300 bg-black/80 px-1.5 py-0.5 rounded shrink-0">
+            GIF
+          </span>
+        )}
+        <div className="absolute bottom-1 left-1.5 right-1.5 flex items-center justify-center sm:justify-start">
+          <span className="text-[9px] sm:text-[10px] font-mono text-cyan-200 bg-black/75 px-1.5 py-0.5 rounded whitespace-nowrap leading-tight">
             {widget.label}
           </span>
-          {(widget.isGif || widget.url.toLowerCase().includes('.gif')) && (
-            <span className="text-[9px] font-mono font-bold text-pink-300 bg-black/75 px-1.5 py-0.5 rounded shrink-0">
-              GIF
-            </span>
-          )}
         </div>
       </div>
 

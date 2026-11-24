@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { PhysicsBody, WindowId, WindowRuntimeState } from '../types/os';
 import { PointerVelocityTracker } from '../engine/physics';
 import { astroSound } from '../engine/sound';
@@ -6,6 +6,7 @@ import { astroSound } from '../engine/sound';
 interface WindowFrameProps {
   win: WindowRuntimeState;
   title: string;
+  mobileTitle?: string;
   accentColor: string;
   isActive: boolean;
   isMobile: boolean;
@@ -18,8 +19,8 @@ interface WindowFrameProps {
   onToggleMaximize: (id: WindowId) => void;
   onClose: (id: WindowId) => void;
   onResize: (id: WindowId, width: number, height: number) => void;
-  onDragStartBody: (id: string) => void;
-  onDragMoveBody: (id: string, x: number, y: number, vx: number) => void;
+  onDragStartBody: (id: string, grabOffsetX: number, grabOffsetY: number) => void;
+  onDragMoveBody: (id: string, x: number, y: number, instVx: number, instVy: number) => void;
   onDragEndBody: (id: string, vx: number, vy: number) => void;
   children: React.ReactNode;
 }
@@ -27,6 +28,7 @@ interface WindowFrameProps {
 export const WindowFrame: React.FC<WindowFrameProps> = ({
   win,
   title,
+  mobileTitle,
   accentColor,
   isActive,
   isMobile,
@@ -46,7 +48,6 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
 }) => {
   const [isClosing, setIsClosing] = useState(false);
   const closingTimeoutRef = useRef<number | null>(null);
-
   const trackerRef = useRef(new PointerVelocityTracker());
   const dragStateRef = useRef({
     active: false,
@@ -55,10 +56,11 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
     startWinX: 0,
     startWinY: 0,
     lastClientX: 0,
+    lastClientY: 0,
+    lastTime: 0,
   });
 
   useEffect(() => {
-    // When window is reopened or re-mounted, clear closing state
     if (win.isOpen) {
       setIsClosing(false);
     }
@@ -89,10 +91,11 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
 
     e.preventDefault();
     e.currentTarget.setPointerCapture(e.pointerId);
-
     const body = getBody(win.id);
     const startX = body ? body.x : win.x;
     const startY = body ? body.y : win.y;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const grabOffsetX = e.clientX - (rect.left + rect.width * 0.5);
 
     dragStateRef.current = {
       active: true,
@@ -101,22 +104,30 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
       startWinX: startX,
       startWinY: startY,
       lastClientX: e.clientX,
+      lastClientY: e.clientY,
+      lastTime: performance.now(),
     };
     trackerRef.current.reset(e.clientX, e.clientY);
-    onDragStartBody(win.id);
+    onDragStartBody(win.id, grabOffsetX, -win.height * 0.45);
   };
 
   const handleTitlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!dragStateRef.current.active) return;
+    const now = performance.now();
+    const dt = Math.max(0.004, (now - dragStateRef.current.lastTime) / 1000);
     const dx = e.clientX - dragStateRef.current.startClientX;
     const dy = e.clientY - dragStateRef.current.startClientY;
-    const instVx = (e.clientX - dragStateRef.current.lastClientX) * 60;
+    const instVx = (e.clientX - dragStateRef.current.lastClientX) / dt;
+    const instVy = (e.clientY - dragStateRef.current.lastClientY) / dt;
+
     dragStateRef.current.lastClientX = e.clientX;
+    dragStateRef.current.lastClientY = e.clientY;
+    dragStateRef.current.lastTime = now;
     trackerRef.current.push(e.clientX, e.clientY);
 
     const nextX = dragStateRef.current.startWinX + dx;
     const nextY = Math.max(4, dragStateRef.current.startWinY + dy);
-    onDragMoveBody(win.id, nextX, nextY, instVx);
+    onDragMoveBody(win.id, nextX, nextY, instVx, instVy);
   };
 
   const handleTitlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -136,6 +147,7 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
     e.preventDefault();
     e.stopPropagation();
     onFocus(win.id);
+
     const startX = e.clientX;
     const startY = e.clientY;
     const startW = win.width;
@@ -146,15 +158,16 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
       const nextH = Math.max(260, Math.min(window.innerHeight - 72, startH + (ev.clientY - startY)));
       onResize(win.id, nextW, nextH);
     };
+
     const onUp = () => {
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerup', onUp);
     };
+
     window.addEventListener('pointermove', onMove);
     window.addEventListener('pointerup', onUp);
   };
 
-  // Custom mobile sizing: allow compact windows like Astro.Verse to take only needed space instead of full screen
   const isAstroVerse = win.id === 'win-astroverse';
 
   const style: React.CSSProperties = isMobile
@@ -231,14 +244,17 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
             className="w-2.5 h-2.5 rounded-full shrink-0"
             style={{ backgroundColor: accentColor, boxShadow: `0 0 8px ${accentColor}` }}
           />
-          <span className="font-mono text-xs font-bold tracking-wide text-slate-100 truncate">
-            {title}
+          <span className="font-mono text-xs font-bold tracking-wide text-slate-100 whitespace-nowrap">
+            {isMobile && mobileTitle ? mobileTitle : title}
           </span>
         </div>
 
         <div className="flex items-center gap-1.5 shrink-0">
           <button
-            onClick={() => {
+            type="button"
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
               astroSound.playWindowPop(false);
               onMinimize(win.id);
             }}
@@ -251,7 +267,10 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
           </button>
           {resizable && !isMobile && (
             <button
-              onClick={() => {
+              type="button"
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation();
                 astroSound.playKeyTap(600);
                 onToggleMaximize(win.id);
               }}
@@ -262,7 +281,12 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
             </button>
           )}
           <button
-            onClick={handleClose}
+            type="button"
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleClose();
+            }}
             title="Close"
             className="w-7 h-7 rounded-lg bg-rose-500/35 hover:bg-rose-500/75 text-rose-100 flex items-center justify-center text-xs font-bold transition-colors"
           >

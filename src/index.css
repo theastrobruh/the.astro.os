@@ -73,8 +73,8 @@
   background: linear-gradient(
     180deg,
     rgba(255, 255, 255, 0.08) 0%,
-    rgba(10, 14, 34, 0.32) 30%,
-    rgba(6, 8, 22, 0.44) 100%
+    rgba(10, 14, 34, 0.36) 30%,
+    rgba(6, 8, 22, 0.5) 100%
   );
   backdrop-filter: blur(22px) saturate(165%);
   -webkit-backdrop-filter: blur(22px) saturate(165%);
@@ -172,62 +172,31 @@
 
 /* Fluid Lava Lamp Organic Movement */
 @keyframes lavaBlob1 {
-  0%, 100% {
-    transform: translate(0px, 0px) scale(1);
-  }
-  33% {
-    transform: translate(45px, -65px) scale(1.18);
-  }
-  66% {
-    transform: translate(-35px, 40px) scale(0.88);
-  }
+  0%, 100% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(45px, -65px) scale(1.18); }
+  66% { transform: translate(-35px, 40px) scale(0.88); }
 }
 
 @keyframes lavaBlob2 {
-  0%, 100% {
-    transform: translate(0px, 0px) scale(1);
-  }
-  33% {
-    transform: translate(-50px, 60px) scale(1.12);
-  }
-  66% {
-    transform: translate(40px, -45px) scale(0.92);
-  }
+  0%, 100% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(-50px, 60px) scale(1.12); }
+  66% { transform: translate(40px, -45px) scale(0.92); }
 }
 
 @keyframes lavaBlob3 {
-  0%, 100% {
-    transform: translate(0px, 0px) scale(1);
-  }
-  50% {
-    transform: translate(60px, 50px) scale(1.25);
-  }
+  0%, 100% { transform: translate(0px, 0px) scale(1); }
+  50% { transform: translate(60px, 50px) scale(1.25); }
 }
 
 @keyframes lavaBlob4 {
-  0%, 100% {
-    transform: translate(0px, 0px) scale(0.9);
-  }
-  50% {
-    transform: translate(-60px, -40px) scale(1.15);
-  }
+  0%, 100% { transform: translate(0px, 0px) scale(0.9); }
+  50% { transform: translate(-60px, -40px) scale(1.15); }
 }
 
-.animate-lava-1 {
-  animation: lavaBlob1 18s ease-in-out infinite;
-}
-
-.animate-lava-2 {
-  animation: lavaBlob2 22s ease-in-out infinite;
-}
-
-.animate-lava-3 {
-  animation: lavaBlob3 25s ease-in-out infinite;
-}
-
-.animate-lava-4 {
-  animation: lavaBlob4 20s ease-in-out infinite;
-}
+.animate-lava-1 { animation: lavaBlob1 18s ease-in-out infinite; }
+.animate-lava-2 { animation: lavaBlob2 22s ease-in-out infinite; }
+.animate-lava-3 { animation: lavaBlob3 25s ease-in-out infinite; }
+.animate-lava-4 { animation: lavaBlob4 20s ease-in-out infinite; }
 
 ::-webkit-scrollbar {
   width: 6px;

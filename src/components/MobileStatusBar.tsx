@@ -1,37 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import { AVAILABLE_TIMEZONES } from '../constants/defaults';
 import { PhysicsMode, WindowId } from '../types/os';
 
 interface MobileStatusBarProps {
   osTitle: string;
-  primaryTimezone: string;
   physicsMode: PhysicsMode;
   soundEnabled: boolean;
-  onToggleSound: () => void;
-  onOpenTimezoneModal: () => void;
+  onChangePhysicsMode: (mode: PhysicsMode) => void;
   onRearrangeIcons: () => void;
   onOpenWindow: (id: WindowId) => void;
-  onChangePhysicsMode: (mode: PhysicsMode) => void;
+  onToggleSound: () => void;
 }
-
-const COUNTRY_CODE_MAP: Record<string, string> = {
-  'America/Lima': 'PE',
-  'America/Bogota': 'CO',
-  'Europe/Madrid': 'ES',
-  'Asia/Tokyo': 'JP',
-  'America/New_York': 'US',
-  'America/Buenos_Aires': 'AR',
-  'America/Mexico_City': 'MX',
-  'America/Santiago': 'CL',
-  'Europe/London': 'GB',
-  'Asia/Seoul': 'KR',
-};
 
 const MODE_LABEL: Record<PhysicsMode, string> = {
   tactile: 'Tactile',
   earth: 'Gravity',
   'zero-g': 'Zero-G',
-  static: 'Fixed',
+  static: 'Static',
 };
 
 function renderPhysicsSvg(mode: PhysicsMode) {
@@ -66,101 +50,71 @@ function renderPhysicsSvg(mode: PhysicsMode) {
 }
 
 export const MobileStatusBar: React.FC<MobileStatusBarProps> = ({
-  osTitle,
-  primaryTimezone,
   physicsMode,
   soundEnabled,
-  onToggleSound,
-  onOpenTimezoneModal,
+  onChangePhysicsMode,
   onRearrangeIcons,
   onOpenWindow,
-  onChangePhysicsMode,
+  onToggleSound,
 }) => {
-  const [now, setNow] = useState(() => new Date());
-  const [physicsPopoverOpen, setPhysicsPopoverOpen] = useState(false);
+  const [timeStr, setTimeStr] = useState(() =>
+    new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  );
+  const [physicsMenuOpen, setPhysicsMenuOpen] = useState(false);
+  const headerRef = React.useRef<HTMLElement | null>(null);
 
   useEffect(() => {
-    const id = setInterval(() => setNow(new Date()), 1000);
+    const id = setInterval(() => {
+      setTimeStr(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+    }, 1000);
     return () => clearInterval(id);
   }, []);
 
-  const tz = AVAILABLE_TIMEZONES.find((t) => t.id === primaryTimezone) || AVAILABLE_TIMEZONES[0];
-  const countryCode = COUNTRY_CODE_MAP[tz.id] || tz.id.split('/')[1]?.slice(0, 2).toUpperCase() || 'GL';
-
-  let timeStr = '--:--';
-  try {
-    timeStr = now.toLocaleTimeString('en-US', {
-      timeZone: tz.id,
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    });
-  } catch {
-    timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  }
-
-  const cyclePhysics = () => {
-    const modes: PhysicsMode[] = ['tactile', 'earth', 'zero-g', 'static'];
-    const nextIdx = (modes.indexOf(physicsMode) + 1) % modes.length;
-    onChangePhysicsMode(modes[nextIdx]);
-  };
+  useEffect(() => {
+    if (!physicsMenuOpen) return;
+    const onOut = (e: PointerEvent) => {
+      if (headerRef.current && !headerRef.current.contains(e.target as Node)) {
+        setPhysicsMenuOpen(false);
+      }
+    };
+    window.addEventListener('pointerdown', onOut);
+    return () => window.removeEventListener('pointerdown', onOut);
+  }, [physicsMenuOpen]);
 
   return (
-    <header className="w-full h-9 px-2 bg-slate-950/90 backdrop-blur-md border-b border-white/10 flex items-center justify-between z-40 shrink-0 text-xs font-mono select-none relative">
-      {/* Left: OS Title & Clocks */}
-      <div className="flex items-center gap-1.5 min-w-0">
-        <button
-          onClick={onOpenTimezoneModal}
-          className="flex items-center gap-1 px-1.5 py-0.5 rounded-lg bg-white/5 border border-white/10 hover:border-cyan-400/40 text-[11px] text-cyan-300 hover:text-cyan-200 transition-colors"
-          title="World Clocks"
-        >
-          <span className="px-1 py-0.2 rounded bg-cyan-500/20 text-[9px] font-bold text-cyan-300 tracking-wider">
-            {countryCode}
-          </span>
-          <span className="font-semibold tabular-nums text-[10.5px]">{timeStr}</span>
-        </button>
-
-        <span className="font-bold text-slate-300 tracking-tight text-[10.5px] hidden xs:inline truncate max-w-[80px]">
-          {osTitle}
-        </span>
+    <header
+      ref={headerRef}
+      onClick={(e) => e.stopPropagation()}
+      className="w-full h-9 px-3 bg-black/50 backdrop-blur-xl border-b border-white/10 grid grid-cols-[1fr_auto_1fr] items-center text-[11px] font-mono text-white z-40 shrink-0 relative"
+    >
+      <div className="flex items-center gap-2 min-w-0 justify-self-start">
+        <span className="font-bold tracking-wide text-slate-200 whitespace-nowrap">{timeStr}</span>
       </div>
 
-      {/* Center Aligned Toolbar: Realign, Physics (aligned directly in center), Theme */}
-      <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-1 bg-white/5 border border-white/10 rounded-xl p-0.5 shadow-sm">
-        {/* Realign Icons Button */}
-        <button
-          onClick={onRearrangeIcons}
-          title="Realign Icons"
-          className="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/15 active:scale-95 flex items-center justify-center text-slate-200 transition-all"
-        >
-          <svg className="w-3.5 h-3.5 text-cyan-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-          </svg>
-        </button>
-
-        {/* Physics Button centered with Start button */}
+      <div className="flex items-center gap-1.5 justify-self-center">
         <div className="relative">
           <button
-            onClick={() => setPhysicsPopoverOpen((v) => !v)}
-            onDoubleClick={cyclePhysics}
+            type="button"
+            onClick={() => setPhysicsMenuOpen((v) => !v)}
+            className="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/15 active:scale-95 flex items-center justify-center transition-all"
             title={`Physics: ${MODE_LABEL[physicsMode]}`}
-            className="h-7 px-2 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 flex items-center gap-1 text-[10px] font-bold text-slate-100 border border-white/15 transition-all"
           >
             {renderPhysicsSvg(physicsMode)}
-            <span className="hidden sm:inline">{MODE_LABEL[physicsMode]}</span>
           </button>
 
-          {/* Physics Quick Switch Popover */}
-          {physicsPopoverOpen && (
-            <div className="absolute top-9 left-1/2 -translate-x-1/2 w-36 glass-window border border-white/20 p-1.5 rounded-xl flex flex-col gap-1 z-50 shadow-2xl bg-slate-950/95 backdrop-blur-xl">
-              {(['tactile', 'earth', 'zero-g', 'static'] as PhysicsMode[]).map((m) => (
+          {physicsMenuOpen && (
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="absolute top-9 left-1/2 -translate-x-1/2 w-36 bg-slate-950/95 backdrop-blur-2xl border border-white/20 rounded-xl p-1.5 shadow-2xl z-50 space-y-1"
+            >
+              {(Object.keys(MODE_LABEL) as PhysicsMode[]).map((m) => (
                 <button
                   key={m}
                   onClick={() => {
                     onChangePhysicsMode(m);
-                    setPhysicsPopoverOpen(false);
+                    setPhysicsMenuOpen(false);
                   }}
-                  className={`w-full px-2 py-1.5 rounded-lg text-left text-xs font-mono flex items-center gap-2 transition-colors ${
+                  className={`w-full px-2.5 py-1.5 rounded-lg text-left text-[11px] font-mono flex items-center gap-2 transition-colors ${
                     physicsMode === m
                       ? 'bg-cyan-500/25 text-cyan-200 font-bold border border-cyan-400/40'
                       : 'hover:bg-white/10 text-slate-300'
@@ -174,8 +128,19 @@ export const MobileStatusBar: React.FC<MobileStatusBarProps> = ({
           )}
         </div>
 
-        {/* Themes Button */}
         <button
+          type="button"
+          onClick={onRearrangeIcons}
+          title="Reset Icons"
+          className="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/15 active:scale-95 flex items-center justify-center text-cyan-300 transition-all"
+        >
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+          </svg>
+        </button>
+
+        <button
+          type="button"
           onClick={() => onOpenWindow('win-themes')}
           title="Themes"
           className="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/15 active:scale-95 flex items-center justify-center text-fuchsia-300 transition-all"
@@ -187,8 +152,7 @@ export const MobileStatusBar: React.FC<MobileStatusBarProps> = ({
         </button>
       </div>
 
-      {/* Right: Sound Toggle */}
-      <div className="flex items-center gap-1.5 text-slate-300">
+      <div className="flex items-center gap-1.5 text-slate-300 justify-self-end">
         <button
           onClick={onToggleSound}
           className="p-1 rounded-lg bg-white/5 border border-white/10 hover:border-white/20 text-slate-300 hover:text-white transition-colors"

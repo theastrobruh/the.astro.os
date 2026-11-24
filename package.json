@@ -2,6 +2,12 @@
   "name": "the-astro-os",
   "private": true,
   "version": "0.5.0",
+  "description": "the.astro.os — Sistema operativo web interactivo con motor de físicas rígidas 2D (SAT OBB), widgets GIF arrastrables y aplicaciones integradas.",
+  "homepage": "https://theastrobruh.github.io/the.astro.os",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/theastrobruh/the.astro.os.git"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",
@@ -27,6 +33,7 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "autoprefixer": "^10.4.21",
+    "esbuild": "^0.25.0",
     "tailwindcss": "^4.3.3",
     "tsx": "^4.21.0",
     "typescript": "^7.0.2",

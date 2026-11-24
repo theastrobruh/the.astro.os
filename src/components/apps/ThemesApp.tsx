@@ -43,7 +43,6 @@ export const ThemesApp: React.FC<ThemesAppProps> = ({
         </div>
       </div>
 
-      {/* Custom Gradient Colors */}
       <div className="pt-3 border-t border-white/10 space-y-3">
         <h3 className="text-xs font-mono font-bold text-cyan-300">
           Colores Personalizados del Universo
@@ -70,7 +69,6 @@ export const ThemesApp: React.FC<ThemesAppProps> = ({
         </div>
       </div>
 
-      {/* Starfield & Glass Sliders */}
       <div className="pt-3 border-t border-white/10 space-y-3">
         <div className="space-y-1">
           <div className="flex justify-between text-xs font-mono">
@@ -119,7 +117,6 @@ export const ThemesApp: React.FC<ThemesAppProps> = ({
         </div>
       </div>
 
-      {/* Physics Quick Tuning */}
       <div className="pt-3 border-t border-white/10 space-y-3">
         <h3 className="text-xs font-mono font-bold text-amber-300">
           Comportamiento Físico de Escritorio
@@ -129,7 +126,7 @@ export const ThemesApp: React.FC<ThemesAppProps> = ({
             [
               { id: 'tactile', label: 'Inercia' },
               { id: 'earth', label: 'Gravedad ↓' },
-              { id: 'zero-g', label: 'Zero-G 🪐' },
+              { id: 'zero-g', label: 'Zero-G' },
               { id: 'static', label: 'Clásico' },
             ] as Array<{ id: PhysicsMode; label: string }>
           ).map((m) => (

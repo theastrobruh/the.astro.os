@@ -15,6 +15,7 @@ export const DesktopDrawCanvas: React.FC<DesktopDrawCanvasProps> = ({ active, on
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+
     const resize = () => {
       const prev = document.createElement('canvas');
       prev.width = canvas.width;
@@ -23,6 +24,7 @@ export const DesktopDrawCanvas: React.FC<DesktopDrawCanvasProps> = ({ active, on
       if (pCtx && canvas.width > 0 && canvas.height > 0) {
         pCtx.drawImage(canvas, 0, 0);
       }
+
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
       const ctx = canvas.getContext('2d');
@@ -30,6 +32,7 @@ export const DesktopDrawCanvas: React.FC<DesktopDrawCanvasProps> = ({ active, on
         ctx.drawImage(prev, 0, 0);
       }
     };
+
     resize();
     window.addEventListener('resize', resize);
     return () => window.removeEventListener('resize', resize);
@@ -55,6 +58,7 @@ export const DesktopDrawCanvas: React.FC<DesktopDrawCanvasProps> = ({ active, on
     ctx.lineJoin = 'round';
     ctx.shadowBlur = 10;
     ctx.shadowColor = color;
+
     ctx.beginPath();
     ctx.moveTo(lastPointRef.current.x, lastPointRef.current.y);
     ctx.lineTo(e.clientX, e.clientY);
@@ -89,7 +93,6 @@ export const DesktopDrawCanvas: React.FC<DesktopDrawCanvasProps> = ({ active, on
           active ? 'pointer-events-auto cursor-crosshair touch-none' : 'pointer-events-none'
         }`}
       />
-
       {active && (
         <div className="fixed top-14 md:top-5 left-1/2 -translate-x-1/2 z-50 bg-slate-950/90 backdrop-blur-xl border border-yellow-400/50 px-4 py-2 rounded-2xl shadow-2xl flex items-center gap-3 flex-wrap justify-center">
           <span className="text-xs font-mono font-bold text-yellow-300 whitespace-nowrap">

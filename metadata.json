@@ -1,6 +1,6 @@
 {
   "name": "the.astro.os",
-  "description": "Sistema operativo simulado interactivo con físicas realistas, widgets GIF arrastrables, estudio de pintura, reproductor de radio, terminal y panel de control.",
+  "description": "Sistema operativo simulado interactivo con motor de físicas rígidas 2D realistas, widgets GIF arrastrables, estudio de pintura, reproductor de radio, terminal y panel de control.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
 import { CURATED_GIF_WIDGET_PRESETS, ICON_ORDER, WINDOW_META_LIST } from '../../constants/defaults';
-import { AdminConfig, MediaWidgetItem, PhysicsMode, PhysicsSettings, ThemeEffectsConfig, WindowId } from '../../types/os';
+import {
+  AdminConfig,
+  MediaWidgetItem,
+  PhysicsMode,
+  PhysicsSettings,
+  ThemeEffectsConfig,
+  WindowId,
+} from '../../types/os';
 
 interface AdminPanelAppProps {
   config: AdminConfig;
@@ -88,12 +95,11 @@ export const AdminPanelApp: React.FC<AdminPanelAppProps> = ({
       security: { ...prev.security, adminPin: pinInput },
     }));
     setPinInput('');
-    onToast(`Nuevo PIN de Administrador guardado`);
+    onToast('Nuevo PIN de Administrador guardado');
   };
 
   return (
     <div className="flex-1 flex flex-col min-h-0">
-      {/* Tab Bar */}
       <div className="px-4 pt-2.5 bg-black/45 border-b border-white/10 flex items-center gap-1.5 overflow-x-auto shrink-0">
         {[
           { id: 'effects', label: 'Efectos & Físicas' },
@@ -116,7 +122,6 @@ export const AdminPanelApp: React.FC<AdminPanelAppProps> = ({
         ))}
       </div>
 
-      {/* Tab Body */}
       <div className="p-5 flex-1 overflow-y-auto space-y-5">
         {tab === 'icons' && (
           <div className="space-y-4">
@@ -140,7 +145,6 @@ export const AdminPanelApp: React.FC<AdminPanelAppProps> = ({
                   className="w-full accent-cyan-400"
                 />
               </div>
-
               <div className="space-y-1">
                 <div className="flex justify-between text-xs font-mono">
                   <span className="text-slate-300">Tamaño de Fuente</span>
@@ -238,65 +242,29 @@ export const AdminPanelApp: React.FC<AdminPanelAppProps> = ({
               return (
                 <div
                   key={meta.id}
-                  className="p-3 rounded-xl bg-white/5 border border-white/10 grid grid-cols-1 md:grid-cols-4 gap-2.5 items-center"
+                  className="p-3 rounded-xl bg-white/5 border border-white/10 flex flex-wrap items-center gap-3"
                 >
-                  <div className="md:col-span-2">
-                    <label className="block text-[10px] font-mono text-slate-400 mb-1">
-                      {meta.id}
-                    </label>
-                    <input
-                      type="text"
-                      value={winCfg.title}
-                      onChange={(e) =>
-                        onUpdateConfig((p) => ({
-                          ...p,
-                          windows: {
-                            ...p.windows,
-                            [meta.id as WindowId]: { ...winCfg, title: e.target.value },
-                          },
-                        }))
-                      }
-                      className="w-full bg-black/40 border border-white/15 rounded-lg px-2.5 py-1.5 text-xs font-mono text-white"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-mono text-slate-400 mb-1">
-                      Ancho (px)
-                    </label>
-                    <input
-                      type="number"
-                      value={winCfg.width}
-                      onChange={(e) =>
-                        onUpdateConfig((p) => ({
-                          ...p,
-                          windows: {
-                            ...p.windows,
-                            [meta.id as WindowId]: { ...winCfg, width: Number(e.target.value) || 400 },
-                          },
-                        }))
-                      }
-                      className="w-full bg-black/40 border border-white/15 rounded-lg px-2.5 py-1.5 text-xs font-mono text-white"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-mono text-slate-400 mb-1">
-                      Alto (px)
-                    </label>
-                    <input
-                      type="number"
-                      value={winCfg.height}
-                      onChange={(e) =>
-                        onUpdateConfig((p) => ({
-                          ...p,
-                          windows: {
-                            ...p.windows,
-                            [meta.id as WindowId]: { ...winCfg, height: Number(e.target.value) || 400 },
-                          },
-                        }))
-                      }
-                      className="w-full bg-black/40 border border-white/15 rounded-lg px-2.5 py-1.5 text-xs font-mono text-white"
-                    />
-                  </div>
+                  <span
+                    className="w-2.5 h-2.5 rounded-full shrink-0"
+                    style={{ backgroundColor: meta.accentColor }}
+                  />
+                  <input
+                    type="text"
+                    value={winCfg.title}
+                    onChange={(e) =>
+                      onUpdateConfig((p) => ({
+                        ...p,
+                        windows: {
+                          ...p.windows,
+                          [meta.id]: { ...winCfg, title: e.target.value },
+                        },
+                      }))
+                    }
+                    className="flex-1 min-w-[160px] bg-black/40 border border-white/15 rounded-lg px-2.5 py-1.5 text-xs font-mono text-white"
+                  />
+                  <span className="text-[11px] font-mono text-slate-400">
+                    {winCfg.width}×{winCfg.height}
+                  </span>
                 </div>
               );
             })}
@@ -306,66 +274,54 @@ export const AdminPanelApp: React.FC<AdminPanelAppProps> = ({
         {tab === 'widgets' && (
           <div className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="text-xs text-slate-300">
-                Edita URLs de GIFs/imágenes en vivo o agrega nuevos widgets al escritorio.
-              </p>
+              <h4 className="text-xs font-mono font-bold text-cyan-300">
+                Widgets Activos en Escritorio ({widgets.length})
+              </h4>
               <button
                 onClick={onResetWidgets}
-                className="px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/35 border border-amber-400/35 text-amber-200 font-mono text-xs font-bold"
+                className="px-3 py-1.5 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/35 border border-cyan-400/35 text-cyan-200 font-mono text-xs"
               >
                 Restaurar Widgets por Defecto
               </button>
             </div>
 
-            <div className="space-y-2.5">
+            <div className="space-y-2">
               {widgets.map((w) => (
                 <div
                   key={w.id}
-                  className="p-3 rounded-xl bg-white/5 border border-white/10 grid grid-cols-1 md:grid-cols-5 gap-2 items-center"
+                  className="p-3 rounded-xl bg-white/5 border border-white/10 flex flex-wrap items-center justify-between gap-3"
                 >
-                  <input
-                    type="text"
-                    value={w.label}
-                    onChange={(e) => onUpdateWidget(w.id, { label: e.target.value })}
-                    className="bg-black/40 border border-white/15 rounded-lg px-2.5 py-1.5 text-xs font-mono text-white"
-                  />
-                  <input
-                    type="text"
-                    value={w.url}
-                    onChange={(e) =>
-                      onUpdateWidget(w.id, {
-                        url: e.target.value,
-                        isGif: e.target.value.toLowerCase().includes('.gif'),
-                      })
-                    }
-                    placeholder="URL de imagen o .gif (vacío = animación canvas)"
-                    className="md:col-span-3 bg-black/40 border border-white/15 rounded-lg px-2.5 py-1.5 text-xs font-mono text-white"
-                  />
-                  <div className="flex items-center justify-end gap-1.5">
+                  <div className="min-w-0 flex-1">
+                    <div className="text-xs font-mono font-bold text-white break-words leading-tight">{w.label}</div>
+                    <div className="text-[11px] font-mono text-slate-400">
+                      {w.width}×{w.height}px · Pos ({Math.round(w.x)}, {Math.round(w.y)})
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5">
                     <button
                       onClick={() => onUpdateWidget(w.id, { visible: !w.visible })}
-                      className={`px-2.5 py-1.5 rounded-lg font-mono text-[11px] border ${
+                      className={`px-2.5 py-1 rounded-lg font-mono text-[11px] border ${
                         w.visible
-                          ? 'bg-cyan-500/20 border-cyan-400/40 text-cyan-200'
+                          ? 'bg-emerald-500/20 border-emerald-400/40 text-emerald-200'
                           : 'bg-white/5 border-white/10 text-slate-400'
                       }`}
                     >
-                      {w.visible ? 'Activo' : 'Oculto'}
+                      {w.visible ? 'Visible' : 'Oculto'}
                     </button>
                     <button
                       onClick={() => onDeleteWidget(w.id)}
-                      className="px-2.5 py-1.5 rounded-lg bg-rose-500/20 text-rose-300 font-mono text-[11px]"
+                      className="px-2.5 py-1 rounded-lg bg-rose-500/20 hover:bg-rose-500/35 text-rose-300 font-mono text-[11px]"
                     >
-                      ✕
+                      Eliminar
                     </button>
                   </div>
                 </div>
               ))}
             </div>
 
-            <div className="pt-2 border-t border-white/10">
+            <div className="pt-3 border-t border-white/10">
               <h4 className="text-xs font-mono font-bold text-pink-300 mb-2">
-                Añadir Rápido (GIFs & Escenas)
+                Anclar Widget Rápido
               </h4>
               <div className="flex flex-wrap gap-2">
                 {CURATED_GIF_WIDGET_PRESETS.map((p) => (
@@ -391,41 +347,35 @@ export const AdminPanelApp: React.FC<AdminPanelAppProps> = ({
 
         {tab === 'effects' && (
           <div className="space-y-5">
-            {/* Real-time 2D Physics Engine Controls */}
-            <div className="p-4 rounded-2xl bg-cyan-500/5 border border-cyan-400/25 space-y-4">
+            <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <div>
-                  <h4 className="text-xs font-mono font-bold text-cyan-300">
-                    Motor de Físicas 2D (Inercia, Gravedad y Colisiones)
-                  </h4>
-                  <p className="text-[11px] text-slate-400">
-                    Ajusta cómo reaccionan las ventanas, íconos y widgets GIF al lanzarlos o chocar.
-                  </p>
-                </div>
+                <h4 className="text-xs font-mono font-bold text-cyan-300">
+                  Motor de Físicas Rígidas 2D (SAT OBB)
+                </h4>
                 <button
                   onClick={onImpulseBurst}
-                  className="px-3.5 py-1.5 rounded-xl bg-pink-500/25 hover:bg-pink-500/40 border border-pink-400/40 text-pink-200 font-mono text-xs font-bold"
+                  className="px-3 py-1.5 rounded-xl bg-pink-500/25 hover:bg-pink-500/40 border border-pink-400/40 text-pink-200 font-mono text-xs font-bold"
                 >
-                  ⚡ Lanzar Todos
+                  Impulso Cósmico
                 </button>
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {(
                   [
-                    { id: 'tactile', label: '💨 Inercia Táctil' },
-                    { id: 'earth', label: '🍎 Gravedad ↓' },
-                    { id: 'zero-g', label: '🪐 Zero-G' },
-                    { id: 'static', label: '📌 Clásico Fijo' },
+                    { id: 'tactile', label: 'Táctil (Inercia)' },
+                    { id: 'earth', label: 'Gravedad ↓' },
+                    { id: 'zero-g', label: 'Zero-G' },
+                    { id: 'static', label: 'Clásico' },
                   ] as Array<{ id: PhysicsMode; label: string }>
                 ).map((m) => (
                   <button
                     key={m.id}
                     onClick={() => onUpdatePhysics({ mode: m.id })}
-                    className={`py-2 px-3 rounded-xl font-mono text-xs border transition-colors ${
+                    className={`py-2 px-2.5 rounded-xl font-mono text-xs border transition-colors ${
                       config.physics.mode === m.id
-                        ? 'bg-cyan-500/25 border-cyan-400 text-white font-bold'
-                        : 'bg-black/35 border-white/10 text-slate-300 hover:bg-white/10'
+                        ? 'bg-cyan-500/25 border-cyan-400 text-cyan-200 font-bold'
+                        : 'bg-black/30 border-white/10 text-slate-300 hover:bg-white/10'
                     }`}
                   >
                     {m.label}
@@ -434,41 +384,39 @@ export const AdminPanelApp: React.FC<AdminPanelAppProps> = ({
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="space-y-1">
-                  <div className="flex justify-between text-xs font-mono">
-                    <span className="text-slate-300">Gravedad (px/s²)</span>
-                    <span className="text-cyan-300">{config.physics.gravity}</span>
+                <div>
+                  <div className="flex justify-between text-xs font-mono mb-1">
+                    <span>Gravedad</span>
+                    <span className="text-emerald-300">{config.physics.gravity}</span>
                   </div>
                   <input
                     type="range"
-                    min={300}
+                    min={400}
                     max={2600}
                     step={50}
                     value={config.physics.gravity}
                     onChange={(e) => onUpdatePhysics({ gravity: Number(e.target.value) })}
-                    className="w-full accent-cyan-400"
+                    className="w-full accent-emerald-400"
                   />
                 </div>
-
-                <div className="space-y-1">
-                  <div className="flex justify-between text-xs font-mono">
-                    <span className="text-slate-300">Rebote (Restitución)</span>
+                <div>
+                  <div className="flex justify-between text-xs font-mono mb-1">
+                    <span>Rebote (Restitución)</span>
                     <span className="text-pink-300">{config.physics.restitution.toFixed(2)}</span>
                   </div>
                   <input
                     type="range"
                     min={0.1}
-                    max={0.95}
-                    step={0.05}
+                    max={0.92}
+                    step={0.02}
                     value={config.physics.restitution}
                     onChange={(e) => onUpdatePhysics({ restitution: Number(e.target.value) })}
                     className="w-full accent-pink-400"
                   />
                 </div>
-
-                <div className="space-y-1">
-                  <div className="flex justify-between text-xs font-mono">
-                    <span className="text-slate-300">Fricción Superficie</span>
+                <div>
+                  <div className="flex justify-between text-xs font-mono mb-1">
+                    <span>Fricción Superficie</span>
                     <span className="text-amber-300">{config.physics.friction.toFixed(3)}</span>
                   </div>
                   <input
@@ -487,12 +435,17 @@ export const AdminPanelApp: React.FC<AdminPanelAppProps> = ({
                 {[
                   {
                     key: 'collisionsEnabled' as const,
-                    label: 'Colisiones Elásticas',
+                    label: 'Colisiones SAT OBB',
                     val: config.physics.collisionsEnabled,
                   },
                   {
+                    key: 'windowCollisions' as const,
+                    label: 'Colisión Ventanas ↔ Widgets',
+                    val: config.physics.windowCollisions,
+                  },
+                  {
                     key: 'tiltEnabled' as const,
-                    label: 'Inclinación por Resorte',
+                    label: 'Péndulo & Torque al Agarrar',
                     val: config.physics.tiltEnabled,
                   },
                   {
@@ -517,7 +470,6 @@ export const AdminPanelApp: React.FC<AdminPanelAppProps> = ({
               </div>
             </div>
 
-            {/* Visual Effects */}
             <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <h4 className="text-xs font-mono font-bold text-purple-300">
@@ -635,17 +587,17 @@ export const AdminPanelApp: React.FC<AdminPanelAppProps> = ({
                 onClick={handleExportJson}
                 className="p-3 rounded-xl bg-purple-500/20 hover:bg-purple-500/35 border border-purple-400/35 text-purple-200 font-mono text-xs font-bold"
               >
-                📥 Exportar Config JSON
+                Exportar Config JSON
               </button>
               <label className="p-3 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/35 border border-emerald-400/35 text-emerald-200 font-mono text-xs font-bold text-center cursor-pointer">
-                📤 Importar Config JSON
+                Importar Config JSON
                 <input type="file" accept=".json" onChange={handleImportJson} className="hidden" />
               </label>
               <button
                 onClick={onFactoryReset}
                 className="p-3 rounded-xl bg-rose-500/20 hover:bg-rose-500/35 border border-rose-400/35 text-rose-200 font-mono text-xs font-bold"
               >
-                ⚠️ Ajustes de Fábrica
+                Ajustes de Fábrica
               </button>
             </div>
 

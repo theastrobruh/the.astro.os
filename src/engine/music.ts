@@ -35,14 +35,12 @@ class GlobalMusicService {
           this.notify();
         }
       });
-
       this.audio.addEventListener('loadedmetadata', () => {
         if (this.audio) {
           this.duration = this.audio.duration;
           this.notify();
         }
       });
-
       this.audio.addEventListener('ended', () => {
         if (this.mode === 'local' && this.localTracks.length > 0) {
           this.playLocal((this.localIdx + 1) % this.localTracks.length);
@@ -81,7 +79,9 @@ class GlobalMusicService {
 
   public startSynth() {
     this.stopSynth();
-    const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    const AudioCtx =
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
     if (!AudioCtx) return;
     if (!this.synthCtx) this.synthCtx = new AudioCtx();
     const ctx = this.synthCtx;
@@ -120,7 +120,6 @@ class GlobalMusicService {
     this.audio.src = RADIO_PRESETS[idx].url;
     this.audio.volume = this.volume;
     this.notify();
-
     this.audio
       .play()
       .then(() => {
@@ -146,7 +145,6 @@ class GlobalMusicService {
     this.audio.src = list[idx].url;
     this.audio.volume = this.volume;
     this.notify();
-
     this.audio
       .play()
       .then(() => {

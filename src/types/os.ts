@@ -8,6 +8,7 @@ export type WindowId =
   | 'win-mediaflow'
   | 'win-pressmark'
   | 'win-cardgram'
+  | 'win-inkra'
   | 'win-icon-manager'
   | 'win-youtube'
   | 'win-admin';
@@ -18,12 +19,13 @@ export type PhysicsMode = 'tactile' | 'earth' | 'zero-g' | 'static';
 
 export interface PhysicsSettings {
   mode: PhysicsMode;
-  gravity: number;       // px/s^2 for earth mode (default 1350)
-  restitution: number;   // 0.1 - 0.92 bounce elasticity
-  friction: number;      // 0.90 - 0.995 surface drag
-  collisionsEnabled: boolean;
-  tiltEnabled: boolean;
-  cursorRepel: boolean;
+  gravity: number;            // px/s^2 for earth mode (default 1350)
+  restitution: number;        // 0.1 - 0.92 bounce elasticity
+  friction: number;           // 0.90 - 0.995 surface drag & contact friction
+  collisionsEnabled: boolean; // SAT OBB collisions among desktop icons & widgets
+  windowCollisions: boolean;  // Optional SAT collisions between icons/widgets and windows
+  tiltEnabled: boolean;       // Realistic grab pendulum & spring self-righting
+  cursorRepel: boolean;       // Repel field in Zero-G mode
   soundEnabled: boolean;
 }
 
@@ -36,12 +38,16 @@ export interface PhysicsBody {
   height: number;
   vx: number;
   vy: number;
-  angle: number;
-  angularVel: number;
-  targetAngle: number;
+  angle: number;         // degrees (for CSS transform)
+  angularVel: number;    // deg/s
+  targetAngle: number;   // drag tilt hint
+  grabOffsetX: number;   // local X offset from body center where user grabbed
+  grabOffsetY: number;   // local Y offset from body center where user grabbed
   isDragging: boolean;
+  isSleeping: boolean;
   scale: number;
   mass: number;
+  inertia: number;       // rectangular moment of inertia I = (1/12)*m*(w^2 + h^2)
 }
 
 export interface WindowMeta {
@@ -140,6 +146,12 @@ export interface TimezoneOption {
 export interface CollisionImpactEvent {
   x: number;
   y: number;
+  nx: number;
+  ny: number;
   intensity: number; // 0..1
   color: string;
+  bodyAId?: string;
+  bodyBId?: string;
+  bodyAKind?: 'icon' | 'widget' | 'window';
+  bodyBKind?: 'icon' | 'widget' | 'window';
 }

@@ -1,20 +1,19 @@
 import React, { useEffect, useRef } from 'react';
-import { CollisionImpactEvent } from '../types/os';
+import { CollisionImpactEvent, ThemeEffectsConfig } from '../types/os';
 
 interface StarfieldCanvasProps {
-  starCount: number;
-  starSpeed: number;
+  effects: ThemeEffectsConfig;
   impactsRef: React.MutableRefObject<CollisionImpactEvent[]>;
 }
 
 interface Star {
   x: number;
   y: number;
-  z: number; // depth layer 0.2..1.0
+  z: number;
   size: number;
   alpha: number;
-  twinklePhase: number;
   twinkleSpeed: number;
+  twinklePhase: number;
 }
 
 interface ShootingStar {
@@ -36,28 +35,34 @@ interface Shockwave {
   color: string;
 }
 
-export const StarfieldCanvas: React.FC<StarfieldCanvasProps> = ({
-  starCount,
-  starSpeed,
-  impactsRef,
-}) => {
+interface ImpactSpark {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  alpha: number;
+  size: number;
+  color: string;
+}
+
+export const StarfieldCanvas: React.FC<StarfieldCanvasProps> = ({ effects, impactsRef }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const settingsRef = useRef(effects);
   const pointerRef = useRef({ x: 0.5, y: 0.5 });
-  const settingsRef = useRef({ starCount, starSpeed });
 
   useEffect(() => {
-    settingsRef.current = { starCount, starSpeed };
-  }, [starCount, starSpeed]);
+    settingsRef.current = effects;
+  }, [effects]);
 
   useEffect(() => {
-    const handleMove = (e: PointerEvent) => {
+    const onPointerMove = (e: PointerEvent) => {
       if (window.innerWidth > 0 && window.innerHeight > 0) {
         pointerRef.current.x = e.clientX / window.innerWidth;
         pointerRef.current.y = e.clientY / window.innerHeight;
       }
     };
-    window.addEventListener('pointermove', handleMove, { passive: true });
-    return () => window.removeEventListener('pointermove', handleMove);
+    window.addEventListener('pointermove', onPointerMove, { passive: true });
+    return () => window.removeEventListener('pointermove', onPointerMove);
   }, []);
 
   useEffect(() => {
@@ -69,19 +74,20 @@ export const StarfieldCanvas: React.FC<StarfieldCanvasProps> = ({
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = window.innerHeight);
 
-    const makeStar = (): Star => ({
+    const createStar = (): Star => ({
       x: Math.random() * width,
       y: Math.random() * height,
-      z: 0.25 + Math.random() * 0.75,
-      size: 0.6 + Math.random() * 1.9,
-      alpha: 0.35 + Math.random() * 0.65,
+      z: 0.3 + Math.random() * 0.9,
+      size: 0.7 + Math.random() * 1.9,
+      alpha: 0.25 + Math.random() * 0.75,
+      twinkleSpeed: 0.015 + Math.random() * 0.035,
       twinklePhase: Math.random() * Math.PI * 2,
-      twinkleSpeed: 0.015 + Math.random() * 0.04,
     });
 
-    let stars: Star[] = Array.from({ length: settingsRef.current.starCount }, makeStar);
+    const stars: Star[] = Array.from({ length: settingsRef.current.starCount }, createStar);
     const shootingStars: ShootingStar[] = [];
     const shockwaves: Shockwave[] = [];
+    const sparks: ImpactSpark[] = [];
 
     const onResize = () => {
       width = canvas.width = window.innerWidth;
@@ -91,22 +97,18 @@ export const StarfieldCanvas: React.FC<StarfieldCanvasProps> = ({
 
     let rafId = 0;
     let lastTime = performance.now();
-    let nextShootDelay = 2500 + Math.random() * 4000;
     let shootTimer = 0;
+    let nextShootDelay = 2800 + Math.random() * 4500;
 
     const render = (now: number) => {
       const dtMs = Math.min(50, now - lastTime);
+      const dt = dtMs / 16.667;
       lastTime = now;
-      const dt = dtMs / 16.6667;
 
-      const targetCount = settingsRef.current.starCount;
-      if (stars.length < targetCount) {
-        while (stars.length < targetCount) stars.push(makeStar());
-      } else if (stars.length > targetCount) {
-        stars = stars.slice(0, targetCount);
-      }
+      const desiredCount = Math.max(40, Math.min(700, settingsRef.current.starCount));
+      while (stars.length < desiredCount) stars.push(createStar());
+      while (stars.length > desiredCount) stars.pop();
 
-      // Consume physics collision shockwaves
       if (impactsRef.current.length > 0) {
         const pending = impactsRef.current.splice(0, impactsRef.current.length);
         for (const imp of pending) {
@@ -114,10 +116,25 @@ export const StarfieldCanvas: React.FC<StarfieldCanvasProps> = ({
             x: imp.x,
             y: imp.y,
             radius: 4,
-            maxRadius: 28 + imp.intensity * 48,
-            alpha: 0.45 + imp.intensity * 0.4,
+            maxRadius: 26 + imp.intensity * 52,
+            alpha: 0.42 + imp.intensity * 0.45,
             color: imp.color,
           });
+          const sparkCount = Math.min(10, Math.max(3, Math.round(imp.intensity * 9)));
+          const baseAngle = Math.atan2(imp.ny, imp.nx);
+          for (let k = 0; k < sparkCount; k++) {
+            const spread = baseAngle + (Math.random() - 0.5) * 2.2;
+            const spd = (1.5 + Math.random() * 4.5) * (0.6 + imp.intensity);
+            sparks.push({
+              x: imp.x,
+              y: imp.y,
+              vx: Math.cos(spread) * spd,
+              vy: Math.sin(spread) * spd,
+              alpha: 0.85,
+              size: 1.2 + Math.random() * 1.6,
+              color: imp.color,
+            });
+          }
         }
       }
 
@@ -127,7 +144,6 @@ export const StarfieldCanvas: React.FC<StarfieldCanvasProps> = ({
       const parallaxX = (pointerRef.current.x - 0.5) * 18;
       const parallaxY = (pointerRef.current.y - 0.5) * 18;
 
-      // Draw stars with depth parallax
       for (const s of stars) {
         s.y -= 0.16 * s.z * speedMult * dt;
         s.x += 0.04 * s.z * speedMult * dt;
@@ -150,7 +166,6 @@ export const StarfieldCanvas: React.FC<StarfieldCanvasProps> = ({
         ctx.fill();
       }
 
-      // Shooting stars
       shootTimer += dtMs;
       if (shootTimer >= nextShootDelay) {
         shootTimer = 0;
@@ -176,7 +191,6 @@ export const StarfieldCanvas: React.FC<StarfieldCanvasProps> = ({
 
         const progress = st.life / st.maxLife;
         const alpha = progress < 0.2 ? progress / 0.2 : Math.max(0, 1 - (progress - 0.2) / 0.8);
-
         const norm = Math.hypot(st.vx, st.vy) || 1;
         const tailX = st.x - (st.vx / norm) * st.length;
         const tailY = st.y - (st.vy / norm) * st.length;
@@ -198,7 +212,6 @@ export const StarfieldCanvas: React.FC<StarfieldCanvasProps> = ({
         }
       }
 
-      // Collision impact shockwaves
       for (let i = shockwaves.length - 1; i >= 0; i--) {
         const sw = shockwaves[i];
         sw.radius += (sw.maxRadius - sw.radius) * 0.2 * dt;
@@ -217,11 +230,30 @@ export const StarfieldCanvas: React.FC<StarfieldCanvasProps> = ({
         ctx.restore();
       }
 
+      for (let i = sparks.length - 1; i >= 0; i--) {
+        const sp = sparks[i];
+        sp.x += sp.vx * dt;
+        sp.y += sp.vy * dt;
+        sp.vx *= Math.pow(0.92, dt);
+        sp.vy *= Math.pow(0.92, dt);
+        sp.alpha -= 0.045 * dt;
+        if (sp.alpha <= 0.03) {
+          sparks.splice(i, 1);
+          continue;
+        }
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, sp.alpha);
+        ctx.fillStyle = sp.color;
+        ctx.beginPath();
+        ctx.arc(sp.x, sp.y, sp.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
       rafId = requestAnimationFrame(render);
     };
 
     rafId = requestAnimationFrame(render);
-
     return () => {
       cancelAnimationFrame(rafId);
       window.removeEventListener('resize', onResize);

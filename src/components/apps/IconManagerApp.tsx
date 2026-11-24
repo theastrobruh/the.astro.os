@@ -53,13 +53,13 @@ export const IconManagerApp: React.FC<IconManagerAppProps> = ({
             <div className="flex items-center gap-3 min-w-0">
               <div className="w-11 h-11 rounded-xl bg-slate-900 border border-white/15 flex items-center justify-center overflow-hidden shrink-0">
                 {icon.customImage ? (
-                  <img src={icon.customImage} alt={icon.name} className="w-full h-full object-cover" />
+                  <img src={icon.customImage} alt={icon.name} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
                 ) : (
                   renderDefaultSvg(icon.winId)
                 )}
               </div>
               <div className="min-w-0">
-                <div className="text-xs font-mono font-bold text-white truncate">{icon.name}</div>
+                <div className="text-xs font-mono font-bold text-white leading-tight">{icon.name}</div>
                 <div className="text-[11px] text-slate-400">
                   {icon.customImage ? 'Imagen personalizada' : 'Ícono vectorial'}
                 </div>

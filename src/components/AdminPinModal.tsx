@@ -37,7 +37,7 @@ export const AdminPinModal: React.FC<AdminPinModalProps> = ({
       <div className={`glass-window w-full max-w-xs p-5 space-y-4 border border-amber-500/40 ${error ? 'animate-shake' : ''}`}>
         <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
           <h3 className="text-xs font-mono font-bold text-amber-300">
-            👑 Acceso Panel Admin
+            Acceso Panel Admin
           </h3>
           <button
             onClick={() => {
@@ -50,11 +50,9 @@ export const AdminPinModal: React.FC<AdminPinModalProps> = ({
             ✕
           </button>
         </div>
-
         <p className="text-xs text-slate-300">
           Ingresa el PIN de 4 dígitos para elevar privilegios (PIN por defecto: <strong className="text-amber-300">{adminPin}</strong>):
         </p>
-
         <input
           type="password"
           maxLength={4}
@@ -68,13 +66,11 @@ export const AdminPinModal: React.FC<AdminPinModalProps> = ({
           placeholder="••••"
           className="w-full bg-black/50 border border-white/20 rounded-xl px-4 py-2.5 text-center text-lg font-mono tracking-[0.5em] text-white focus:outline-none focus:border-amber-400"
         />
-
         {error && (
           <p className="text-[11px] font-mono text-rose-400 text-center">
             PIN incorrecto. Intenta nuevamente.
           </p>
         )}
-
         <div className="flex justify-end gap-2">
           <button
             onClick={onClose}

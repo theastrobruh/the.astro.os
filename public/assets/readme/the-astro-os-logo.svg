@@ -1,0 +1,223 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 460 160"
+     width="460" height="160"
+     role="img" aria-label="the.astro.os — Cosmic Physics Desktop Web OS">
+
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"   stop-color="#070c18"/>
+      <stop offset="45%"  stop-color="#0d182e"/>
+      <stop offset="100%" stop-color="#140f2d"/>
+    </linearGradient>
+
+    <!-- Glass Window Face Gradient -->
+    <linearGradient id="wf" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"   stop-color="#182c54"/>
+      <stop offset="50%"  stop-color="#1e1848"/>
+      <stop offset="100%" stop-color="#0b385e"/>
+    </linearGradient>
+
+    <!-- Window Back Face (Orbital Core) Gradient -->
+    <radialGradient id="wb" cx="50%" cy="45%" r="65%">
+      <stop offset="0%"   stop-color="#1b2447"/>
+      <stop offset="70%"  stop-color="#090e21"/>
+      <stop offset="100%" stop-color="#040610"/>
+    </radialGradient>
+
+    <!-- Cosmic Core / Star Gradient -->
+    <radialGradient id="starGrad" cx="40%" cy="40%" r="60%">
+      <stop offset="0%"   stop-color="#d682ff"/>
+      <stop offset="40%"  stop-color="#7000ff"/>
+      <stop offset="85%"  stop-color="#00f0ff"/>
+      <stop offset="100%" stop-color="#0055ff"/>
+    </radialGradient>
+
+    <!-- Title text gradient -->
+    <linearGradient id="tg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"   stop-color="#ffffff"/>
+      <stop offset="50%"  stop-color="#d4e5ff"/>
+      <stop offset="100%" stop-color="#8fd3ff"/>
+    </linearGradient>
+
+    <!-- Soft Glow Filter -->
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3.5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="subtleGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="1.8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Clip Paths for Rotating Window Faces -->
+    <clipPath id="wc"><rect x="-30" y="-32" width="60" height="64" rx="7"/></clipPath>
+  </defs>
+
+  <!-- ── BACKGROUND PILL ─────────────────────────────────────────────── -->
+  <rect width="460" height="160" rx="22" fill="url(#bg)"/>
+  <rect x="1" y="1" width="458" height="158" rx="21"
+        fill="none" stroke="rgba(0,229,255,0.18)" stroke-width="1"/>
+
+  <!-- Background decorative grid lines (subtle retro cyber matrix) -->
+  <line x1="20" y1="40" x2="440" y2="40" stroke="rgba(112,0,255,0.08)" stroke-width="1"/>
+  <line x1="20" y1="80" x2="440" y2="80" stroke="rgba(0,229,255,0.06)" stroke-width="1"/>
+  <line x1="20" y1="120" x2="440" y2="120" stroke="rgba(112,0,255,0.08)" stroke-width="1"/>
+
+  <!-- ── SPINNING COSMIC WINDOW & PHYSICS CORE — centered at (82, 80) ─── -->
+  <g transform="translate(82,80)" filter="url(#glow)">
+
+    <!-- Pulsing Orbital Resonance Rings -->
+    <ellipse cx="0" cy="0" rx="44" ry="18" fill="none" stroke="rgba(0,240,255,0.35)" stroke-width="1.2" transform="rotate(-18,0,0)">
+      <animateTransform attributeName="transform" type="rotate" values="-18,0,0; 342,0,0" dur="14s" repeatCount="indefinite"/>
+    </ellipse>
+    <ellipse cx="0" cy="0" rx="42" ry="15" fill="none" stroke="rgba(214,130,255,0.3)" stroke-width="1" stroke-dasharray="3,3" transform="rotate(28,0,0)">
+      <animateTransform attributeName="transform" type="rotate" values="28,0,0; -332,0,0" dur="18s" repeatCount="indefinite"/>
+    </ellipse>
+
+    <!-- FRONT FACE — Glass Window & Physics OS UI (0° -> 90° and 270° -> 360°) -->
+    <g>
+      <rect x="-30" y="-32" width="60" height="64" rx="7"
+            fill="url(#wf)"
+            stroke="rgba(0,229,255,0.85)" stroke-width="1.4"/>
+
+      <!-- Window Title Bar & Traffic Light Controls -->
+      <g clip-path="url(#wc)">
+        <rect x="-30" y="-32" width="60" height="13" fill="rgba(255,255,255,0.12)"/>
+        <line x1="-30" y1="-19" x2="30" y2="-19" stroke="rgba(0,229,255,0.35)" stroke-width="0.8"/>
+        
+        <!-- Window Dots -->
+        <circle cx="-23" cy="-25.5" r="2" fill="#ff5f56"/>
+        <circle cx="-16.5" cy="-25.5" r="2" fill="#ffbd2e"/>
+        <circle cx="-10" cy="-25.5" r="2" fill="#27c93f"/>
+
+        <!-- SAT Physics collision vector & coordinate crosshair -->
+        <line x1="-22" y1="18" x2="22" y2="18" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+        <line x1="0" y1="-15" x2="0" y2="28" stroke="rgba(255,255,255,0.12)" stroke-width="0.8"/>
+
+        <!-- Interactive Physics Node (Pulsing Orbit) -->
+        <circle cx="0" cy="4" r="8" fill="url(#starGrad)" opacity="0.9"/>
+        <circle cx="0" cy="4" r="13" fill="none" stroke="rgba(0,240,255,0.5)" stroke-width="0.9" stroke-dasharray="2,2"/>
+        <polygon points="0,-1 4,4 0,9 -4,4" fill="#ffffff" opacity="0.95"/>
+      </g>
+
+      <!-- Glass Specular Sheen -->
+      <polygon points="-30,-32 18,-32 -8,32 -30,32" fill="rgba(255,255,255,0.06)" clip-path="url(#wc)"/>
+
+      <!-- 3D Spin Animation (Front Face) -->
+      <animateTransform attributeName="transform"
+        type="scale"
+        values="1 1; 0 1; -1 1; 0 1; 1 1"
+        keyTimes="0; 0.25; 0.5; 0.75; 1"
+        keySplines="0.45 0.05 0.55 0.95;
+                    0.45 0.05 0.55 0.95;
+                    0.45 0.05 0.55 0.95;
+                    0.45 0.05 0.55 0.95"
+        calcMode="spline"
+        dur="6s"
+        repeatCount="indefinite"
+        additive="sum"/>
+    </g>
+
+    <!-- BACK FACE — Cosmic OS Core (Visible when scaleX is negative) -->
+    <g>
+      <rect x="-30" y="-32" width="60" height="64" rx="7"
+            fill="url(#wb)"
+            stroke="rgba(214,130,255,0.85)" stroke-width="1.4"/>
+      
+      <!-- Back Face Content: Holographic Astro Gyroscope -->
+      <g clip-path="url(#wc)">
+        <!-- Outer Gyro Ring -->
+        <circle cx="0" cy="0" r="18" fill="none" stroke="#7000ff" stroke-width="1.5"/>
+        <circle cx="0" cy="0" r="11" fill="none" stroke="#00e5ff" stroke-width="1.2"/>
+        
+        <!-- SAT OBB Collision Box outline -->
+        <rect x="-9" y="-9" width="18" height="18" fill="rgba(112,0,255,0.25)" stroke="#ffffff" stroke-width="0.9" transform="rotate(45,0,0)"/>
+        
+        <!-- Central Gravity Singularity -->
+        <circle cx="0" cy="0" r="3.5" fill="#00ffff"/>
+      </g>
+
+      <!-- Glass Sheen on Back -->
+      <rect x="-30" y="-32" width="60" height="26" rx="7" fill="rgba(255,255,255,0.05)"/>
+
+      <!-- 3D Spin Animation (Back Face Mirror) -->
+      <animateTransform attributeName="transform"
+        type="scale"
+        values="1 1; 0 1; -1 1; 0 1; 1 1"
+        keyTimes="0; 0.25; 0.5; 0.75; 1"
+        keySplines="0.45 0.05 0.55 0.95;
+                    0.45 0.05 0.55 0.95;
+                    0.45 0.05 0.55 0.95;
+                    0.45 0.05 0.55 0.95"
+        calcMode="spline"
+        dur="6s"
+        repeatCount="indefinite"
+        additive="sum"/>
+    </g>
+
+    <!-- Floating Zero-G Physics Particles & Sparkles -->
+    <circle cx="36" cy="-26" r="1.5" fill="#00e5ff" opacity="0">
+      <animate attributeName="opacity" values="0;1;0" dur="2.2s" repeatCount="indefinite" begin="0s"/>
+      <animate attributeName="cy" values="-26;-30;-26" dur="2.2s" repeatCount="indefinite" begin="0s"/>
+    </circle>
+    <circle cx="-35" cy="22" r="1.2" fill="#d682ff" opacity="0">
+      <animate attributeName="opacity" values="0;0.9;0" dur="2.6s" repeatCount="indefinite" begin="0.7s"/>
+      <animate attributeName="cy" values="22;18;22" dur="2.6s" repeatCount="indefinite" begin="0.7s"/>
+    </circle>
+    <circle cx="28" cy="30" r="1.4" fill="#60a5fa" opacity="0">
+      <animate attributeName="opacity" values="0;1;0" dur="1.9s" repeatCount="indefinite" begin="1.2s"/>
+    </circle>
+    <circle cx="-30" cy="-24" r="1" fill="#ffffff" opacity="0">
+      <animate attributeName="opacity" values="0;0.8;0" dur="2.4s" repeatCount="indefinite" begin="0.4s"/>
+    </circle>
+  </g>
+
+  <!-- ── WORDMARK — Right of animated window, centered vertically at y=80 ─────── -->
+  <text x="148" y="70"
+        font-family="'Segoe UI',system-ui,-apple-system,sans-serif"
+        font-size="44" font-weight="800" letter-spacing="-0.5"
+        fill="url(#tg)">the.astro<tspan fill="#00e5ff">.os</tspan></text>
+
+  <!-- Subtitle -->
+  <text x="150" y="94"
+        font-family="'Segoe UI',system-ui,sans-serif"
+        font-size="11.5" fill="#00e5ff" opacity="0.75"
+        letter-spacing="3.2" font-weight="400">COSMIC PHYSICS WEB DESKTOP</text>
+
+  <!-- Version Pill -->
+  <rect x="150" y="104" width="56" height="20" rx="10"
+        fill="rgba(0,229,255,0.12)" stroke="rgba(0,229,255,0.32)" stroke-width="0.8"/>
+  <text x="178" y="118" text-anchor="middle"
+        font-family="'Segoe UI',monospace" font-size="10" fill="#00e5ff" font-weight="600">v0.5.0</text>
+
+  <!-- Ecosystem Pill (Sibling of CardGram) -->
+  <rect x="214" y="104" width="102" height="20" rx="10"
+        fill="rgba(112,0,255,0.15)" stroke="rgba(112,0,255,0.35)" stroke-width="0.8"/>
+  <text x="265" y="118" text-anchor="middle"
+        font-family="'Segoe UI',sans-serif" font-size="9.5" fill="#d682ff" font-weight="600">ECOSYSTEM HUB</text>
+
+  <!-- Thin accent line below wordmark -->
+  <line x1="148" y1="134" x2="425" y2="134"
+        stroke="#7000ff" stroke-width="0.7" opacity="0.4"/>
+
+  <!-- Ambient floating particles on right side -->
+  <circle cx="410" cy="36" r="1.4" fill="#00e5ff" opacity="0">
+    <animate attributeName="opacity" values="0;0.6;0" dur="3.8s" repeatCount="indefinite" begin="0.2s"/>
+    <animate attributeName="cy" values="36;26;36" dur="3.8s" repeatCount="indefinite" begin="0.2s"/>
+  </circle>
+  <circle cx="430" cy="115" r="1" fill="#d682ff" opacity="0">
+    <animate attributeName="opacity" values="0;0.5;0" dur="4.2s" repeatCount="indefinite" begin="1.1s"/>
+    <animate attributeName="cy" values="115;105;115" dur="4.2s" repeatCount="indefinite" begin="1.1s"/>
+  </circle>
+  <circle cx="335" cy="50" r="0.8" fill="#ffffff" opacity="0">
+    <animate attributeName="opacity" values="0;0.7;0" dur="2.5s" repeatCount="indefinite" begin="1.8s"/>
+  </circle>
+</svg>

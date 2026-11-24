@@ -131,7 +131,7 @@ export const Taskbar: React.FC<TaskbarProps> = ({
         onClick={(e) => e.stopPropagation()}
         className="w-full h-14 bg-slate-950/90 backdrop-blur-2xl border-t border-white/20 px-4 flex items-center justify-between z-40 shrink-0 shadow-[0_-8px_30px_rgba(0,0,0,0.6)]"
       >
-        <div className="w-12 flex items-center justify-start">
+        <div className="w-11 flex items-center justify-start">
           {musicClosedToTray && (
             <button
               type="button"
@@ -156,15 +156,12 @@ export const Taskbar: React.FC<TaskbarProps> = ({
           }}
           aria-label="Start"
           aria-expanded={startMenuOpen}
-          className="xp-start-btn min-w-[70px] h-10 px-3.5 rounded-2xl flex items-center justify-center gap-2 transition-transform active:scale-95 shadow-lg shadow-pink-500/30 border border-white/40 text-white"
+          className="xp-start-btn w-11 h-11 rounded-2xl flex items-center justify-center transition-transform active:scale-95 shadow-lg shadow-pink-500/30 border border-white/40 text-white"
         >
           <AstroLogoSvg className="w-6 h-6 shrink-0" />
-          <span className="font-mono text-xs font-bold tracking-wider uppercase text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]">
-            Astro
-          </span>
         </button>
 
-        <div className="w-12" />
+        <div className="w-11" />
       </footer>
     );
   }
@@ -185,13 +182,13 @@ export const Taskbar: React.FC<TaskbarProps> = ({
             setMusicTrayMenuOpen(false);
             onToggleStartMenu();
           }}
+          aria-label="Start"
           aria-expanded={startMenuOpen}
-          className={`xp-start-btn h-9 px-3 rounded-xl flex items-center gap-2 text-xs font-display font-bold text-white transition-all whitespace-nowrap ${
+          className={`xp-start-btn w-10 h-9 rounded-xl flex items-center justify-center transition-all ${
             startMenuOpen ? 'ring-2 ring-cyan-400/60' : ''
           }`}
         >
           <AstroLogoSvg className="w-6 h-6 shrink-0" />
-          <span>Astro</span>
         </button>
 
         <button

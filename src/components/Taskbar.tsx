@@ -129,9 +129,9 @@ export const Taskbar: React.FC<TaskbarProps> = ({
       <footer
         ref={footerRef}
         onClick={(e) => e.stopPropagation()}
-        className="w-full h-12 xp-taskbar px-4 grid grid-cols-[1fr_auto_1fr] items-center z-40 relative shrink-0"
+        className="w-full h-13 xp-taskbar px-4 flex items-center justify-between z-40 relative shrink-0"
       >
-        <div className="flex items-center justify-self-start">
+        <div className="w-10 flex items-center justify-start">
           {musicClosedToTray && (
             <button
               type="button"
@@ -156,12 +156,13 @@ export const Taskbar: React.FC<TaskbarProps> = ({
           }}
           aria-label="Start"
           aria-expanded={startMenuOpen}
-          className="xp-start-btn w-12 h-9 rounded-2xl flex items-center justify-center transition-transform active:scale-95 shadow-lg shadow-pink-500/20 justify-self-center"
+          className="xp-start-btn min-w-[56px] h-10 px-3 rounded-2xl flex items-center justify-center gap-1.5 transition-transform active:scale-95 shadow-lg shadow-pink-500/25 border border-white/30 text-white"
         >
-          <AstroLogoSvg className="w-6 h-6" />
+          <AstroLogoSvg className="w-6 h-6 shrink-0" />
+          <span className="font-mono text-xs font-bold tracking-wide">Astro</span>
         </button>
 
-        <div className="justify-self-end" />
+        <div className="w-10" />
       </footer>
     );
   }

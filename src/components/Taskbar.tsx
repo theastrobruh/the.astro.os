@@ -129,15 +129,15 @@ export const Taskbar: React.FC<TaskbarProps> = ({
       <footer
         ref={footerRef}
         onClick={(e) => e.stopPropagation()}
-        className="w-full h-13 xp-taskbar px-4 flex items-center justify-between z-40 relative shrink-0"
+        className="w-full h-14 bg-slate-950/90 backdrop-blur-2xl border-t border-white/20 px-4 flex items-center justify-between z-40 shrink-0 shadow-[0_-8px_30px_rgba(0,0,0,0.6)]"
       >
-        <div className="w-10 flex items-center justify-start">
+        <div className="w-12 flex items-center justify-start">
           {musicClosedToTray && (
             <button
               type="button"
               onClick={onRestoreMusic}
               title="Astro.Radio Tray"
-              className="w-8 h-8 rounded-xl bg-violet-600/35 border border-violet-400/50 flex items-center justify-center text-xs text-violet-200"
+              className="w-9 h-9 rounded-xl bg-violet-600/40 border border-violet-400/60 flex items-center justify-center text-xs text-violet-200 shadow-md shadow-violet-500/20"
             >
               <svg className="w-4 h-4 text-cyan-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z" />
@@ -156,13 +156,15 @@ export const Taskbar: React.FC<TaskbarProps> = ({
           }}
           aria-label="Start"
           aria-expanded={startMenuOpen}
-          className="xp-start-btn min-w-[56px] h-10 px-3 rounded-2xl flex items-center justify-center gap-1.5 transition-transform active:scale-95 shadow-lg shadow-pink-500/25 border border-white/30 text-white"
+          className="xp-start-btn min-w-[70px] h-10 px-3.5 rounded-2xl flex items-center justify-center gap-2 transition-transform active:scale-95 shadow-lg shadow-pink-500/30 border border-white/40 text-white"
         >
           <AstroLogoSvg className="w-6 h-6 shrink-0" />
-          <span className="font-mono text-xs font-bold tracking-wide">Astro</span>
+          <span className="font-mono text-xs font-bold tracking-wider uppercase text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]">
+            Astro
+          </span>
         </button>
 
-        <div className="w-10" />
+        <div className="w-12" />
       </footer>
     );
   }

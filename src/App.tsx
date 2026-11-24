@@ -971,7 +971,7 @@ export default function App() {
         if (selectedWidgetId) setSelectedWidgetId(null);
         if (ctxMenu) setCtxMenu(null);
       }}
-      className="relative w-screen h-screen overflow-hidden astro-wallpaper flex flex-col select-none"
+      className="relative w-full h-full h-[100dvh] max-h-[100dvh] overflow-hidden astro-wallpaper flex flex-col select-none"
     >
       <StarfieldCanvas effects={config.effects} impactsRef={impactsRef} />
       <div className="fixed inset-0 astro-vignette z-[1]" />

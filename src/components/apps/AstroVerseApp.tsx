@@ -76,9 +76,15 @@ export const AstroVerseApp: React.FC<AstroVerseAppProps> = ({ onOpenWindow }) =>
       <div className="flex flex-col items-center text-center">
         <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-tr from-pink-500 via-purple-500 to-cyan-400 p-[2px] shadow-lg shadow-pink-500/25">
           <img
-            src={ASTRO_AVATAR_IMG}
+            src="https://github.com/theastrobruh.png"
             alt="theAstroBruh"
             referrerPolicy="no-referrer"
+            onError={(e) => {
+              const img = e.currentTarget;
+              if (img.src !== ASTRO_AVATAR_IMG) {
+                img.src = ASTRO_AVATAR_IMG;
+              }
+            }}
             className="w-full h-full rounded-full object-cover bg-slate-950"
           />
         </div>

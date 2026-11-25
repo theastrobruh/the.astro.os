@@ -178,7 +178,7 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
           right: 14,
           top: '50%',
           transform: 'translateY(-50%)',
-          maxHeight: 'min(380px, calc(100vh - 110px))',
+          maxHeight: 'min(580px, calc(100vh - 104px))',
           zIndex: win.zIndex,
         }
       : {

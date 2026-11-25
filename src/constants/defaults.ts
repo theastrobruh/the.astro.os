@@ -11,6 +11,7 @@ export const WINDOW_META_LIST: WindowMeta[] = [
   { id: 'win-cardgram', title: 'CardGram • Web Identity', shortTitle: 'CardGram', accentColor: '#F472B6', defaultWidth: 880, defaultHeight: 580, resizable: true },
   { id: 'win-pressmark', title: 'Pressmark • Watermark & Media Multi-Tool', shortTitle: 'Pressmark', accentColor: '#06B6D4', defaultWidth: 880, defaultHeight: 600, resizable: true },
   { id: 'win-astrochess', title: 'Astro Chess • Cosmic Chess Game', shortTitle: 'Astro Chess', accentColor: '#F59E0B', defaultWidth: 880, defaultHeight: 600, resizable: true },
+  { id: 'win-astrostudio', title: 'Astro.Studio • Cosmic Image Editor', shortTitle: 'Astro.Studio', accentColor: '#8B5CF6', defaultWidth: 900, defaultHeight: 620, resizable: true },
   { id: 'win-inkra', title: 'Inkra • Creative Digital Studio', shortTitle: 'Inkra', accentColor: '#D946EF', defaultWidth: 880, defaultHeight: 600, resizable: true },
   { id: 'win-notes', title: 'Astro.Notes • Notebook & Glossary', shortTitle: 'Notes', accentColor: '#818CF8', defaultWidth: 780, defaultHeight: 540, resizable: true },
   { id: 'win-draw', title: 'Studio Paint • Astro.Paint', shortTitle: 'Paint', accentColor: '#FACC15', defaultWidth: 780, defaultHeight: 560, resizable: true },
@@ -39,6 +40,7 @@ export const ICON_ORDER: Array<{ id: string; winId: WindowId; defaultName: strin
   { id: 'icon-win-music', winId: 'win-music', defaultName: 'Music' },
   { id: 'icon-win-youtube', winId: 'win-youtube', defaultName: 'YouTube' },
   { id: 'icon-win-astrochess', winId: 'win-astrochess', defaultName: 'Astro Chess' },
+  { id: 'icon-win-astrostudio', winId: 'win-astrostudio', defaultName: 'Astro.Studio' },
 ];
 
 export const DEFAULT_ADMIN_CONFIG: AdminConfig = {
@@ -62,6 +64,7 @@ export const DEFAULT_ADMIN_CONFIG: AdminConfig = {
       'icon-win-music': { name: 'Music', visible: true },
       'icon-win-youtube': { name: 'YouTube', visible: true },
       'icon-win-astrochess': { name: 'Astro Chess', visible: true },
+      'icon-win-astrostudio': { name: 'Astro.Studio', visible: true },
     },
   },
   windows: {
@@ -69,6 +72,7 @@ export const DEFAULT_ADMIN_CONFIG: AdminConfig = {
     'win-cardgram': { title: 'CardGram • Web Identity', width: 880, height: 580 },
     'win-pressmark': { title: 'Pressmark • Watermark & Media Multi-Tool', width: 880, height: 600 },
     'win-astrochess': { title: 'Astro Chess • Cosmic Chess Game', width: 880, height: 600 },
+    'win-astrostudio': { title: 'Astro.Studio • Cosmic Image Editor', width: 900, height: 620 },
     'win-inkra': { title: 'Inkra • Creative Digital Studio', width: 880, height: 600 },
     'win-notes': { title: 'Astro.Notes • Notebook & Glossary', width: 780, height: 540 },
     'win-draw': { title: 'Studio Paint • Astro.Paint', width: 780, height: 560 },

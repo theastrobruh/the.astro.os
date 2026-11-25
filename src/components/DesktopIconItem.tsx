@@ -473,6 +473,22 @@ export function renderDefaultSvg(winId: WindowId) {
           <circle cx="17.5" cy="13" r="1.2" fill="#1E1B4B" />
         </svg>
       );
+    case 'win-astrostudio':
+      return (
+        <svg className="w-[58%] h-[58%] group-hover:scale-110 transition-transform duration-300" viewBox="0 0 40 40" fill="none">
+          <defs>
+            <linearGradient id="icoStudio" x1="6" y1="6" x2="34" y2="34" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#C084FC" />
+              <stop offset="50%" stopColor="#8B5CF6" />
+              <stop offset="100%" stopColor="#38BDF8" />
+            </linearGradient>
+          </defs>
+          <rect x="6" y="8" width="28" height="24" rx="5" fill="#160f2e" stroke="url(#icoStudio)" strokeWidth="2.2" />
+          <path d="M10 27L16.5 19.5L21.5 24.5L25.5 20L30 27H10Z" fill="url(#icoStudio)" opacity="0.85" />
+          <circle cx="15" cy="15" r="2.2" fill="#FDE047" />
+          <path d="M27 11L28 13.5L30.5 14.5L28 15.5L27 18L26 15.5L23.5 14.5L26 13.5L27 11Z" fill="#00F0FF" />
+        </svg>
+      );
     case 'win-inkra':
       return (
         <svg className="w-[60%] h-[60%] group-hover:scale-110 transition-transform duration-300" viewBox="0 0 40 40" fill="none">

@@ -55,6 +55,14 @@ export const AstroVerseApp: React.FC<AstroVerseAppProps> = ({ onOpenWindow }) =>
       internalWin: 'win-astrochess',
     },
     {
+      code: 'AS',
+      title: 'Astro.Studio',
+      subtitle: 'Cosmic image editor & studio',
+      url: 'https://theastrobruh.github.io/Astro.Studio/',
+      accent: 'text-violet-300 bg-violet-500/15 border-violet-400/35',
+      internalWin: 'win-astrostudio',
+    },
+    {
       code: 'GH',
       title: 'GitHub Repo',
       subtitle: 'github.com/theastrobruh/the.astro.os',

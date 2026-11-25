@@ -8,6 +8,7 @@ export type WindowId =
   | 'win-mediaflow'
   | 'win-pressmark'
   | 'win-astrochess'
+  | 'win-astrostudio'
   | 'win-cardgram'
   | 'win-inkra'
   | 'win-icon-manager'

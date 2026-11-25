@@ -125,6 +125,19 @@ export const StartMenu: React.FC<StartMenuProps> = ({
           </button>
 
           <button
+            onClick={() => launch(() => onOpenWindow('win-astrostudio'))}
+            className="p-2 rounded-2xl bg-white/8 hover:bg-white/15 border border-white/10 hover:border-violet-400/50 flex flex-col items-center justify-center gap-1.5 text-center transition-all active:scale-95 shadow-sm"
+          >
+            <div className="w-7 h-7 rounded-lg bg-violet-500/20 text-violet-300 flex items-center justify-center">
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <rect x="3" y="4" width="18" height="16" rx="3" />
+                <path d="M7 16l4-4 3 3 2-2 3 3" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+            <span className="text-[11px] font-mono font-bold text-white whitespace-nowrap">Astro.Studio</span>
+          </button>
+
+          <button
             onClick={() => launch(() => onOpenWindow('win-inkra'))}
             className="p-2 rounded-2xl bg-white/8 hover:bg-white/15 border border-white/10 hover:border-fuchsia-400/50 flex flex-col items-center justify-center gap-1.5 text-center transition-all active:scale-95 shadow-sm"
           >

@@ -80,6 +80,8 @@ export interface DesktopIconConfig {
   name: string;
   visible: boolean;
   customImage?: string;
+  isFolder?: boolean;
+  folderApps?: Array<{ winId: WindowId; name: string }>;
 }
 
 export interface MediaWidgetItem {

@@ -7,7 +7,7 @@ export const ASTRO_AVATAR_IMG = astroAvatarImg;
 export const DAHYUN_GIF_URL = 'https://media.tenor.com/hWEGQvJ2ntsAAAAM/haishatp-dahyun.gif';
 
 export const WINDOW_META_LIST: WindowMeta[] = [
-  { id: 'win-astroverse', title: 'theAstroBruh — Links', shortTitle: 'Astro.Verse', accentColor: '#FF007A', defaultWidth: 460, defaultHeight: 520 },
+  { id: 'win-astroverse', title: 'theAstroBruh — Links', shortTitle: 'Astro.Verse', accentColor: '#FF007A', defaultWidth: 460, defaultHeight: 640 },
   { id: 'win-cardgram', title: 'CardGram • Web Identity', shortTitle: 'CardGram', accentColor: '#F472B6', defaultWidth: 880, defaultHeight: 580, resizable: true },
   { id: 'win-pressmark', title: 'Pressmark • Watermark & Media Multi-Tool', shortTitle: 'Pressmark', accentColor: '#06B6D4', defaultWidth: 880, defaultHeight: 600, resizable: true },
   { id: 'win-astrochess', title: 'Astro Chess • Cosmic Chess Game', shortTitle: 'Astro Chess', accentColor: '#F59E0B', defaultWidth: 880, defaultHeight: 600, resizable: true },
@@ -29,10 +29,25 @@ export const WINDOW_META_MAP: Record<WindowId, WindowMeta> = WINDOW_META_LIST.re
   return acc;
 }, {} as Record<WindowId, WindowMeta>);
 
-export const ICON_ORDER: Array<{ id: string; winId: WindowId; defaultName: string }> = [
+export const ICON_ORDER: Array<{
+  id: string;
+  winId: WindowId;
+  defaultName: string;
+  isFolder?: boolean;
+  folderApps?: Array<{ winId: WindowId; name: string }>;
+}> = [
   { id: 'icon-win-astroverse', winId: 'win-astroverse', defaultName: 'Astro.Verse' },
   { id: 'icon-win-cardgram', winId: 'win-cardgram', defaultName: 'CardGram' },
-  { id: 'icon-win-pressmark', winId: 'win-pressmark', defaultName: 'Pressmark' },
+  {
+    id: 'icon-folder-studio',
+    winId: 'win-pressmark',
+    defaultName: 'Media Tools',
+    isFolder: true,
+    folderApps: [
+      { winId: 'win-pressmark', name: 'Pressmark' },
+      { winId: 'win-astrostudio', name: 'Astro.Studio' },
+    ],
+  },
   { id: 'icon-win-inkra', winId: 'win-inkra', defaultName: 'Inkra' },
   { id: 'icon-win-notes', winId: 'win-notes', defaultName: 'Notes' },
   { id: 'icon-win-draw', winId: 'win-draw', defaultName: 'Paint' },
@@ -40,7 +55,6 @@ export const ICON_ORDER: Array<{ id: string; winId: WindowId; defaultName: strin
   { id: 'icon-win-music', winId: 'win-music', defaultName: 'Music' },
   { id: 'icon-win-youtube', winId: 'win-youtube', defaultName: 'YouTube' },
   { id: 'icon-win-astrochess', winId: 'win-astrochess', defaultName: 'Astro Chess' },
-  { id: 'icon-win-astrostudio', winId: 'win-astrostudio', defaultName: 'Astro.Studio' },
 ];
 
 export const DEFAULT_ADMIN_CONFIG: AdminConfig = {
@@ -56,7 +70,7 @@ export const DEFAULT_ADMIN_CONFIG: AdminConfig = {
     icons: {
       'icon-win-astroverse': { name: 'Astro.Verse', visible: true },
       'icon-win-cardgram': { name: 'CardGram', visible: true },
-      'icon-win-pressmark': { name: 'Pressmark', visible: true },
+      'icon-folder-studio': { name: 'Media Tools', visible: true },
       'icon-win-inkra': { name: 'Inkra', visible: true },
       'icon-win-notes': { name: 'Notes', visible: true },
       'icon-win-draw': { name: 'Paint', visible: true },
@@ -64,11 +78,10 @@ export const DEFAULT_ADMIN_CONFIG: AdminConfig = {
       'icon-win-music': { name: 'Music', visible: true },
       'icon-win-youtube': { name: 'YouTube', visible: true },
       'icon-win-astrochess': { name: 'Astro Chess', visible: true },
-      'icon-win-astrostudio': { name: 'Astro.Studio', visible: true },
     },
   },
   windows: {
-    'win-astroverse': { title: 'theAstroBruh — Links', width: 460, height: 520 },
+    'win-astroverse': { title: 'theAstroBruh — Links', width: 460, height: 640 },
     'win-cardgram': { title: 'CardGram • Web Identity', width: 880, height: 580 },
     'win-pressmark': { title: 'Pressmark • Watermark & Media Multi-Tool', width: 880, height: 600 },
     'win-astrochess': { title: 'Astro Chess • Cosmic Chess Game', width: 880, height: 600 },

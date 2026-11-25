@@ -30,7 +30,7 @@ import { MobileStatusBar } from './components/MobileStatusBar';
 import { Taskbar } from './components/Taskbar';
 import { StartMenu } from './components/StartMenu';
 import { DesktopDrawCanvas } from './components/DesktopDrawCanvas';
-import { DesktopIconItem } from './components/DesktopIconItem';
+import { DesktopIconItem, renderDefaultSvg } from './components/DesktopIconItem';
 import { MediaWidgetItemView } from './components/MediaWidgetItemView';
 import { WindowFrame } from './components/WindowFrame';
 import { TimezoneModal } from './components/TimezoneModal';
@@ -286,6 +286,13 @@ export default function App() {
   const [timezoneModalOpen, setTimezoneModalOpen] = useState(false);
   const [adminPinModalOpen, setAdminPinModalOpen] = useState(false);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
+  const [openFolder, setOpenFolder] = useState<{
+    id: string;
+    name: string;
+    x: number;
+    y: number;
+    apps: Array<{ winId: WindowId; name: string }>;
+  } | null>(null);
   const [musicInTray, setMusicInTray] = useState(false);
 
   const [ctxMenu, setCtxMenu] = useState<{ open: boolean; widgetId: string; x: number; y: number } | null>(null);
@@ -963,6 +970,8 @@ export default function App() {
       name: cfg.name,
       visible: cfg.visible,
       customImage: cfg.customImage,
+      isFolder: item.isFolder,
+      folderApps: item.folderApps,
     };
   });
 
@@ -972,6 +981,7 @@ export default function App() {
         if (startMenuOpen) setStartMenuOpen(false);
         if (selectedWidgetId) setSelectedWidgetId(null);
         if (ctxMenu) setCtxMenu(null);
+        if (openFolder) setOpenFolder(null);
       }}
       className="relative w-full h-full h-[100dvh] max-h-[100dvh] overflow-hidden astro-wallpaper flex flex-col select-none"
     >
@@ -1028,12 +1038,72 @@ export default function App() {
               registerElement={registerElement}
               getBody={getBody}
               onOpenWindow={openWindow}
+              onOpenFolder={(ico, rect) => {
+                if (!ico.folderApps) return;
+                setOpenFolder((prev) =>
+                  prev?.id === ico.id
+                    ? null
+                    : {
+                        id: ico.id,
+                        name: ico.name,
+                        x: Math.min(window.innerWidth - 220, Math.max(12, rect.left)),
+                        y: Math.min(window.innerHeight - 190, Math.max(12, rect.bottom + 8)),
+                        apps: ico.folderApps!,
+                      }
+                );
+              }}
               onDragStartBody={handleDragStartBody}
               onDragMoveBody={handleDragMoveBody}
               onDragEndBody={handleDragEndBody}
             />
           );
         })}
+
+        {openFolder && (
+          <div
+            onClick={(e) => e.stopPropagation()}
+            onPointerDown={(e) => e.stopPropagation()}
+            style={{
+              left: isMobile ? '50%' : openFolder.x,
+              top: isMobile ? '50%' : openFolder.y,
+              transform: isMobile ? 'translate(-50%, -50%)' : 'none',
+            }}
+            className="fixed z-50 w-56 glass-window border border-white/25 rounded-2xl p-3 shadow-2xl bg-slate-950/90 backdrop-blur-2xl window-anim-open"
+          >
+            <div className="flex items-center justify-between pb-2 mb-2.5 border-b border-white/10">
+              <span className="text-xs font-mono font-bold text-slate-200 truncate">
+                {openFolder.name}
+              </span>
+              <button
+                type="button"
+                onClick={() => setOpenFolder(null)}
+                className="w-5 h-5 rounded-md bg-white/10 hover:bg-white/20 text-slate-300 text-[10px] flex items-center justify-center"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              {openFolder.apps.map((app) => (
+                <button
+                  key={app.winId}
+                  type="button"
+                  onClick={() => {
+                    openWindow(app.winId);
+                    setOpenFolder(null);
+                  }}
+                  className="p-2.5 rounded-xl bg-white/5 hover:bg-white/15 border border-white/10 hover:border-cyan-400/50 flex flex-col items-center gap-1.5 transition-all active:scale-95"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-slate-900/80 border border-white/15 flex items-center justify-center">
+                    {renderDefaultSvg(app.winId)}
+                  </div>
+                  <span className="text-[11px] font-mono font-semibold text-white truncate max-w-full">
+                    {app.name}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {widgets.map((widget) => (
           <MediaWidgetItemView

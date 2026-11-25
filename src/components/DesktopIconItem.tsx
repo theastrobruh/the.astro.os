@@ -104,6 +104,7 @@ interface DesktopIconItemProps {
   registerElement: (id: string, el: HTMLElement | null) => void;
   getBody: (id: string) => PhysicsBody | undefined;
   onOpenWindow: (winId: WindowId) => void;
+  onOpenFolder?: (icon: DesktopIconConfig, rect: DOMRect) => void;
   onDragStartBody: (id: string, grabOffsetX: number, grabOffsetY: number) => void;
   onDragMoveBody: (id: string, x: number, y: number, instVx: number, instVy: number) => void;
   onDragEndBody: (id: string, vx: number, vy: number) => void;
@@ -119,6 +120,7 @@ export const DesktopIconItem: React.FC<DesktopIconItemProps> = ({
   registerElement,
   getBody,
   onOpenWindow,
+  onOpenFolder,
   onDragStartBody,
   onDragMoveBody,
   onDragEndBody,
@@ -220,7 +222,11 @@ export const DesktopIconItem: React.FC<DesktopIconItemProps> = ({
       onDragEndBody(icon.id, vx, vy);
     } else {
       astroSound.playWindowPop(true);
-      onOpenWindow(icon.winId);
+      if (icon.isFolder && onOpenFolder) {
+        onOpenFolder(icon, e.currentTarget.getBoundingClientRect());
+      } else {
+        onOpenWindow(icon.winId);
+      }
     }
   };
 
@@ -254,7 +260,11 @@ export const DesktopIconItem: React.FC<DesktopIconItemProps> = ({
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           astroSound.playWindowPop(true);
-          onOpenWindow(icon.winId);
+          if (icon.isFolder && onOpenFolder) {
+            onOpenFolder(icon, e.currentTarget.getBoundingClientRect());
+          } else {
+            onOpenWindow(icon.winId);
+          }
         }
       }}
       role="button"
@@ -282,6 +292,14 @@ export const DesktopIconItem: React.FC<DesktopIconItemProps> = ({
             className="w-full h-full object-cover"
             draggable={false}
           />
+        ) : icon.isFolder && icon.folderApps ? (
+          <div className="w-[84%] h-[84%] grid grid-cols-2 gap-1 p-1 rounded-xl bg-slate-950/60 border border-white/15 place-items-center">
+            {icon.folderApps.slice(0, 4).map((app) => (
+              <div key={app.winId} className="w-full h-full flex items-center justify-center rounded-md bg-white/5">
+                {renderDefaultSvg(app.winId)}
+              </div>
+            ))}
+          </div>
         ) : (
           renderDefaultSvg(icon.winId)
         )}

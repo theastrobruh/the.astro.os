@@ -43,6 +43,7 @@ import { ThemesApp } from './components/apps/ThemesApp';
 import { MusicApp } from './components/apps/MusicApp';
 import { MediaFlowApp } from './components/apps/MediaFlowApp';
 import { PressmarkApp } from './components/apps/PressmarkApp';
+import { AstroChessApp } from './components/apps/AstroChessApp';
 import { CardGramApp } from './components/apps/CardGramApp';
 import { InkraApp } from './components/apps/InkraApp';
 import { IconManagerApp } from './components/apps/IconManagerApp';
@@ -185,7 +186,7 @@ function createInitialWindows(): Record<WindowId, WindowRuntimeState> {
     const y = Math.max(14, Math.round((vh - 56 - h) / 2) + (idx % 3) * 14 - 14);
     const isAstroVerse = meta.id === 'win-astroverse';
     const startsMaximized =
-      meta.id === 'win-pressmark' || meta.id === 'win-cardgram' || meta.id === 'win-inkra';
+      meta.id === 'win-pressmark' || meta.id === 'win-astrochess' || meta.id === 'win-cardgram' || meta.id === 'win-inkra';
 
     result[meta.id] = {
       id: meta.id,
@@ -1120,6 +1121,7 @@ export default function App() {
                 <MediaFlowApp onSpawnWidget={spawnWidget} onToast={showToast} />
               )}
               {win.id === 'win-pressmark' && <PressmarkApp />}
+              {win.id === 'win-astrochess' && <AstroChessApp />}
               {win.id === 'win-cardgram' && <CardGramApp />}
               {win.id === 'win-inkra' && <InkraApp />}
               {win.id === 'win-youtube' && <YouTubeApp />}

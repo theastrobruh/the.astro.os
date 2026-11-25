@@ -113,6 +113,18 @@ export const StartMenu: React.FC<StartMenuProps> = ({
           </button>
 
           <button
+            onClick={() => launch(() => onOpenWindow('win-astrochess'))}
+            className="p-2 rounded-2xl bg-white/8 hover:bg-white/15 border border-white/10 hover:border-amber-400/50 flex flex-col items-center justify-center gap-1.5 text-center transition-all active:scale-95 shadow-sm"
+          >
+            <div className="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-300 flex items-center justify-center">
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <path d="M8 19h8M9 16h6l-1-4c1.5-1.5 2-4 .5-6-1-1.2-2.5-1.5-4-1.2L9.5 3 8 5.5C6.5 6.5 6 8.5 7 10l2.5-1L8 12l1 4z" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+            <span className="text-[11px] font-mono font-bold text-white whitespace-nowrap">Astro Chess</span>
+          </button>
+
+          <button
             onClick={() => launch(() => onOpenWindow('win-inkra'))}
             className="p-2 rounded-2xl bg-white/8 hover:bg-white/15 border border-white/10 hover:border-fuchsia-400/50 flex flex-col items-center justify-center gap-1.5 text-center transition-all active:scale-95 shadow-sm"
           >

@@ -451,6 +451,28 @@ export function renderDefaultSvg(winId: WindowId) {
           <rect x="21.5" y="21" width="6" height="2.4" rx="1.2" fill="#FFFFFF" opacity="0.7" />
         </svg>
       );
+    case 'win-astrochess':
+      return (
+        <svg className="w-[58%] h-[58%] group-hover:scale-110 transition-transform duration-300" viewBox="0 0 40 40" fill="none">
+          <defs>
+            <linearGradient id="icoChess" x1="8" y1="6" x2="32" y2="34" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#FDE047" />
+              <stop offset="50%" stopColor="#F59E0B" />
+              <stop offset="100%" stopColor="#EA580C" />
+            </linearGradient>
+          </defs>
+          {/* Chess Knight / King Crown Silhouette */}
+          <path
+            d="M13 31H27M14 27H26L24.5 21C26.8 18.5 27.5 14.5 25 11.5C23.5 9.7 21 9 19 9.5L17.5 7L15.5 10.5C13 12 12 15 13 18L17.5 16.5L15 21L14 27Z"
+            fill="url(#icoChess)"
+            stroke="#FEF08A"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <circle cx="17.5" cy="13" r="1.2" fill="#1E1B4B" />
+        </svg>
+      );
     case 'win-inkra':
       return (
         <svg className="w-[60%] h-[60%] group-hover:scale-110 transition-transform duration-300" viewBox="0 0 40 40" fill="none">

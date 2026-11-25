@@ -47,6 +47,14 @@ export const AstroVerseApp: React.FC<AstroVerseAppProps> = ({ onOpenWindow }) =>
       internalWin: 'win-pressmark',
     },
     {
+      code: 'AC',
+      title: 'Astro Chess',
+      subtitle: 'Cosmic interactive chess game',
+      url: 'https://theastrobruh.github.io/Astro-Chess/',
+      accent: 'text-amber-300 bg-amber-500/15 border-amber-400/35',
+      internalWin: 'win-astrochess',
+    },
+    {
       code: 'GH',
       title: 'GitHub Repo',
       subtitle: 'github.com/theastrobruh/the.astro.os',

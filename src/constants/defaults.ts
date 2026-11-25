@@ -10,6 +10,7 @@ export const WINDOW_META_LIST: WindowMeta[] = [
   { id: 'win-astroverse', title: 'theAstroBruh — Links', shortTitle: 'Astro.Verse', accentColor: '#FF007A', defaultWidth: 460, defaultHeight: 520 },
   { id: 'win-cardgram', title: 'CardGram • Web Identity', shortTitle: 'CardGram', accentColor: '#F472B6', defaultWidth: 880, defaultHeight: 580, resizable: true },
   { id: 'win-pressmark', title: 'Pressmark • Watermark & Media Multi-Tool', shortTitle: 'Pressmark', accentColor: '#06B6D4', defaultWidth: 880, defaultHeight: 600, resizable: true },
+  { id: 'win-astrochess', title: 'Astro Chess • Cosmic Chess Game', shortTitle: 'Astro Chess', accentColor: '#F59E0B', defaultWidth: 880, defaultHeight: 600, resizable: true },
   { id: 'win-inkra', title: 'Inkra • Creative Digital Studio', shortTitle: 'Inkra', accentColor: '#D946EF', defaultWidth: 880, defaultHeight: 600, resizable: true },
   { id: 'win-notes', title: 'Astro.Notes • Notebook & Glossary', shortTitle: 'Notes', accentColor: '#818CF8', defaultWidth: 780, defaultHeight: 540, resizable: true },
   { id: 'win-draw', title: 'Studio Paint • Astro.Paint', shortTitle: 'Paint', accentColor: '#FACC15', defaultWidth: 780, defaultHeight: 560, resizable: true },
@@ -37,6 +38,7 @@ export const ICON_ORDER: Array<{ id: string; winId: WindowId; defaultName: strin
   { id: 'icon-win-terminal', winId: 'win-terminal', defaultName: 'Terminal' },
   { id: 'icon-win-music', winId: 'win-music', defaultName: 'Music' },
   { id: 'icon-win-youtube', winId: 'win-youtube', defaultName: 'YouTube' },
+  { id: 'icon-win-astrochess', winId: 'win-astrochess', defaultName: 'Astro Chess' },
 ];
 
 export const DEFAULT_ADMIN_CONFIG: AdminConfig = {
@@ -59,12 +61,14 @@ export const DEFAULT_ADMIN_CONFIG: AdminConfig = {
       'icon-win-terminal': { name: 'Terminal', visible: true },
       'icon-win-music': { name: 'Music', visible: true },
       'icon-win-youtube': { name: 'YouTube', visible: true },
+      'icon-win-astrochess': { name: 'Astro Chess', visible: true },
     },
   },
   windows: {
     'win-astroverse': { title: 'theAstroBruh — Links', width: 460, height: 520 },
     'win-cardgram': { title: 'CardGram • Web Identity', width: 880, height: 580 },
     'win-pressmark': { title: 'Pressmark • Watermark & Media Multi-Tool', width: 880, height: 600 },
+    'win-astrochess': { title: 'Astro Chess • Cosmic Chess Game', width: 880, height: 600 },
     'win-inkra': { title: 'Inkra • Creative Digital Studio', width: 880, height: 600 },
     'win-notes': { title: 'Astro.Notes • Notebook & Glossary', width: 780, height: 540 },
     'win-draw': { title: 'Studio Paint • Astro.Paint', width: 780, height: 560 },

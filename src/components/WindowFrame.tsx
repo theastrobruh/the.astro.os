@@ -183,13 +183,14 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
         }
       : {
           position: 'fixed',
-          left: 8,
-          right: 8,
-          top: 8,
-          bottom: 62,
+          left: 0,
+          right: 0,
+          top: 0,
+          bottom: 56,
           zIndex: win.zIndex,
           transform: 'none',
-          maxHeight: 'calc(100dvh - 70px)',
+          maxHeight: 'calc(100dvh - 56px)',
+          borderRadius: 0,
         }
     : isMaximized
     ? {

@@ -1001,10 +1001,17 @@ export default function App() {
     ...ICON_ORDER.map((item) => {
       const cfg = config.desktop.icons[item.id] || { name: item.defaultName, visible: true };
       const override = folderOverrides.edits[item.id];
+      const rawName = override?.name ?? cfg.name;
+      const migratedName =
+        item.id === 'icon-folder-studio' && rawName === 'Media Tools'
+          ? 'Astro Tools'
+          : item.id === 'icon-folder-freetime' && rawName === 'Free Time'
+          ? 'Media Hub'
+          : rawName;
       return {
         id: item.id,
         winId: item.winId,
-        name: override?.name ?? cfg.name,
+        name: migratedName,
         visible: cfg.visible,
         customImage: cfg.customImage,
         isFolder: item.isFolder,

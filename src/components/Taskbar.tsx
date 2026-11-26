@@ -101,12 +101,21 @@ export const Taskbar: React.FC<TaskbarProps> = ({
   const [physicsPopoverOpen, setPhysicsPopoverOpen] = useState(false);
   const [musicTrayMenuOpen, setMusicTrayMenuOpen] = useState(false);
   const [now, setNow] = useState(() => new Date());
+  const [tzOffset, setTzOffset] = useState(0);
   const footerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(id);
   }, []);
+
+  useEffect(() => {
+    if (selectedTimezones.length <= 2) return;
+    const id = setInterval(() => {
+      setTzOffset((prev) => (prev + 1) % selectedTimezones.length);
+    }, 4500);
+    return () => clearInterval(id);
+  }, [selectedTimezones.length]);
 
   useEffect(() => {
     if (!physicsPopoverOpen && !musicTrayMenuOpen) return;
@@ -125,27 +134,128 @@ export const Taskbar: React.FC<TaskbarProps> = ({
   );
 
   if (isMobile) {
+    const tzList = selectedTimezones.length > 0 ? selectedTimezones : ['America/Lima', 'America/New_York'];
+    const firstTzId = tzList[tzOffset % tzList.length];
+    const secondTzId = tzList.length > 1 ? tzList[(tzOffset + 1) % tzList.length] : null;
+
+    const formatTzRow = (tzId: string) => {
+      const meta = AVAILABLE_TIMEZONES.find((t) => t.id === tzId);
+      const code = meta?.code || tzId.split('/')[1]?.slice(0, 2).toUpperCase() || 'GL';
+      let tStr = '--:--';
+      try {
+        tStr = now.toLocaleTimeString('en-US', {
+          timeZone: tzId,
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false,
+        });
+      } catch {
+        tStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+      }
+      return { code, tStr };
+    };
+
+    const row1 = formatTzRow(firstTzId);
+    const row2 = secondTzId ? formatTzRow(secondTzId) : null;
+
     return (
       <footer
         ref={footerRef}
         onClick={(e) => e.stopPropagation()}
-        className="w-full h-14 bg-slate-950/90 backdrop-blur-2xl border-t border-white/20 px-4 flex items-center justify-between z-40 shrink-0 shadow-[0_-8px_30px_rgba(0,0,0,0.6)]"
+        className="w-full h-14 bg-slate-950/90 backdrop-blur-2xl border-t border-white/20 px-2.5 grid grid-cols-[1fr_auto_1fr] items-center gap-1.5 z-40 shrink-0 shadow-[0_-8px_30px_rgba(0,0,0,0.6)] relative"
       >
-        <div className="w-11 flex items-center justify-start">
+        {/* Bottom-Left: Gravity, Realign, Themes, Volume, Music Tray */}
+        <div className="flex items-center gap-1 justify-self-start relative">
+          <button
+            type="button"
+            onClick={() => setPhysicsPopoverOpen((v) => !v)}
+            title="Physics"
+            className="w-8 h-8 rounded-xl bg-white/8 hover:bg-white/15 active:scale-95 border border-white/15 flex items-center justify-center transition-all"
+          >
+            {renderPhysicsIcon(physicsMode)}
+          </button>
+
+          <button
+            type="button"
+            onClick={onRearrangeIcons}
+            title="Reset Icons"
+            className="w-8 h-8 rounded-xl bg-white/8 hover:bg-white/15 active:scale-95 border border-white/15 flex items-center justify-center text-cyan-300 transition-all"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+            </svg>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => onOpenWindow('win-themes')}
+            title="Themes"
+            className="w-8 h-8 rounded-xl bg-white/8 hover:bg-white/15 active:scale-95 border border-white/15 flex items-center justify-center text-fuchsia-300 transition-all"
+          >
+            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M7 21a4 4 0 01-4-4 4 4 0 014-4h4a4 4 0 014 4 4 4 0 01-4 4H7z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 3h6v6l-7 7-6-6 7-7z" />
+            </svg>
+          </button>
+
+          <button
+            type="button"
+            onClick={onToggleSound}
+            title={soundEnabled ? 'Mute' : 'Unmute'}
+            className="w-8 h-8 rounded-xl bg-white/8 hover:bg-white/15 active:scale-95 border border-white/15 flex items-center justify-center text-slate-200 transition-all"
+          >
+            {soundEnabled ? (
+              <svg className="w-3.5 h-3.5 text-emerald-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />
+              </svg>
+            ) : (
+              <svg className="w-3.5 h-3.5 text-rose-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                <line x1="23" y1="9" x2="17" y2="15" />
+                <line x1="17" y1="9" x2="23" y2="15" />
+              </svg>
+            )}
+          </button>
+
           {musicClosedToTray && (
             <button
               type="button"
               onClick={onRestoreMusic}
               title="Astro.Radio Tray"
-              className="w-9 h-9 rounded-xl bg-violet-600/40 border border-violet-400/60 flex items-center justify-center text-xs text-violet-200 shadow-md shadow-violet-500/20"
+              className="w-8 h-8 rounded-xl bg-violet-600/40 border border-violet-400/60 flex items-center justify-center text-xs text-violet-200 shadow-md shadow-violet-500/20"
             >
-              <svg className="w-4 h-4 text-cyan-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <svg className="w-3.5 h-3.5 text-cyan-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z" />
               </svg>
             </button>
           )}
+
+          {physicsPopoverOpen && (
+            <div className="absolute bottom-12 left-0 w-40 bg-slate-950/95 backdrop-blur-2xl border border-white/20 rounded-xl p-1.5 shadow-2xl z-50 space-y-1">
+              {(Object.keys(PHYSICS_DESCRIPTIONS) as PhysicsMode[]).map((m) => (
+                <button
+                  key={m}
+                  type="button"
+                  onClick={() => {
+                    onChangePhysicsMode(m);
+                    setPhysicsPopoverOpen(false);
+                  }}
+                  className={`w-full px-2.5 py-1.5 rounded-lg text-left text-[11px] font-mono flex items-center gap-2 transition-colors ${
+                    physicsMode === m
+                      ? 'bg-cyan-500/25 text-cyan-200 font-bold border border-cyan-400/40'
+                      : 'hover:bg-white/10 text-slate-300'
+                  }`}
+                >
+                  {renderPhysicsIcon(m)}
+                  <span>{PHYSICS_DESCRIPTIONS[m]}</span>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
+        {/* Center: Home / Start Button */}
         <button
           type="button"
           onClick={(e) => {
@@ -156,12 +266,33 @@ export const Taskbar: React.FC<TaskbarProps> = ({
           }}
           aria-label="Start"
           aria-expanded={startMenuOpen}
-          className="xp-start-btn w-11 h-11 rounded-2xl flex items-center justify-center transition-transform active:scale-95 shadow-lg shadow-pink-500/30 border border-white/40 text-white"
+          className="xp-start-btn w-11 h-11 rounded-2xl flex items-center justify-center transition-transform active:scale-95 shadow-lg shadow-pink-500/30 border border-white/40 text-white justify-self-center"
         >
           <AstroLogoSvg className="w-6 h-6 shrink-0" />
         </button>
 
-        <div className="w-11" />
+        {/* Bottom-Right: Dynamic Stacked Dual-Timezone Clock */}
+        <button
+          type="button"
+          onClick={onOpenTimezoneModal}
+          title="World Clocks"
+          className="justify-self-end flex flex-col items-end justify-center gap-0.5 px-2 py-1 rounded-xl bg-white/8 hover:bg-white/15 border border-white/15 transition-colors"
+        >
+          <div className="flex items-center gap-1.5 text-[10px] font-mono leading-none">
+            <span className="px-1 py-0.5 rounded bg-cyan-500/20 text-cyan-300 font-bold text-[8.5px] tracking-wider">
+              {row1.code}
+            </span>
+            <span className="text-slate-100 font-bold tabular-nums">{row1.tStr}</span>
+          </div>
+          {row2 && (
+            <div className="flex items-center gap-1.5 text-[10px] font-mono leading-none opacity-80">
+              <span className="px-1 py-0.5 rounded bg-pink-500/20 text-pink-300 font-bold text-[8.5px] tracking-wider">
+                {row2.code}
+              </span>
+              <span className="text-slate-300 font-semibold tabular-nums">{row2.tStr}</span>
+            </div>
+          )}
+        </button>
       </footer>
     );
   }

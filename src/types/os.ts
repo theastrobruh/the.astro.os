@@ -9,6 +9,8 @@ export type WindowId =
   | 'win-pressmark'
   | 'win-astrochess'
   | 'win-astrostudio'
+  | 'win-astroupscaler'
+  | 'win-biohub'
   | 'win-cardgram'
   | 'win-inkra'
   | 'win-icon-manager'

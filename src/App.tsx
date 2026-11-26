@@ -45,6 +45,8 @@ import { MediaFlowApp } from './components/apps/MediaFlowApp';
 import { PressmarkApp } from './components/apps/PressmarkApp';
 import { AstroChessApp } from './components/apps/AstroChessApp';
 import { AstroStudioApp } from './components/apps/AstroStudioApp';
+import { AstroUpscalerApp } from './components/apps/AstroUpscalerApp';
+import { BioHubApp } from './components/apps/BioHubApp';
 import { CardGramApp } from './components/apps/CardGramApp';
 import { InkraApp } from './components/apps/InkraApp';
 import { IconManagerApp } from './components/apps/IconManagerApp';
@@ -187,7 +189,7 @@ function createInitialWindows(): Record<WindowId, WindowRuntimeState> {
     const y = Math.max(14, Math.round((vh - 56 - h) / 2) + (idx % 3) * 14 - 14);
     const isAstroVerse = meta.id === 'win-astroverse';
     const startsMaximized =
-      meta.id === 'win-pressmark' || meta.id === 'win-astrochess' || meta.id === 'win-astrostudio' || meta.id === 'win-cardgram' || meta.id === 'win-inkra';
+      meta.id === 'win-pressmark' || meta.id === 'win-astrochess' || meta.id === 'win-astrostudio' || meta.id === 'win-astroupscaler' || meta.id === 'win-biohub' || meta.id === 'win-cardgram' || meta.id === 'win-inkra';
 
     result[meta.id] = {
       id: meta.id,
@@ -1003,23 +1005,6 @@ export default function App() {
         />
       )}
 
-      {isMobile && (
-        <MobileStatusBar
-          osTitle={config.security.osTitle}
-          physicsMode={config.physics.mode}
-          soundEnabled={config.physics.soundEnabled}
-          onChangePhysicsMode={changePhysicsMode}
-          onRearrangeIcons={rearrangeIcons}
-          onOpenWindow={openWindow}
-          onToggleSound={() =>
-            setConfig((p) => ({
-              ...p,
-              physics: { ...p.physics, soundEnabled: !p.physics.soundEnabled },
-            }))
-          }
-        />
-      )}
-
       <main
         ref={desktopRef}
         className="relative flex-1 min-h-0 overflow-hidden z-10"
@@ -1194,6 +1179,8 @@ export default function App() {
               {win.id === 'win-pressmark' && <PressmarkApp />}
               {win.id === 'win-astrochess' && <AstroChessApp />}
               {win.id === 'win-astrostudio' && <AstroStudioApp />}
+              {win.id === 'win-astroupscaler' && <AstroUpscalerApp />}
+              {win.id === 'win-biohub' && <BioHubApp />}
               {win.id === 'win-cardgram' && <CardGramApp />}
               {win.id === 'win-inkra' && <InkraApp />}
               {win.id === 'win-youtube' && <YouTubeApp />}

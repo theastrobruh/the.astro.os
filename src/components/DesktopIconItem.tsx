@@ -507,6 +507,34 @@ export function renderDefaultSvg(winId: WindowId) {
           <path d="M27 11L28 13.5L30.5 14.5L28 15.5L27 18L26 15.5L23.5 14.5L26 13.5L27 11Z" fill="#00F0FF" />
         </svg>
       );
+    case 'win-astroupscaler':
+      return (
+        <svg className="w-[58%] h-[58%] group-hover:scale-110 transition-transform duration-300" viewBox="0 0 40 40" fill="none">
+          <defs>
+            <linearGradient id="icoUpscale" x1="6" y1="34" x2="34" y2="6" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#10B981" />
+              <stop offset="100%" stopColor="#00F0FF" />
+            </linearGradient>
+          </defs>
+          <rect x="7" y="7" width="26" height="26" rx="5.5" fill="#06221b" stroke="url(#icoUpscale)" strokeWidth="2.2" />
+          <path d="M14 26L26 14M26 14H18M26 14V22" stroke="#34D399" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M13 13L14 15.5L16.5 16.5L14 17.5L13 20L12 17.5L9.5 16.5L12 15.5L13 13Z" fill="#FDE047" />
+        </svg>
+      );
+    case 'win-biohub':
+      return (
+        <svg className="w-[58%] h-[58%] group-hover:scale-110 transition-transform duration-300" viewBox="0 0 40 40" fill="none">
+          <defs>
+            <linearGradient id="icoBio" x1="6" y1="6" x2="34" y2="34" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#FF007A" />
+              <stop offset="100%" stopColor="#A855F7" />
+            </linearGradient>
+          </defs>
+          <circle cx="20" cy="20" r="13.5" fill="#230b24" stroke="url(#icoBio)" strokeWidth="2.2" />
+          <circle cx="20" cy="15.5" r="3.5" fill="#FFFFFF" />
+          <path d="M13.5 26.5C15 22.8 25 22.8 26.5 26.5" stroke="#00F0FF" strokeWidth="2.2" strokeLinecap="round" />
+        </svg>
+      );
     case 'win-inkra':
       return (
         <svg className="w-[60%] h-[60%] group-hover:scale-110 transition-transform duration-300" viewBox="0 0 40 40" fill="none">

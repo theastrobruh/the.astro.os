@@ -17,66 +17,66 @@ export const AstroVerseApp: React.FC<AstroVerseAppProps> = ({ onOpenWindow }) =>
     internalWin?: WindowId;
   }> = [
     {
+      code: 'BH',
+      title: 'BioHub.',
+      subtitle: '~ Know More about theAstroBruh ~',
+      url: 'https://theastrobruh.github.io/bio-hub/',
+      accent: 'text-pink-300 bg-pink-500/15 border-pink-400/35',
+      internalWin: 'win-biohub',
+    },
+    {
+      code: 'AC',
+      title: 'Astro~Chess.',
+      subtitle: '',
+      url: 'https://theastrobruh.github.io/Astro-Chess/',
+      accent: 'text-amber-300 bg-amber-500/15 border-amber-400/35',
+      internalWin: 'win-astrochess',
+    },
+    {
       code: 'CG',
-      title: 'CardGram',
-      subtitle: 'Digital cards & web identity platform',
+      title: 'CardGram.',
+      subtitle: '~ 3D Cards Editor and TCG Social Experience.',
       url: 'https://theastrobruh.github.io/CardGram/#/home',
       accent: 'text-cyan-300 bg-cyan-500/15 border-cyan-400/35',
       internalWin: 'win-cardgram',
     },
     {
       code: 'IK',
-      title: 'Inkra',
-      subtitle: 'Creative illustration & digital studio',
+      title: 'Inkra.',
+      subtitle: '~ Oricas quick creator.',
       url: 'https://theastrobruh.github.io/Inkra/inkra.html',
       accent: 'text-fuchsia-300 bg-fuchsia-500/15 border-fuchsia-400/35',
       internalWin: 'win-inkra',
     },
     {
-      code: 'BH',
-      title: 'BioHub',
-      subtitle: 'Personal bio & centralized links',
-      url: 'https://theastrobruh.github.io/bio-hub/',
-      accent: 'text-pink-300 bg-pink-500/15 border-pink-400/35',
-      internalWin: 'win-biohub',
-    },
-    {
       code: 'PM',
-      title: 'Pressmark',
-      subtitle: 'Watermark & Media Multi-Tool',
+      title: 'Pressmark.',
+      subtitle: 'Watermark multi tool for pictures, GIF & Vids.',
       url: 'https://theastrobruh.github.io/Pressmark/',
       accent: 'text-sky-300 bg-sky-500/15 border-sky-400/35',
       internalWin: 'win-pressmark',
     },
     {
-      code: 'AC',
-      title: 'Astro Chess',
-      subtitle: 'Cosmic interactive chess game',
-      url: 'https://theastrobruh.github.io/Astro-Chess/',
-      accent: 'text-amber-300 bg-amber-500/15 border-amber-400/35',
-      internalWin: 'win-astrochess',
-    },
-    {
       code: 'AS',
-      title: 'Astro.Studio',
-      subtitle: 'Cosmic image editor & studio',
+      title: 'Astro.Studio.',
+      subtitle: '~ Picture Studio with filters, quick edits, watermarks and more.',
       url: 'https://theastrobruh.github.io/Astro.Studio/',
       accent: 'text-violet-300 bg-violet-500/15 border-violet-400/35',
       internalWin: 'win-astrostudio',
     },
     {
       code: 'AU',
-      title: 'Astro.Upscaler',
-      subtitle: 'AI image upscaler & enhancer',
+      title: 'Astro.Upscaler.',
+      subtitle: '~ Upscaler with quick access features.',
       url: 'https://theastrobruh.github.io/Astro.Upscale/',
       accent: 'text-emerald-300 bg-emerald-500/15 border-emerald-400/35',
       internalWin: 'win-astroupscaler',
     },
     {
       code: 'GH',
-      title: 'GitHub Repo',
-      subtitle: 'github.com/theastrobruh/the.astro.os',
-      url: 'https://github.com/theastrobruh/the.astro.os',
+      title: 'GitHub.',
+      subtitle: '~ My GitHub :D',
+      url: 'https://github.com/theastrobruh',
       accent: 'text-slate-200 bg-white/10 border-white/25',
     },
   ];
@@ -108,7 +108,7 @@ export const AstroVerseApp: React.FC<AstroVerseAppProps> = ({ onOpenWindow }) =>
           theAstroBruh
         </h2>
         <p className="text-[10px] sm:text-[11px] font-mono text-cyan-300/90">
-          Creative Developer · Cosmic Web OS
+          Creative Developer ~ Designer | V. Editor | Content Creator ~
         </p>
       </div>
 

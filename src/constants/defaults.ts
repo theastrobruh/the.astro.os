@@ -7,7 +7,7 @@ export const ASTRO_AVATAR_IMG = astroAvatarImg;
 export const DAHYUN_GIF_URL = 'https://media.tenor.com/hWEGQvJ2ntsAAAAM/haishatp-dahyun.gif';
 
 export const WINDOW_META_LIST: WindowMeta[] = [
-  { id: 'win-astroverse', title: 'theAstroBruh — Links', shortTitle: 'Astro.Verse', accentColor: '#FF007A', defaultWidth: 460, defaultHeight: 640 },
+  { id: 'win-astroverse', title: 'theAstroBruh — Links', shortTitle: 'Astro.Verse', accentColor: '#FF007A', defaultWidth: 460, defaultHeight: 670 },
   { id: 'win-cardgram', title: 'CardGram • Web Identity', shortTitle: 'CardGram', accentColor: '#F472B6', defaultWidth: 880, defaultHeight: 580, resizable: true },
   { id: 'win-pressmark', title: 'Pressmark • Watermark & Media Multi-Tool', shortTitle: 'Pressmark', accentColor: '#06B6D4', defaultWidth: 880, defaultHeight: 600, resizable: true },
   { id: 'win-astrochess', title: 'Astro Chess • Cosmic Chess Game', shortTitle: 'Astro Chess', accentColor: '#F59E0B', defaultWidth: 880, defaultHeight: 600, resizable: true },
@@ -43,27 +43,27 @@ export const ICON_ORDER: Array<{
   {
     id: 'icon-folder-studio',
     winId: 'win-astrostudio',
-    defaultName: 'Media Tools',
+    defaultName: 'Astro Tools',
     isFolder: true,
     folderApps: [
       { winId: 'win-astrostudio', name: 'Astro.Studio' },
       { winId: 'win-pressmark', name: 'Pressmark' },
       { winId: 'win-astroupscaler', name: 'Astro.Upscaler' },
+      { winId: 'win-inkra', name: 'Inkra' },
     ],
   },
-  { id: 'icon-win-inkra', winId: 'win-inkra', defaultName: 'Inkra' },
   { id: 'icon-win-notes', winId: 'win-notes', defaultName: 'Notes' },
+  { id: 'icon-win-draw', winId: 'win-draw', defaultName: 'Paint' },
   { id: 'icon-win-terminal', winId: 'win-terminal', defaultName: 'Terminal' },
+  { id: 'icon-win-astrochess', winId: 'win-astrochess', defaultName: 'Astro~Chess' },
   {
     id: 'icon-folder-freetime',
     winId: 'win-music',
-    defaultName: 'Free Time',
+    defaultName: 'Media Hub',
     isFolder: true,
     folderApps: [
       { winId: 'win-music', name: 'Music' },
       { winId: 'win-youtube', name: 'YouTube' },
-      { winId: 'win-draw', name: 'Paint' },
-      { winId: 'win-astrochess', name: 'Astro~Chess' },
     ],
   },
 ];
@@ -81,11 +81,12 @@ export const DEFAULT_ADMIN_CONFIG: AdminConfig = {
     icons: {
       'icon-win-astroverse': { name: 'Astro.Verse', visible: true },
       'icon-win-cardgram': { name: 'CardGram', visible: true },
-      'icon-folder-studio': { name: 'Media Tools', visible: true },
-      'icon-win-inkra': { name: 'Inkra', visible: true },
+      'icon-folder-studio': { name: 'Astro Tools', visible: true },
       'icon-win-notes': { name: 'Notes', visible: true },
+      'icon-win-draw': { name: 'Paint', visible: true },
       'icon-win-terminal': { name: 'Terminal', visible: true },
-      'icon-folder-freetime': { name: 'Free Time', visible: true },
+      'icon-win-astrochess': { name: 'Astro~Chess', visible: true },
+      'icon-folder-freetime': { name: 'Media Hub', visible: true },
     },
   },
   windows: {

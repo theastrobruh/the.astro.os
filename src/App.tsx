@@ -267,6 +267,8 @@ function computeGridIconPositions(
   return positions;
 }
 
+const STORAGE_FOLDERS_KEY = 'astro_os_v3_folders';
+
 export default function App() {
   const [config, setConfig] = useState<AdminConfig>(loadInitialConfig);
   const [userRole, setUserRole] = useState<UserRole>('guest');
@@ -295,6 +297,29 @@ export default function App() {
     y: number;
     apps: Array<{ winId: WindowId; name: string }>;
   } | null>(null);
+  const [editingFolderName, setEditingFolderName] = useState(false);
+  const [folderNameDraft, setFolderNameDraft] = useState('');
+  const [addingAppToFolder, setAddingAppToFolder] = useState(false);
+  const [folderOverrides, setFolderOverrides] = useState<{
+    edits: Record<string, { name?: string; apps?: Array<{ winId: WindowId; name: string }> }>;
+    custom: Array<{ id: string; name: string; apps: Array<{ winId: WindowId; name: string }> }>;
+  }>(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_FOLDERS_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object') {
+          return {
+            edits: parsed.edits || {},
+            custom: Array.isArray(parsed.custom) ? parsed.custom : [],
+          };
+        }
+      }
+    } catch {
+      // ignore
+    }
+    return { edits: {}, custom: [] };
+  });
   const [musicInTray, setMusicInTray] = useState(false);
 
   const [ctxMenu, setCtxMenu] = useState<{ open: boolean; widgetId: string; x: number; y: number } | null>(null);
@@ -379,6 +404,14 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem(STORAGE_TIMEZONES_KEY, JSON.stringify(selectedTimezones));
   }, [selectedTimezones]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_FOLDERS_KEY, JSON.stringify(folderOverrides));
+    } catch {
+      // ignore
+    }
+  }, [folderOverrides]);
 
   useEffect(() => {
     const onResize = () => {
@@ -964,18 +997,29 @@ export default function App() {
     e.target.value = '';
   };
 
-  const iconList = ICON_ORDER.map((item) => {
-    const cfg = config.desktop.icons[item.id] || { name: item.defaultName, visible: true };
-    return {
-      id: item.id,
-      winId: item.winId,
-      name: cfg.name,
-      visible: cfg.visible,
-      customImage: cfg.customImage,
-      isFolder: item.isFolder,
-      folderApps: item.folderApps,
-    };
-  });
+  const iconList = [
+    ...ICON_ORDER.map((item) => {
+      const cfg = config.desktop.icons[item.id] || { name: item.defaultName, visible: true };
+      const override = folderOverrides.edits[item.id];
+      return {
+        id: item.id,
+        winId: item.winId,
+        name: override?.name ?? cfg.name,
+        visible: cfg.visible,
+        customImage: cfg.customImage,
+        isFolder: item.isFolder,
+        folderApps: override?.apps ?? item.folderApps,
+      };
+    }),
+    ...folderOverrides.custom.map((cf) => ({
+      id: cf.id,
+      winId: (cf.apps[0]?.winId || 'win-astroverse') as WindowId,
+      name: cf.name,
+      visible: true,
+      isFolder: true,
+      folderApps: cf.apps,
+    })),
+  ];
 
   return (
     <div
@@ -1025,14 +1069,17 @@ export default function App() {
               onOpenWindow={openWindow}
               onOpenFolder={(ico, rect) => {
                 if (!ico.folderApps) return;
+                setEditingFolderName(false);
+                setAddingAppToFolder(false);
+                setFolderNameDraft(ico.name);
                 setOpenFolder((prev) =>
                   prev?.id === ico.id
                     ? null
                     : {
                         id: ico.id,
                         name: ico.name,
-                        x: Math.min(window.innerWidth - 220, Math.max(12, rect.left)),
-                        y: Math.min(window.innerHeight - 190, Math.max(12, rect.bottom + 8)),
+                        x: Math.min(window.innerWidth - 250, Math.max(12, rect.left)),
+                        y: Math.min(window.innerHeight - 240, Math.max(12, rect.bottom + 8)),
                         apps: ico.folderApps!,
                       }
                 );
@@ -1046,47 +1093,219 @@ export default function App() {
 
         {openFolder && (
           <div
-            onClick={(e) => e.stopPropagation()}
-            onPointerDown={(e) => e.stopPropagation()}
-            style={{
-              left: isMobile ? '50%' : openFolder.x,
-              top: isMobile ? '50%' : openFolder.y,
-              transform: isMobile ? 'translate(-50%, -50%)' : 'none',
-            }}
-            className="fixed z-50 w-56 glass-window border border-white/25 rounded-2xl p-3 shadow-2xl bg-slate-950/90 backdrop-blur-2xl folder-anim-open"
+            style={
+              isMobile
+                ? { left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }
+                : { left: openFolder.x, top: openFolder.y }
+            }
+            className="fixed z-50"
           >
-            <div className="flex items-center justify-between pb-2 mb-2.5 border-b border-white/10">
-              <span className="text-xs font-mono font-bold text-slate-200 truncate">
-                {openFolder.name}
-              </span>
-              <button
-                type="button"
-                onClick={() => setOpenFolder(null)}
-                className="w-5 h-5 rounded-md bg-white/10 hover:bg-white/20 text-slate-300 text-[10px] flex items-center justify-center"
-              >
-                ✕
-              </button>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              {openFolder.apps.map((app, idx) => (
-                <button
-                  key={app.winId}
-                  type="button"
-                  style={{ animationDelay: `${idx * 45}ms` }}
-                  onClick={() => {
-                    openWindow(app.winId);
-                    setOpenFolder(null);
+            <div
+              onClick={(e) => e.stopPropagation()}
+              onPointerDown={(e) => e.stopPropagation()}
+              className="w-[min(86vw,270px)] sm:w-64 glass-window border border-white/25 rounded-2xl p-3 shadow-2xl bg-slate-950/90 backdrop-blur-2xl folder-anim-open"
+            >
+            <div className="flex items-center justify-between gap-1.5 pb-2 mb-2.5 border-b border-white/10">
+              {editingFolderName ? (
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    const nextName = folderNameDraft.trim() || openFolder.name;
+                    setFolderOverrides((prev) => {
+                      const isCustom = prev.custom.some((c) => c.id === openFolder.id);
+                      if (isCustom) {
+                        return {
+                          ...prev,
+                          custom: prev.custom.map((c) =>
+                            c.id === openFolder.id ? { ...c, name: nextName } : c
+                          ),
+                        };
+                      }
+                      return {
+                        ...prev,
+                        edits: {
+                          ...prev.edits,
+                          [openFolder.id]: {
+                            ...prev.edits[openFolder.id],
+                            name: nextName,
+                          },
+                        },
+                      };
+                    });
+                    setOpenFolder((prev) => (prev ? { ...prev, name: nextName } : null));
+                    setEditingFolderName(false);
                   }}
-                  className="folder-item-pop p-2.5 rounded-xl bg-white/5 hover:bg-white/15 border border-white/10 hover:border-cyan-400/50 flex flex-col items-center gap-1.5 transition-all hover:scale-105 active:scale-90"
+                  className="flex-1 flex items-center gap-1"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-slate-900/80 border border-white/15 flex items-center justify-center">
-                    {renderDefaultSvg(app.winId)}
-                  </div>
-                  <span className="text-[11px] font-mono font-semibold text-white truncate max-w-full">
-                    {app.name}
-                  </span>
+                  <input
+                    autoFocus
+                    value={folderNameDraft}
+                    onChange={(e) => setFolderNameDraft(e.target.value)}
+                    className="w-full px-2 py-0.5 rounded bg-white/10 border border-cyan-400/50 text-xs font-mono text-white outline-none"
+                  />
+                </form>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFolderNameDraft(openFolder.name);
+                    setEditingFolderName(true);
+                  }}
+                  title="Rename folder"
+                  className="text-xs font-mono font-bold text-slate-200 hover:text-cyan-300 truncate flex items-center gap-1.5 transition-colors"
+                >
+                  <span className="truncate">{openFolder.name}</span>
+                  <svg className="w-3 h-3 opacity-60 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                  </svg>
                 </button>
-              ))}
+              )}
+
+              <div className="flex items-center gap-1 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setAddingAppToFolder((v) => !v)}
+                  title="Add app to folder"
+                  className="px-1.5 h-5 rounded-md bg-cyan-500/20 hover:bg-cyan-500/35 border border-cyan-400/40 text-cyan-200 text-[10px] font-mono font-bold flex items-center justify-center"
+                >
+                  + App
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const newId = `icon-folder-custom-${Date.now()}`;
+                    const newFolder = {
+                      id: newId,
+                      name: 'New Folder',
+                      apps: [{ winId: 'win-notes' as WindowId, name: 'Notes' }],
+                    };
+                    setFolderOverrides((prev) => ({
+                      ...prev,
+                      custom: [...prev.custom, newFolder],
+                    }));
+                    setIconPositions((prev) => ({
+                      ...prev,
+                      [newId]: { x: Math.min(window.innerWidth - 110, openFolder.x + 24), y: Math.min(window.innerHeight - 140, openFolder.y + 24) },
+                    }));
+                    showToast('New folder created');
+                  }}
+                  title="Create new folder"
+                  className="px-1.5 h-5 rounded-md bg-white/10 hover:bg-white/20 text-slate-200 text-[10px] font-mono flex items-center justify-center"
+                >
+                  + Folder
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setOpenFolder(null)}
+                  className="w-5 h-5 rounded-md bg-white/10 hover:bg-white/20 text-slate-300 text-[10px] flex items-center justify-center"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+
+            {addingAppToFolder ? (
+              <div className="max-h-48 overflow-y-auto space-y-1 pr-1">
+                {WINDOW_META_LIST.filter(
+                  (m) => m.id !== 'win-admin' && m.id !== 'win-icon-manager' && !openFolder.apps.some((a) => a.winId === m.id)
+                ).map((m) => (
+                  <button
+                    key={m.id}
+                    type="button"
+                    onClick={() => {
+                      const nextApps = [...openFolder.apps, { winId: m.id, name: m.shortTitle }];
+                      setFolderOverrides((prev) => {
+                        const isCustom = prev.custom.some((c) => c.id === openFolder.id);
+                        if (isCustom) {
+                          return {
+                            ...prev,
+                            custom: prev.custom.map((c) =>
+                              c.id === openFolder.id ? { ...c, apps: nextApps } : c
+                            ),
+                          };
+                        }
+                        return {
+                          ...prev,
+                          edits: {
+                            ...prev.edits,
+                            [openFolder.id]: {
+                              ...prev.edits[openFolder.id],
+                              apps: nextApps,
+                            },
+                          },
+                        };
+                      });
+                      setOpenFolder((prev) => (prev ? { ...prev, apps: nextApps } : null));
+                      setAddingAppToFolder(false);
+                    }}
+                    className="w-full px-2 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 border border-white/10 flex items-center gap-2 text-left text-xs font-mono text-slate-200"
+                  >
+                    <div className="w-6 h-6 rounded-md bg-slate-900/80 flex items-center justify-center shrink-0">
+                      {renderDefaultSvg(m.id)}
+                    </div>
+                    <span className="truncate">{m.shortTitle}</span>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-2">
+                {openFolder.apps.map((app, idx) => (
+                  <div key={app.winId} className="relative group/item">
+                    <button
+                      type="button"
+                      style={{ animationDelay: `${idx * 45}ms` }}
+                      onClick={() => {
+                        openWindow(app.winId);
+                        setOpenFolder(null);
+                      }}
+                      className="w-full folder-item-pop p-2.5 rounded-xl bg-white/5 hover:bg-white/15 border border-white/10 hover:border-cyan-400/50 flex flex-col items-center gap-1.5 transition-all hover:scale-105 active:scale-90"
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-slate-900/80 border border-white/15 flex items-center justify-center">
+                        {renderDefaultSvg(app.winId)}
+                      </div>
+                      <span className="text-[11px] font-mono font-semibold text-white truncate max-w-full">
+                        {app.name}
+                      </span>
+                    </button>
+                    {openFolder.apps.length > 1 && (
+                      <button
+                        type="button"
+                        title="Remove from folder"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const nextApps = openFolder.apps.filter((a) => a.winId !== app.winId);
+                          setFolderOverrides((prev) => {
+                            const isCustom = prev.custom.some((c) => c.id === openFolder.id);
+                            if (isCustom) {
+                              return {
+                                ...prev,
+                                custom: prev.custom.map((c) =>
+                                  c.id === openFolder.id ? { ...c, apps: nextApps } : c
+                                ),
+                              };
+                            }
+                            return {
+                              ...prev,
+                              edits: {
+                                ...prev.edits,
+                                [openFolder.id]: {
+                                  ...prev.edits[openFolder.id],
+                                  apps: nextApps,
+                                },
+                              },
+                            };
+                          });
+                          setOpenFolder((prev) => (prev ? { ...prev, apps: nextApps } : null));
+                        }}
+                        className="opacity-0 group-hover/item:opacity-100 absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-[9px] font-bold flex items-center justify-center shadow transition-opacity"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
             </div>
           </div>
         )}

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 export const BioHubApp: React.FC = () => {
-  const realUrl = 'https://theastrobruh.github.io/BioHub/';
+  const realUrl = 'https://theastrobruh.github.io/bio-hub/';
   const displayDomain = 'biohub.app';
   const [reloadKey, setReloadKey] = useState(0);
 

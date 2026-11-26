@@ -1053,7 +1053,7 @@ export default function App() {
               top: isMobile ? '50%' : openFolder.y,
               transform: isMobile ? 'translate(-50%, -50%)' : 'none',
             }}
-            className="fixed z-50 w-56 glass-window border border-white/25 rounded-2xl p-3 shadow-2xl bg-slate-950/90 backdrop-blur-2xl window-anim-open"
+            className="fixed z-50 w-56 glass-window border border-white/25 rounded-2xl p-3 shadow-2xl bg-slate-950/90 backdrop-blur-2xl folder-anim-open"
           >
             <div className="flex items-center justify-between pb-2 mb-2.5 border-b border-white/10">
               <span className="text-xs font-mono font-bold text-slate-200 truncate">
@@ -1068,15 +1068,16 @@ export default function App() {
               </button>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              {openFolder.apps.map((app) => (
+              {openFolder.apps.map((app, idx) => (
                 <button
                   key={app.winId}
                   type="button"
+                  style={{ animationDelay: `${idx * 45}ms` }}
                   onClick={() => {
                     openWindow(app.winId);
                     setOpenFolder(null);
                   }}
-                  className="p-2.5 rounded-xl bg-white/5 hover:bg-white/15 border border-white/10 hover:border-cyan-400/50 flex flex-col items-center gap-1.5 transition-all active:scale-95"
+                  className="folder-item-pop p-2.5 rounded-xl bg-white/5 hover:bg-white/15 border border-white/10 hover:border-cyan-400/50 flex flex-col items-center gap-1.5 transition-all hover:scale-105 active:scale-90"
                 >
                   <div className="w-10 h-10 rounded-xl bg-slate-900/80 border border-white/15 flex items-center justify-center">
                     {renderDefaultSvg(app.winId)}

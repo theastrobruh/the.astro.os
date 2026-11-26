@@ -1,4 +1,4 @@
-import React, { useId, useRef } from 'react';
+import React, { useId, useRef, useState } from 'react';
 import { DesktopIconConfig, PhysicsBody, WindowId } from '../types/os';
 import { PointerVelocityTracker } from '../engine/physics';
 import { astroSound } from '../engine/sound';
@@ -125,6 +125,7 @@ export const DesktopIconItem: React.FC<DesktopIconItemProps> = ({
   onDragMoveBody,
   onDragEndBody,
 }) => {
+  const [isTapped, setIsTapped] = useState(false);
   const trackerRef = useRef(new PointerVelocityTracker());
   const dragRef = useRef({
     down: false,
@@ -222,6 +223,8 @@ export const DesktopIconItem: React.FC<DesktopIconItemProps> = ({
       onDragEndBody(icon.id, vx, vy);
     } else {
       astroSound.playWindowPop(true);
+      setIsTapped(true);
+      window.setTimeout(() => setIsTapped(false), 380);
       if (icon.isFolder && onOpenFolder) {
         onOpenFolder(icon, e.currentTarget.getBoundingClientRect());
       } else {
@@ -282,7 +285,9 @@ export const DesktopIconItem: React.FC<DesktopIconItemProps> = ({
     >
       <div
         style={{ width: iconSize, height: iconSize }}
-        className="relative rounded-2xl flex items-center justify-center bg-slate-900/55 border border-white/15 backdrop-blur-md shadow-lg group-hover:border-cyan-400/55 group-hover:shadow-[0_0_20px_rgba(0,240,255,0.22)] transition-all overflow-hidden pointer-events-none"
+        className={`relative rounded-2xl flex items-center justify-center bg-slate-900/55 border border-white/15 backdrop-blur-md shadow-lg group-hover:border-cyan-400/55 group-hover:shadow-[0_0_20px_rgba(0,240,255,0.28)] group-hover:scale-110 group-hover:-translate-y-1 group-active:scale-90 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] overflow-hidden pointer-events-none ${
+          isTapped ? 'animate-icon-tap' : ''
+        }`}
       >
         {icon.customImage ? (
           <img

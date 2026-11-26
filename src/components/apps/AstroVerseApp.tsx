@@ -36,7 +36,7 @@ export const AstroVerseApp: React.FC<AstroVerseAppProps> = ({ onOpenWindow }) =>
       code: 'BH',
       title: 'BioHub',
       subtitle: 'Personal bio & centralized links',
-      url: 'https://theastrobruh.github.io/BioHub/',
+      url: 'https://theastrobruh.github.io/bio-hub/',
       accent: 'text-pink-300 bg-pink-500/15 border-pink-400/35',
       internalWin: 'win-biohub',
     },

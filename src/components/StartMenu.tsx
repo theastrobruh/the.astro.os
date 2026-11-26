@@ -283,8 +283,8 @@ export const StartMenu: React.FC<StartMenuProps> = ({
         </div>
       </div>
 
-      {/* Right Column: Live Widgets */}
-      <div className="w-full md:w-64 border-t md:border-t-0 md:border-l border-white/10 pt-3 md:pt-0 md:pl-4 flex flex-col gap-2.5 shrink-0">
+      {/* Right Column: Live Widgets (Desktop & Tablet only) */}
+      <div className="hidden md:flex w-full md:w-64 border-t md:border-t-0 md:border-l border-white/10 pt-3 md:pt-0 md:pl-4 flex-col gap-2.5 shrink-0">
         <span className="text-[11px] font-mono font-bold text-slate-400">Desktop Live Widgets</span>
 
         <button
